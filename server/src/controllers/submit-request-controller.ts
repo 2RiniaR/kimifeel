@@ -1,8 +1,8 @@
 import { Controller } from "~/controller";
 import { ClientUser } from "~/models/context/client-user";
-import { SubmitRequestAction, SubmitRequestParams } from "~/discord/actions/submit-request-action";
+import { SubmitRequestSession, SubmitRequestParams } from "~/discord/actions/submit-request-action";
 
-export class SubmitRequestController extends Controller<SubmitRequestAction> {
+export class SubmitRequestController extends Controller<SubmitRequestSession> {
   requireUsersDiscordId = (ctx: SubmitRequestParams) => [ctx.client, ctx.target];
 
   async action(ctx: SubmitRequestParams, client: ClientUser) {

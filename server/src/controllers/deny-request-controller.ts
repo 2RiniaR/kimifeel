@@ -1,8 +1,8 @@
 import { Controller } from "~/controller";
 import { ClientUser } from "~/models/context/client-user";
-import { DenyRequestAction, DenyRequestParams } from "~/discord/actions/deny-request-action";
+import { DenyRequestSession, DenyRequestParams } from "~/discord/actions/deny-request-action";
 
-export class DenyRequestController extends Controller<DenyRequestAction> {
+export class DenyRequestController extends Controller<DenyRequestSession> {
   requireUsersDiscordId = (ctx: DenyRequestParams) => [ctx.client];
 
   async action(ctx: DenyRequestParams, client: ClientUser) {

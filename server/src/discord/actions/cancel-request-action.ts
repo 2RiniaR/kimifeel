@@ -1,14 +1,14 @@
 import { RequestEmbed } from "../views/request-embed";
 import { ErrorEmbed } from "../views/error-embed";
-import { Action, ActionBaseParams, ContextOf, EventOf } from "~/discord/action";
+import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
 import { ReactionAddEvent, ReactionAddEventContext } from "~/discord/events/reaction-add-event";
-import { Endpoint } from "~/discord/endpoint";
+import { Action } from "~/discord/action";
 
 export type CancelRequestParams = ActionBaseParams & {
   index: number;
 };
 
-export class CancelRequestAction extends Action<ReactionAddEventContext, CancelRequestParams> {
+export class CancelRequestSession extends Session<ReactionAddEventContext, CancelRequestParams> {
   async fetchParams() {
     await Promise.resolve();
     if (this.context.message.embeds.length === 0) return;
@@ -28,13 +28,13 @@ export class CancelRequestAction extends Action<ReactionAddEventContext, CancelR
   }
 }
 
-export class CancelRequestEndpoint extends Endpoint<CancelRequestAction> {
-  protected defineEvent(): EventOf<CancelRequestAction> {
+export class CancelRequestAction extends Action<CancelRequestSession> {
+  protected defineEvent(): EventOf<CancelRequestSession> {
     return new ReactionAddEvent(["⛔"]);
   }
 
-  protected async onEvent(context: ContextOf<CancelRequestAction>): Promise<void> {
+  protected async onEvent(context: ContextOf<CancelRequestSession>): Promise<void> {
     if (!this.listener) return;
-    await new CancelRequestAction(context, this.listener).run();
+    await new CancelRequestSession(context, this.listener).run();
   }
 }

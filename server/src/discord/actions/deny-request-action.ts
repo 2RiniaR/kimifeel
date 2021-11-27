@@ -1,14 +1,14 @@
 import { RequestEmbed } from "../views/request-embed";
 import { ErrorEmbed } from "../views/error-embed";
-import { Action, ActionBaseParams, ContextOf, EventOf } from "~/discord/action";
+import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
 import { ReactionAddEvent, ReactionAddEventContext } from "~/discord/events/reaction-add-event";
-import { Endpoint } from "~/discord/endpoint";
+import { Action } from "~/discord/action";
 
 export type DenyRequestParams = ActionBaseParams & {
   index: number;
 };
 
-export class DenyRequestAction extends Action<ReactionAddEventContext, DenyRequestParams> {
+export class DenyRequestSession extends Session<ReactionAddEventContext, DenyRequestParams> {
   async fetchParams() {
     await Promise.resolve();
     if (this.context.message.embeds.length === 0) return;
@@ -28,13 +28,13 @@ export class DenyRequestAction extends Action<ReactionAddEventContext, DenyReque
   }
 }
 
-export class DenyRequestEndpoint extends Endpoint<DenyRequestAction> {
-  protected defineEvent(): EventOf<DenyRequestAction> {
+export class DenyRequestAction extends Action<DenyRequestSession> {
+  protected defineEvent(): EventOf<DenyRequestSession> {
     return new ReactionAddEvent(["❌"]);
   }
 
-  protected async onEvent(context: ContextOf<DenyRequestAction>): Promise<void> {
+  protected async onEvent(context: ContextOf<DenyRequestSession>): Promise<void> {
     if (!this.listener) return;
-    await new DenyRequestAction(context, this.listener).run();
+    await new DenyRequestSession(context, this.listener).run();
   }
 }

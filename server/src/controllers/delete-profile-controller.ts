@@ -1,8 +1,8 @@
 import { Controller } from "~/controller";
 import { ClientUser } from "~/models/context/client-user";
-import { DeleteProfileAction, DeleteProfileParams } from "~/discord/actions/delete-profile-action";
+import { DeleteProfileSession, DeleteProfileParams } from "~/discord/actions/delete-profile-action";
 
-export class DeleteProfileController extends Controller<DeleteProfileAction> {
+export class DeleteProfileController extends Controller<DeleteProfileSession> {
   requireUsersDiscordId = (ctx: DeleteProfileParams) => [ctx.client];
 
   async action(ctx: DeleteProfileParams, client: ClientUser) {

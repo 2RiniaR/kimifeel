@@ -1,14 +1,14 @@
 import { RequestEmbed } from "../views/request-embed";
 import { ErrorEmbed } from "../views/error-embed";
-import { Action, ActionBaseParams, ContextOf, EventOf } from "~/discord/action";
+import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
 import { ReactionAddEvent, ReactionAddEventContext } from "~/discord/events/reaction-add-event";
-import { Endpoint } from "~/discord/endpoint";
+import { Action } from "~/discord/action";
 
 export type AcceptRequestParams = ActionBaseParams & {
   index: number;
 };
 
-export class AcceptRequestAction extends Action<ReactionAddEventContext, AcceptRequestParams> {
+export class AcceptRequestSession extends Session<ReactionAddEventContext, AcceptRequestParams> {
   async fetchParams() {
     await Promise.resolve();
     if (this.context.message.embeds.length === 0) return;
@@ -28,13 +28,13 @@ export class AcceptRequestAction extends Action<ReactionAddEventContext, AcceptR
   }
 }
 
-export class AcceptRequestEndpoint extends Endpoint<AcceptRequestAction> {
-  protected defineEvent(): EventOf<AcceptRequestAction> {
+export class AcceptRequestAction extends Action<AcceptRequestSession> {
+  protected defineEvent(): EventOf<AcceptRequestSession> {
     return new ReactionAddEvent(["✅"]);
   }
 
-  protected async onEvent(context: ContextOf<AcceptRequestAction>): Promise<void> {
+  protected async onEvent(context: ContextOf<AcceptRequestSession>): Promise<void> {
     if (!this.listener) return;
-    await new AcceptRequestAction(context, this.listener).run();
+    await new AcceptRequestSession(context, this.listener).run();
   }
 }

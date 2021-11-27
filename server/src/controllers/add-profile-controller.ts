@@ -1,8 +1,8 @@
 import { Controller } from "~/controller";
 import { ClientUser } from "~/models/context/client-user";
-import { AddProfileAction, AddProfileParams } from "~/discord/actions/add-profile-action";
+import { AddProfileSession, AddProfileParams } from "~/discord/actions/add-profile-action";
 
-export class AddProfileController extends Controller<AddProfileAction> {
+export class AddProfileController extends Controller<AddProfileSession> {
   requireUsersDiscordId = (ctx: AddProfileParams) => [ctx.client];
 
   async action(ctx: AddProfileParams, client: ClientUser) {

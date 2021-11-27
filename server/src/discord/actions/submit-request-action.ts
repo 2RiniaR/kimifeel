@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js";
 import { ErrorEmbed } from "../views/error-embed";
-import { Action, ActionBaseParams, ContextOf, EventOf } from "~/discord/action";
+import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
 import { SlashCommandEvent, SlashCommandEventContext } from "~/discord/events/slash-command-event";
 import { RequestEmbed } from "~/discord/views/request-embed";
-import { Endpoint } from "~/discord/endpoint";
+import { Action } from "~/discord/action";
 
 export type SubmitRequestParams = ActionBaseParams & {
   target: string;
@@ -14,7 +14,7 @@ export type SubmitRequestResult = {
   index: number;
 };
 
-export class SubmitRequestAction extends Action<SlashCommandEventContext, SubmitRequestParams, SubmitRequestResult> {
+export class SubmitRequestSession extends Session<SlashCommandEventContext, SubmitRequestParams, SubmitRequestResult> {
   private target!: GuildMember;
   private content!: string;
 
@@ -58,13 +58,13 @@ export class SubmitRequestAction extends Action<SlashCommandEventContext, Submit
   }
 }
 
-export class SubmitRequestEndpoint extends Endpoint<SubmitRequestAction> {
-  protected defineEvent(): EventOf<SubmitRequestAction> {
+export class SubmitRequestAction extends Action<SubmitRequestSession> {
+  protected defineEvent(): EventOf<SubmitRequestSession> {
     return new SlashCommandEvent("request-profile");
   }
 
-  protected async onEvent(context: ContextOf<SubmitRequestAction>): Promise<void> {
+  protected async onEvent(context: ContextOf<SubmitRequestSession>): Promise<void> {
     if (!this.listener) return;
-    await new SubmitRequestAction(context, this.listener).run();
+    await new SubmitRequestSession(context, this.listener).run();
   }
 }

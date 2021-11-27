@@ -1,13 +1,13 @@
 import { ErrorEmbed } from "../views/error-embed";
-import { Action, ActionBaseParams, ContextOf, EventOf } from "~/discord/action";
-import { Endpoint } from "~/discord/endpoint";
+import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
+import { Action } from "~/discord/action";
 import { SlashCommandEvent, SlashCommandEventContext } from "~/discord/events/slash-command-event";
 
 export type AddProfileParams = ActionBaseParams & {
   content: string;
 };
 
-export class AddProfileAction extends Action<SlashCommandEventContext, AddProfileParams> {
+export class AddProfileSession extends Session<SlashCommandEventContext, AddProfileParams> {
   content!: string;
 
   async fetchParams() {
@@ -33,13 +33,13 @@ export class AddProfileAction extends Action<SlashCommandEventContext, AddProfil
   }
 }
 
-export class AddProfileEndpoint extends Endpoint<AddProfileAction> {
-  protected defineEvent(): EventOf<AddProfileAction> {
+export class AddProfileAction extends Action<AddProfileSession> {
+  protected defineEvent(): EventOf<AddProfileSession> {
     return new SlashCommandEvent("add-profile");
   }
 
-  protected async onEvent(context: ContextOf<AddProfileAction>): Promise<void> {
+  protected async onEvent(context: ContextOf<AddProfileSession>): Promise<void> {
     if (!this.listener) return;
-    await new AddProfileAction(context, this.listener).run();
+    await new AddProfileSession(context, this.listener).run();
   }
 }

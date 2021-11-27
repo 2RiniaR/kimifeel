@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js";
 import { ProfileListElement, ProfileListEmbed } from "../views/profile-list-embed";
 import { ErrorEmbed } from "../views/error-embed";
-import { Action, ActionBaseParams, ContextOf, EventOf } from "~/discord/action";
+import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
 import { SlashCommandEvent, SlashCommandEventContext } from "~/discord/events/slash-command-event";
-import { Endpoint } from "~/discord/endpoint";
+import { Action } from "~/discord/action";
 
 export type ShowProfilesParams = ActionBaseParams & {
   target: string;
@@ -11,7 +11,7 @@ export type ShowProfilesParams = ActionBaseParams & {
 
 export type ShowProfilesResult = ProfileListElement[];
 
-export class ShowProfilesAction extends Action<SlashCommandEventContext, ShowProfilesParams, ShowProfilesResult> {
+export class ShowProfilesSession extends Session<SlashCommandEventContext, ShowProfilesParams, ShowProfilesResult> {
   private target!: GuildMember;
 
   async fetchParams() {
@@ -42,13 +42,13 @@ export class ShowProfilesAction extends Action<SlashCommandEventContext, ShowPro
   }
 }
 
-export class ShowProfilesEndpoint extends Endpoint<ShowProfilesAction> {
-  protected defineEvent(): EventOf<ShowProfilesAction> {
+export class ShowProfilesAction extends Action<ShowProfilesSession> {
+  protected defineEvent(): EventOf<ShowProfilesSession> {
     return new SlashCommandEvent("show-profile");
   }
 
-  protected async onEvent(context: ContextOf<ShowProfilesAction>): Promise<void> {
+  protected async onEvent(context: ContextOf<ShowProfilesSession>): Promise<void> {
     if (!this.listener) return;
-    await new ShowProfilesAction(context, this.listener).run();
+    await new ShowProfilesSession(context, this.listener).run();
   }
 }

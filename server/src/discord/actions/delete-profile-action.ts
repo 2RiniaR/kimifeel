@@ -1,13 +1,13 @@
 import { ErrorEmbed } from "../views/error-embed";
-import { Action, ActionBaseParams, ContextOf, EventOf } from "~/discord/action";
-import { Endpoint } from "~/discord/endpoint";
+import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
+import { Action } from "~/discord/action";
 import { SlashCommandEvent, SlashCommandEventContext } from "~/discord/events/slash-command-event";
 
 export type DeleteProfileParams = ActionBaseParams & {
   index: number;
 };
 
-export class DeleteProfileAction extends Action<SlashCommandEventContext, DeleteProfileParams> {
+export class DeleteProfileSession extends Session<SlashCommandEventContext, DeleteProfileParams> {
   index!: number;
 
   async fetchParams() {
@@ -33,13 +33,13 @@ export class DeleteProfileAction extends Action<SlashCommandEventContext, Delete
   }
 }
 
-export class DeleteProfileEndpoint extends Endpoint<DeleteProfileAction> {
-  protected defineEvent(): EventOf<DeleteProfileAction> {
+export class DeleteProfileAction extends Action<DeleteProfileSession> {
+  protected defineEvent(): EventOf<DeleteProfileSession> {
     return new SlashCommandEvent("delete-profile");
   }
 
-  protected async onEvent(context: ContextOf<DeleteProfileAction>): Promise<void> {
+  protected async onEvent(context: ContextOf<DeleteProfileSession>): Promise<void> {
     if (!this.listener) return;
-    await new DeleteProfileAction(context, this.listener).run();
+    await new DeleteProfileSession(context, this.listener).run();
   }
 }

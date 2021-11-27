@@ -8,9 +8,6 @@ export type DenyRequestParams = ActionBaseParams & {
   index: number;
 };
 
-export class ForbiddenError extends Error {}
-export class NotFoundError extends Error {}
-
 export class DenyRequestAction extends Action<ReactionAddEventContext, DenyRequestParams> {
   async fetchParams() {
     await Promise.resolve();

@@ -23,7 +23,7 @@ export class Profile extends ContextModel implements ProfileIdentifier, Partial<
   }
 
   public async fetch() {
-    const clone = await this.repositories.profiles.getById(this.target.id, this.id);
+    const clone = await this.repositories.profiles.getById(this.context, this.target.id, this.id);
     if (!clone) throw new NotFoundError();
     this.setProps(clone);
   }

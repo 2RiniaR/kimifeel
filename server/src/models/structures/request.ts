@@ -24,7 +24,7 @@ export class Request extends ContextModel implements RequestIdentifier, Partial<
   }
 
   public async fetch() {
-    const clone = await this.repositories.requests.getById(this.target.id, this.id);
+    const clone = await this.repositories.requests.getById(this.context, this.target.id, this.id);
     if (!clone) throw new NotFoundError();
     this.setProps(clone);
   }
@@ -35,7 +35,7 @@ export class Request extends ContextModel implements RequestIdentifier, Partial<
 
     if (this.context.clientUser.id !== this.target.id) throw new ForbiddenError();
     await this.repositories.requests.delete(this);
-    await this.repositories.profiles.create({
+    await this.repositories.profiles.create(this.context, {
       content: this.content,
       author: this.requester,
       target: this.target

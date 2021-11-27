@@ -11,12 +11,8 @@ export class ClientUser implements UserIdentifier, UserProps {
   public constructor(props: UserIdentifier & UserProps) {
     this.id = props.id;
     this.discordId = props.discordId;
-    console.log("ClientUser-1");
     this.context = new Context(this);
-    console.log("ClientUser-2");
     this.user = new User(this.context, this);
-    console.log("ClientUser-3");
     this.services = new ContextServices(this.context);
-    console.log("ClientUser-4");
   }
 }

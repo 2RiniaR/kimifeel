@@ -20,13 +20,19 @@ export abstract class Action<
 
   public async run(): Promise<void> {
     const params = await this.fetchParams();
-    if (!params) return;
+    if (!params) {
+      await this.onFailed(Error());
+      return;
+    }
+
     try {
       this.result = await this.listener.onAction(params);
     } catch (error) {
+      console.error(error);
       await this.onFailed(error);
       return;
     }
+
     await this.onSucceed();
   }
 }

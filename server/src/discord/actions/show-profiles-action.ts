@@ -17,7 +17,7 @@ export class ShowProfilesAction extends Action<SlashCommandEventContext, ShowPro
   async fetchParams() {
     await Promise.resolve();
 
-    const target = this.context.interaction.options.getMember("member");
+    const target = this.context.interaction.options.getMember("target");
     if (!(target instanceof GuildMember)) return;
     this.target = target;
 

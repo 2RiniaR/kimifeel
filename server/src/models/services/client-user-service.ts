@@ -5,6 +5,8 @@ import { ClientUser } from "../context";
 
 export class ClientUserService {
   public async registerIfNotExist(discordId: string): Promise<ClientUser | null> {
+    const user = await this.getByDiscordId(discordId);
+    if (user) return null;
     return UserRepository.register({ discordId: discordId });
   }
 

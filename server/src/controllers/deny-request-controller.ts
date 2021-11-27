@@ -1,6 +1,5 @@
 import { Controller } from "~/controller";
 import { ClientUser } from "~/models/context/client-user";
-import { NotFoundError } from "~/models/errors/not-found-error";
 import { DenyRequestAction, DenyRequestParams } from "~/discord/actions/deny-request-action";
 
 export class DenyRequestController extends Controller<DenyRequestAction> {
@@ -8,7 +7,7 @@ export class DenyRequestController extends Controller<DenyRequestAction> {
 
   async action(ctx: DenyRequestParams, client: ClientUser) {
     const request = await client.services.requests.getByIndex(ctx.index);
-    if (!request) throw new NotFoundError();
+    if (!request) throw Error();
     await request.deny();
   }
 }

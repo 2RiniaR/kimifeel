@@ -9,11 +9,8 @@ export class User extends ContextModel implements UserIdentifier, Partial<UserPr
   public discordId?: string;
 
   public constructor(ctx: Context, props: UserIdentifier & Partial<UserProps>) {
-    console.log("User-1");
     super(ctx);
-    console.log("User-2");
     this.id = props.id;
-    console.log("User-3");
     this.setProps(props);
   }
 
@@ -21,15 +18,15 @@ export class User extends ContextModel implements UserIdentifier, Partial<UserPr
     this.discordId = props.discordId;
   }
 
-  private async fetch() {
-    const clone = await this.repositories.users.getById(this.id);
+  public async fetch() {
+    const clone = await this.repositories.users.getById(this.context, this.id);
     if (!clone) throw new NotFoundError();
     this.setProps(clone);
   }
 
   public async submitRequest(props: SubmitRequestProps): Promise<Request> {
     if (this.context.clientUser.id === this.id) throw new ForbiddenError();
-    return await this.repositories.requests.create({
+    return await this.repositories.requests.create(this.context, {
       target: this,
       content: props.content,
       requester: this.context.clientUser.user
@@ -38,7 +35,7 @@ export class User extends ContextModel implements UserIdentifier, Partial<UserPr
 
   public async addProfile(props: AddProfileProps) {
     if (this.context.clientUser.id !== this.id) throw new ForbiddenError();
-    await this.repositories.profiles.create({
+    await this.repositories.profiles.create(this.context, {
       target: this,
       author: this,
       content: props.content
@@ -46,7 +43,7 @@ export class User extends ContextModel implements UserIdentifier, Partial<UserPr
   }
 
   public async getProfiles(): Promise<Profile[]> {
-    return await this.repositories.profiles.getAll({ user: this });
+    return await this.repositories.profiles.getAll(this.context, { user: this });
   }
 }
 

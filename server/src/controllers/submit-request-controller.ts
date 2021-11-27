@@ -1,6 +1,5 @@
 import { Controller } from "~/controller";
 import { ClientUser } from "~/models/context/client-user";
-import { NotFoundError } from "~/models/errors/not-found-error";
 import { SubmitRequestAction, SubmitRequestParams } from "~/discord/actions/submit-request-action";
 
 export class SubmitRequestController extends Controller<SubmitRequestAction> {
@@ -8,7 +7,7 @@ export class SubmitRequestController extends Controller<SubmitRequestAction> {
 
   async action(ctx: SubmitRequestParams, client: ClientUser) {
     const target = await client.services.users.getByDiscordId(ctx.target);
-    if (!target) throw new NotFoundError();
+    if (!target) throw Error();
 
     const request = await target.submitRequest({ content: ctx.content });
 

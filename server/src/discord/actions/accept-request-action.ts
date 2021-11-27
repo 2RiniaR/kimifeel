@@ -8,9 +8,6 @@ export type AcceptRequestParams = ActionBaseParams & {
   index: number;
 };
 
-export class ForbiddenError extends Error {}
-export class NotFoundError extends Error {}
-
 export class AcceptRequestAction extends Action<ReactionAddEventContext, AcceptRequestParams> {
   async fetchParams() {
     await Promise.resolve();

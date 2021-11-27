@@ -7,16 +7,13 @@ export type DeleteProfileParams = ActionBaseParams & {
   index: number;
 };
 
-export class ForbiddenError extends Error {}
-export class NotFoundError extends Error {}
-
 export class DeleteProfileAction extends Action<SlashCommandEventContext, DeleteProfileParams> {
   index!: number;
 
   async fetchParams() {
     await Promise.resolve();
 
-    const index = this.context.interaction.options.getNumber("index");
+    const index = this.context.interaction.options.getInteger("number");
     if (!index) return;
     this.index = index;
 

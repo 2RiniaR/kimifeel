@@ -5,35 +5,38 @@ import { User } from "../structures/user";
 import { firestore } from "firebase-admin";
 import { db } from "~/firebase";
 import { UserDocument } from "~/models/repositories/documents/user-document";
-import { ContextModel } from "../context";
+import { Context } from "~/models/context";
 
-export class RequestRepository extends ContextModel {
-  public build(snapshot: firestore.DocumentSnapshot): Request | null {
+export class RequestRepository {
+  public build(context: Context, snapshot: firestore.DocumentSnapshot): Request | null {
     if (!snapshot?.exists) return null;
     const doc = snapshot.data() as RequestDocument;
-    return new Request(this.context, { ...this.toProps(doc), ...this.toIdentifier(snapshot) });
+    return new Request(context, {
+      ...RequestRepository.toProps(context, doc),
+      ...RequestRepository.toIdentifier(context, snapshot)
+    });
   }
 
-  public buildFirst(snapshot: firestore.QuerySnapshot): Request | null {
+  public buildFirst(context: Context, snapshot: firestore.QuerySnapshot): Request | null {
     if (snapshot.empty) return null;
-    return this.build(snapshot.docs[0]);
+    return this.build(context, snapshot.docs[0]);
   }
 
   private static getDocumentReference(request: Request) {
     return DocumentScheme.request(request.target.id, request.id);
   }
 
-  private toIdentifier(snapshot: firestore.DocumentSnapshot): RequestIdentifier {
+  private static toIdentifier(context: Context, snapshot: firestore.DocumentSnapshot): RequestIdentifier {
     return {
       id: snapshot.id,
-      target: new User(this.context, { id: snapshot.ref.id })
+      target: new User(context, { id: snapshot.ref.id })
     };
   }
 
-  private toProps(doc: RequestDocument): RequestProps {
+  private static toProps(context: Context, doc: RequestDocument): RequestProps {
     return {
       content: doc.content,
-      requester: new User(this.context, { id: doc.requesterUserId }),
+      requester: new User(context, { id: doc.requesterUserId }),
       index: doc.index
     };
   }
@@ -46,30 +49,34 @@ export class RequestRepository extends ContextModel {
     };
   }
 
-  async getById(userId: string, requestId: string): Promise<Request | null> {
+  async getById(context: Context, userId: string, requestId: string): Promise<Request | null> {
     const snapshot = await DocumentScheme.request(userId, requestId).get();
-    return this.build(snapshot);
+    return this.build(context, snapshot);
   }
 
-  public async getByIndex(index: number): Promise<Request | null> {
-    const snapshot = await DocumentScheme.requests(this.context.clientUser.id).where("index", "==", index).get();
-    return this.repositories.requests.buildFirst(snapshot);
+  public async getByIndex(context: Context, index: number): Promise<Request | null> {
+    const snapshot = await DocumentScheme.requests(context.clientUser.id).where("index", "==", index).get();
+    return this.buildFirst(context, snapshot);
   }
 
-  async create(props: CreateProps): Promise<Request> {
-    const requestDocRef = await db.runTransaction(async (transaction) => {
-      const userSnapshot = await transaction.get(DocumentScheme.user(props.target.id));
+  async create(context: Context, props: CreateProps): Promise<Request> {
+    const id = await db.runTransaction(async (transaction) => {
+      const userDocRef = DocumentScheme.user(props.target.id);
+      const userSnapshot = await transaction.get(userDocRef);
       if (!userSnapshot?.exists) throw Error();
       const userDoc = userSnapshot.data() as UserDocument;
+
       const requestDoc = RequestRepository.toDocument({ ...props, index: userDoc.requestIndex });
       const requestDocRef = DocumentScheme.requests(props.target.id).doc();
       transaction.create(requestDocRef, requestDoc);
-      return requestDocRef;
+
+      const afterUserDoc: UserDocument = { ...userDoc, requestIndex: userDoc.requestIndex + 1 };
+      transaction.update(userDocRef, afterUserDoc);
+
+      return requestDocRef.id;
     });
-    return new Request(this.context, {
-      ...props,
-      id: requestDocRef.id
-    });
+
+    return new Request(context, { ...props, id });
   }
 
   async delete(request: Request) {

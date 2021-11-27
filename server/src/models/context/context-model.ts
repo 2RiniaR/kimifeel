@@ -6,7 +6,6 @@ export abstract class ContextModel {
 
   public constructor(ctx: Context) {
     this.context = ctx;
-    console.log("ContextModel-1");
-    this.repositories = new ContextRepositories(ctx);
+    this.repositories = new ContextRepositories();
   }
 }

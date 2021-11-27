@@ -8,9 +8,6 @@ export type CancelRequestParams = ActionBaseParams & {
   index: number;
 };
 
-export class ForbiddenError extends Error {}
-export class NotFoundError extends Error {}
-
 export class CancelRequestAction extends Action<ReactionAddEventContext, CancelRequestParams> {
   async fetchParams() {
     await Promise.resolve();

@@ -7,9 +7,6 @@ export type AddProfileParams = ActionBaseParams & {
   content: string;
 };
 
-export class ForbiddenError extends Error {}
-export class NotFoundError extends Error {}
-
 export class AddProfileAction extends Action<SlashCommandEventContext, AddProfileParams> {
   content!: string;
 

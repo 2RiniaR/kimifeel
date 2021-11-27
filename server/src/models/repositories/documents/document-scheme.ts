@@ -14,10 +14,6 @@ export namespace DocumentScheme {
     return user(userId).collection("requests");
   }
 
-  export function requestsGroup() {
-    return db.collectionGroup("requests");
-  }
-
   export function request(userId: string, requestId: string) {
     return requests(userId).doc(requestId);
   }
@@ -27,6 +23,6 @@ export namespace DocumentScheme {
   }
 
   export function profile(userId: string, profileId: string) {
-    return requests(userId).doc(profileId);
+    return profiles(userId).doc(profileId);
   }
 }

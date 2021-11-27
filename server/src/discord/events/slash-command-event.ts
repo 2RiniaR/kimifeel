@@ -9,10 +9,10 @@ export type SlashCommandEventContext = {
 
 export class SlashCommandEvent extends Event<SlashCommandEventContext> {
   commandName: string;
-  subCommandName: string;
+  subCommandName?: string;
   allowBot: boolean;
 
-  constructor(commandName: string, subCommandName: string, allowBot = false) {
+  constructor(commandName: string, subCommandName: string | undefined = undefined, allowBot = false) {
     super();
     this.commandName = commandName;
     this.subCommandName = subCommandName;
@@ -24,7 +24,7 @@ export class SlashCommandEvent extends Event<SlashCommandEventContext> {
       if (
         !interaction.isCommand() ||
         interaction.commandName !== this.commandName ||
-        interaction.options.getSubcommand() !== this.subCommandName ||
+        (this.subCommandName && interaction.options.getSubcommand() !== this.subCommandName) ||
         !interaction.channel ||
         !interaction.channel.isText() ||
         (!this.allowBot && interaction.user.bot)

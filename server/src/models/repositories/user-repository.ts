@@ -1,8 +1,7 @@
 import { User, UserProps } from "../structures/user";
-import { ContextModel } from "../context/context-model";
-import { ClientUser } from "../context/client-user";
 import { UserDocument } from "./documents/user-document";
 import { DocumentScheme } from "./documents/document-scheme";
+import { ContextModel, ClientUser } from "../context";
 import { firestore } from "firebase-admin";
 
 export class UserRepository extends ContextModel {

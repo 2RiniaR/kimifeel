@@ -1,5 +1,4 @@
-import { Context } from "./context";
-import { ContextRepositories } from "~/models/context/context-repositories";
+import { Context, ContextRepositories } from ".";
 
 export abstract class ContextModel {
   public context: Context;
@@ -7,6 +6,7 @@ export abstract class ContextModel {
 
   public constructor(ctx: Context) {
     this.context = ctx;
+    console.log("ContextModel-1");
     this.repositories = new ContextRepositories(ctx);
   }
 }

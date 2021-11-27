@@ -2,10 +2,10 @@ import { Profile, ProfileIdentifier, ProfileProps } from "../structures/profile"
 import { DocumentScheme } from "./documents/document-scheme";
 import { ProfileDocument } from "./documents/profile-document";
 import { User } from "../structures/user";
-import { ContextModel } from "../context/context-model";
 import { db } from "~/firebase";
 import { firestore } from "firebase-admin";
 import { UserDocument } from "~/models/repositories/documents/user-document";
+import { ContextModel } from "../context";
 
 export class ProfileRepository extends ContextModel {
   public build(snapshot: firestore.DocumentSnapshot): Profile | null {
@@ -66,6 +66,7 @@ export class ProfileRepository extends ContextModel {
   }
 
   public async create(props: CreateProps): Promise<Profile> {
+    console.log("repository-1");
     const profileDocRef = await db.runTransaction(async (transaction) => {
       const userSnapshot = await transaction.get(DocumentScheme.user(props.target.id));
       if (!userSnapshot?.exists) throw Error();
@@ -75,6 +76,7 @@ export class ProfileRepository extends ContextModel {
       transaction.create(profileDocRef, profileDoc);
       return profileDocRef;
     });
+    console.log("repository-2");
     return new Profile(this.context, {
       ...props,
       id: profileDocRef.id

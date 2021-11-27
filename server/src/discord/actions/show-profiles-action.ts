@@ -44,7 +44,7 @@ export class ShowProfilesAction extends Action<SlashCommandEventContext, ShowPro
 
 export class ShowProfilesEndpoint extends Endpoint<ShowProfilesAction> {
   protected defineEvent(): EventOf<ShowProfilesAction> {
-    return new SlashCommandEvent("profile", "show");
+    return new SlashCommandEvent("show-profile");
   }
 
   protected async onEvent(context: ContextOf<ShowProfilesAction>): Promise<void> {

@@ -38,7 +38,7 @@ export class AddProfileAction extends Action<SlashCommandEventContext, AddProfil
 
 export class AddProfileEndpoint extends Endpoint<AddProfileAction> {
   protected defineEvent(): EventOf<AddProfileAction> {
-    return new SlashCommandEvent("profile", "add");
+    return new SlashCommandEvent("add-profile");
   }
 
   protected async onEvent(context: ContextOf<AddProfileAction>): Promise<void> {

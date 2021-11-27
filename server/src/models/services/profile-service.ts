@@ -1,5 +1,5 @@
-import { ContextModel } from "../context/context-model";
 import { Profile } from "../structures/profile";
+import { ContextModel } from "../context";
 
 export class ProfileService extends ContextModel {
   public async getByIndex(index: number): Promise<Profile | null> {

@@ -1,6 +1,5 @@
 import { User } from "./user";
-import { ContextModel } from "../context/context-model";
-import { Context } from "~/models/context/context";
+import { Context, ContextModel } from "../context";
 import { NotFoundError } from "~/models/errors/not-found-error";
 
 export class Profile extends ContextModel implements ProfileIdentifier, Partial<ProfileProps> {

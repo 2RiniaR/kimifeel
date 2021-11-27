@@ -24,7 +24,8 @@ function getCommands(): object[] {
         {
           type: 3,
           name: "content",
-          description: "追加するプロフィールの内容"
+          description: "追加するプロフィールの内容",
+          required: true
         }
       ]
     },
@@ -35,7 +36,8 @@ function getCommands(): object[] {
         {
           type: 4,
           name: "number",
-          description: "削除するプロフィールの番号"
+          description: "削除するプロフィールの番号",
+          required: true
         }
       ]
     },
@@ -46,7 +48,8 @@ function getCommands(): object[] {
         {
           type: 6,
           name: "target",
-          description: "表示するユーザー"
+          description: "表示するユーザー",
+          required: true
         }
       ]
     },
@@ -57,12 +60,14 @@ function getCommands(): object[] {
         {
           type: 6,
           name: "target",
-          description: "プロフィールを追加する対象のユーザー"
+          description: "プロフィールを追加する対象のユーザー",
+          required: true
         },
         {
           type: 3,
           name: "content",
-          description: "追加するプロフィールの内容"
+          description: "追加するプロフィールの内容",
+          required: true
         }
       ]
     }

@@ -38,7 +38,7 @@ export class DeleteProfileAction extends Action<SlashCommandEventContext, Delete
 
 export class DeleteProfileEndpoint extends Endpoint<DeleteProfileAction> {
   protected defineEvent(): EventOf<DeleteProfileAction> {
-    return new SlashCommandEvent("profile", "add");
+    return new SlashCommandEvent("delete-profile");
   }
 
   protected async onEvent(context: ContextOf<DeleteProfileAction>): Promise<void> {

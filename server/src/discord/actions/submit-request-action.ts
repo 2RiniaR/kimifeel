@@ -60,7 +60,7 @@ export class SubmitRequestAction extends Action<SlashCommandEventContext, Submit
 
 export class SubmitRequestEndpoint extends Endpoint<SubmitRequestAction> {
   protected defineEvent(): EventOf<SubmitRequestAction> {
-    return new SlashCommandEvent("profile", "request");
+    return new SlashCommandEvent("request-profile");
   }
 
   protected async onEvent(context: ContextOf<SubmitRequestAction>): Promise<void> {

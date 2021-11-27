@@ -1,7 +1,7 @@
+import { Context } from ".";
 import { UserService } from "~/models/services/user-service";
 import { ProfileService } from "~/models/services/profile-service";
 import { RequestService } from "~/models/services/request-service";
-import { Context } from "./context";
 
 export class ContextServices {
   users: UserService;

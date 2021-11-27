@@ -1,4 +1,4 @@
-import { ClientUser } from "./client-user";
+import { ClientUser } from ".";
 
 export class Context {
   public readonly clientUser: ClientUser;

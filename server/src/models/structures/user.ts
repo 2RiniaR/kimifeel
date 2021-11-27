@@ -1,7 +1,6 @@
-import { ContextModel } from "../context/context-model";
 import { Request } from "./request";
 import { Profile } from "./profile";
-import { Context } from "~/models/context/context";
+import { Context, ContextModel } from "../context";
 import { NotFoundError } from "~/models/errors/not-found-error";
 import { ForbiddenError } from "~/models/errors/forbidden-error";
 
@@ -10,8 +9,11 @@ export class User extends ContextModel implements UserIdentifier, Partial<UserPr
   public discordId?: string;
 
   public constructor(ctx: Context, props: UserIdentifier & Partial<UserProps>) {
+    console.log("User-1");
     super(ctx);
+    console.log("User-2");
     this.id = props.id;
+    console.log("User-3");
     this.setProps(props);
   }
 

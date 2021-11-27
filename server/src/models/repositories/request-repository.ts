@@ -2,10 +2,10 @@ import { Request, RequestIdentifier, RequestProps } from "../structures/request"
 import { DocumentScheme } from "./documents/document-scheme";
 import { RequestDocument } from "./documents/request-document";
 import { User } from "../structures/user";
-import { ContextModel } from "../context/context-model";
 import { firestore } from "firebase-admin";
 import { db } from "~/firebase";
 import { UserDocument } from "~/models/repositories/documents/user-document";
+import { ContextModel } from "../context";
 
 export class RequestRepository extends ContextModel {
   public build(snapshot: firestore.DocumentSnapshot): Request | null {

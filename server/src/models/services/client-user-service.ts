@@ -1,7 +1,7 @@
-import { ClientUser } from "../context/client-user";
 import { DocumentScheme } from "~/models/repositories/documents/document-scheme";
 import { UserDocument } from "~/models/repositories/documents/user-document";
 import { UserRepository } from "~/models/repositories/user-repository";
+import { ClientUser } from "../context";
 
 export class ClientUserService {
   public async registerIfNotExist(discordId: string): Promise<ClientUser | null> {

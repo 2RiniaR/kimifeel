@@ -1,0 +1,22 @@
+import { AcceptRequestEndpoint } from "~/discord/actions/accept-request-action";
+import { AcceptRequestController } from "~/controllers/accept-request-controller";
+import { AddProfileEndpoint } from "~/discord/actions/add-profile-action";
+import { AddProfileController } from "~/controllers/add-profile-controller";
+import { CancelRequestEndpoint } from "~/discord/actions/cancel-request-action";
+import { CancelRequestController } from "~/controllers/cancel-request-controller";
+import { DeleteProfileEndpoint } from "~/discord/actions/delete-profile-action";
+import { DeleteProfileController } from "~/controllers/delete-profile-controller";
+import { DenyRequestEndpoint } from "~/discord/actions/deny-request-action";
+import { DenyRequestController } from "~/controllers/deny-request-controller";
+import { ShowProfilesEndpoint } from "~/discord/actions/show-profiles-action";
+import { ShowProfilesController } from "~/controllers/show-profiles-controller";
+import { SubmitRequestEndpoint } from "~/discord/actions/submit-request-action";
+import { SubmitRequestController } from "~/controllers/submit-request-controller";
+
+new AcceptRequestEndpoint().register(new AcceptRequestController());
+new AddProfileEndpoint().register(new AddProfileController());
+new CancelRequestEndpoint().register(new CancelRequestController());
+new DeleteProfileEndpoint().register(new DeleteProfileController());
+new DenyRequestEndpoint().register(new DenyRequestController());
+new ShowProfilesEndpoint().register(new ShowProfilesController());
+new SubmitRequestEndpoint().register(new SubmitRequestController());

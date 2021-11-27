@@ -1,13 +1,24 @@
 import { ErrorEmbed } from "../views/error-embed";
-import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
-import { Action } from "~/discord/action";
+import { Action, ActionBaseParams } from "~/discord/action";
 import { SlashCommandEvent, SlashCommandEventContext } from "~/discord/events/slash-command-event";
+import { Session } from "~/discord/session";
 
 export type AddProfileParams = ActionBaseParams & {
   content: string;
 };
 
-export class AddProfileSession extends Session<SlashCommandEventContext, AddProfileParams> {
+export class AddProfileAction extends Action<SlashCommandEventContext, AddProfileParams> {
+  protected defineEvent() {
+    return new SlashCommandEvent("add-profile");
+  }
+
+  protected async onEvent(context: SlashCommandEventContext) {
+    if (!this.listener) return;
+    await new AddProfileSession(context, this.listener).run();
+  }
+}
+
+export class AddProfileSession extends Session<AddProfileAction> {
   content!: string;
 
   async fetchParams() {
@@ -30,16 +41,5 @@ export class AddProfileSession extends Session<SlashCommandEventContext, AddProf
   async onFailed(error: unknown) {
     const embed = new ErrorEmbed({ type: "error", error });
     await this.context.interaction.reply({ embeds: [embed] });
-  }
-}
-
-export class AddProfileAction extends Action<AddProfileSession> {
-  protected defineEvent(): EventOf<AddProfileSession> {
-    return new SlashCommandEvent("add-profile");
-  }
-
-  protected async onEvent(context: ContextOf<AddProfileSession>): Promise<void> {
-    if (!this.listener) return;
-    await new AddProfileSession(context, this.listener).run();
   }
 }

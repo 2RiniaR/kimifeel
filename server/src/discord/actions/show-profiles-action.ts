@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js";
 import { ProfileListElement, ProfileListEmbed } from "../views/profile-list-embed";
 import { ErrorEmbed } from "../views/error-embed";
-import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
 import { SlashCommandEvent, SlashCommandEventContext } from "~/discord/events/slash-command-event";
-import { Action } from "~/discord/action";
+import { Action, ActionBaseParams } from "~/discord/action";
+import { Session } from "~/discord/session";
 
 export type ShowProfilesParams = ActionBaseParams & {
   target: string;
@@ -11,7 +11,18 @@ export type ShowProfilesParams = ActionBaseParams & {
 
 export type ShowProfilesResult = ProfileListElement[];
 
-export class ShowProfilesSession extends Session<SlashCommandEventContext, ShowProfilesParams, ShowProfilesResult> {
+export class ShowProfilesAction extends Action<SlashCommandEventContext, ShowProfilesParams, ShowProfilesResult> {
+  protected defineEvent() {
+    return new SlashCommandEvent("show-profile");
+  }
+
+  protected async onEvent(context: SlashCommandEventContext) {
+    if (!this.listener) return;
+    await new ShowProfilesSession(context, this.listener).run();
+  }
+}
+
+export class ShowProfilesSession extends Session<ShowProfilesAction> {
   private target!: GuildMember;
 
   async fetchParams() {
@@ -39,16 +50,5 @@ export class ShowProfilesSession extends Session<SlashCommandEventContext, ShowP
       targetAvatarURL: this.target.displayAvatarURL()
     });
     await this.context.interaction.reply({ embeds: [listEmbed] });
-  }
-}
-
-export class ShowProfilesAction extends Action<ShowProfilesSession> {
-  protected defineEvent(): EventOf<ShowProfilesSession> {
-    return new SlashCommandEvent("show-profile");
-  }
-
-  protected async onEvent(context: ContextOf<ShowProfilesSession>): Promise<void> {
-    if (!this.listener) return;
-    await new ShowProfilesSession(context, this.listener).run();
   }
 }

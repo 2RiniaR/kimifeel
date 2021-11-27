@@ -1,7 +1,7 @@
 import { ClientUser } from "~/models/context/client-user";
 import { ClientUserService } from "~/models/services/client-user-service";
 import { NotFoundError } from "~/models/errors/not-found-error";
-import { AnyAction, ListenerOf, ParamsOf, ResultOf } from "~/discord/session";
+import { AnyAction, ListenerOf, ParamsOf, ResultOf } from "~/discord/action";
 
 export abstract class Controller<TAction extends AnyAction> implements ListenerOf<TAction> {
   private service = new ClientUserService();

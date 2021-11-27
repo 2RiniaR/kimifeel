@@ -1,8 +1,8 @@
 import { Controller } from "~/controller";
 import { ClientUser } from "~/models/context/client-user";
-import { CancelRequestSession, CancelRequestParams } from "~/discord/actions/cancel-request-action";
+import { CancelRequestParams, CancelRequestAction } from "~/discord/actions/cancel-request-action";
 
-export class CancelRequestController extends Controller<CancelRequestSession> {
+export class CancelRequestController extends Controller<CancelRequestAction> {
   requireUsersDiscordId = (ctx: CancelRequestParams) => [ctx.client];
 
   async action(ctx: CancelRequestParams, client: ClientUser) {

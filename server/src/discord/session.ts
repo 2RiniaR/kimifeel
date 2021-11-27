@@ -1,20 +1,16 @@
-import { Event } from "~/discord/event";
+import { AnyAction, ContextOf, ListenerOf, ParamsOf, ResultOf } from "~/discord/action";
 
-export abstract class Session<
-  TEventContext extends object | void = void,
-  TActionParams extends ActionBaseParams = ActionBaseParams,
-  TActionResult extends object | void = void
-> {
-  public context: TEventContext;
-  public listener: ActionListener<TActionParams, TActionResult>;
-  public result!: TActionResult;
+export abstract class Session<TAction extends AnyAction> {
+  public context: ContextOf<TAction>;
+  public listener: ListenerOf<TAction>;
+  public result!: ResultOf<TAction>;
 
-  public constructor(context: TEventContext, listener: ActionListener<TActionParams, TActionResult>) {
+  public constructor(context: ContextOf<TAction>, listener: ListenerOf<TAction>) {
     this.context = context;
     this.listener = listener;
   }
 
-  protected abstract fetchParams(): Promise<TActionParams | undefined>;
+  protected abstract fetchParams(): Promise<ParamsOf<TAction> | undefined>;
   protected abstract onSucceed(): Promise<void>;
   protected abstract onFailed(error: unknown): Promise<void>;
 
@@ -36,24 +32,3 @@ export abstract class Session<
     await this.onSucceed();
   }
 }
-
-export type ActionBaseParams = {
-  client: string;
-};
-
-export interface ActionListener<TActionParams extends ActionBaseParams, TActionResult> {
-  onAction(params: TActionParams): Promise<TActionResult>;
-}
-
-export type ContextOf<TAction extends AnyAction> = TAction extends Session<infer U, ActionBaseParams, object | void>
-  ? U
-  : never;
-export type ParamsOf<TAction extends AnyAction> = TAction extends Session<object | void, infer U, object | void>
-  ? U
-  : never;
-export type ResultOf<TAction extends AnyAction> = TAction extends Session<object | void, ActionBaseParams, infer U>
-  ? U
-  : never;
-export type ListenerOf<TAction extends AnyAction> = ActionListener<ParamsOf<TAction>, ResultOf<TAction>>;
-export type EventOf<TAction extends AnyAction> = Event<ContextOf<TAction>>;
-export type AnyAction = Session<object | void, ActionBaseParams, object | void>;

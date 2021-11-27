@@ -1,9 +1,9 @@
 import { ClientUser } from "~/models/context/client-user";
 import { ForbiddenError } from "~/models/errors/forbidden-error";
-import { AcceptRequestSession, AcceptRequestParams } from "~/discord/actions/accept-request-action";
+import { AcceptRequestParams, AcceptRequestAction } from "~/discord/actions/accept-request-action";
 import { Controller } from "~/controller";
 
-export class AcceptRequestController extends Controller<AcceptRequestSession> {
+export class AcceptRequestController extends Controller<AcceptRequestAction> {
   requireUsersDiscordId = (ctx: AcceptRequestParams) => [ctx.client];
 
   async action(ctx: AcceptRequestParams, client: ClientUser) {

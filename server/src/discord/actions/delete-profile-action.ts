@@ -1,13 +1,24 @@
 import { ErrorEmbed } from "../views/error-embed";
-import { Session, ActionBaseParams, ContextOf, EventOf } from "~/discord/session";
-import { Action } from "~/discord/action";
+import { Action, ActionBaseParams } from "~/discord/action";
 import { SlashCommandEvent, SlashCommandEventContext } from "~/discord/events/slash-command-event";
+import { Session } from "~/discord/session";
 
 export type DeleteProfileParams = ActionBaseParams & {
   index: number;
 };
 
-export class DeleteProfileSession extends Session<SlashCommandEventContext, DeleteProfileParams> {
+export class DeleteProfileAction extends Action<SlashCommandEventContext, DeleteProfileParams> {
+  protected defineEvent() {
+    return new SlashCommandEvent("delete-profile");
+  }
+
+  protected async onEvent(context: SlashCommandEventContext) {
+    if (!this.listener) return;
+    await new DeleteProfileSession(context, this.listener).run();
+  }
+}
+
+export class DeleteProfileSession extends Session<DeleteProfileAction> {
   index!: number;
 
   async fetchParams() {
@@ -30,16 +41,5 @@ export class DeleteProfileSession extends Session<SlashCommandEventContext, Dele
   async onFailed(error: unknown) {
     const embed = new ErrorEmbed({ type: "error", error });
     await this.context.interaction.reply({ embeds: [embed] });
-  }
-}
-
-export class DeleteProfileAction extends Action<DeleteProfileSession> {
-  protected defineEvent(): EventOf<DeleteProfileSession> {
-    return new SlashCommandEvent("delete-profile");
-  }
-
-  protected async onEvent(context: ContextOf<DeleteProfileSession>): Promise<void> {
-    if (!this.listener) return;
-    await new DeleteProfileSession(context, this.listener).run();
   }
 }

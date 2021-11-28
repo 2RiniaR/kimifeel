@@ -20,7 +20,9 @@ export class UserService extends ContextModel {
 
   public async fetch() {
     const result = await getUserById(this.user.id);
-    if (!result) throw new NotFoundError();
+    if (!result) {
+      throw Error("Tried to fetch data, but it wasn't found.");
+    }
     const user = buildUser(this.context, result);
     this.user.setProps(user);
   }

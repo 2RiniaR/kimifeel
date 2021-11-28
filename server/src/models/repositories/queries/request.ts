@@ -48,7 +48,9 @@ export async function createRequest(props: CreateProps): Promise<RequestQueryRes
   const { id, index } = await db.runTransaction(async (transaction) => {
     const userDocRef = DocumentScheme.user({ userId: props.userId });
     const userSnapshot = await transaction.get(userDocRef);
-    if (!userSnapshot?.exists) throw Error();
+    if (!userSnapshot?.exists) {
+      throw Error("The request target user was not found.");
+    }
     const userDoc = userSnapshot.data() as UserDocument;
 
     const requestDoc = (({ content, index, requesterUserId }: RequestDocument) => ({

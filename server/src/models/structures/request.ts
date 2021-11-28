@@ -29,20 +29,28 @@ export class Request extends ContextModel implements RequestIdentifier, Partial<
   }
 
   public async accept() {
-    if (this.context.clientUser.id !== this.target.id) throw new ForbiddenError();
+    if (this.context.clientUser.id !== this.target.id) {
+      throw new ForbiddenError("Can not accept the request because you are not the reviewer.");
+    }
     await this.service.delete();
     return await this.service.createProfile();
   }
 
   public async deny() {
-    if (this.context.clientUser.id !== this.target.id) throw new ForbiddenError();
+    if (this.context.clientUser.id !== this.target.id) {
+      throw new ForbiddenError("Can not deny the request because you are not the reviewer.");
+    }
     await this.service.delete();
   }
 
   public async cancel() {
     if (!this.requester) await this.fetch();
-    if (!this.requester) throw Error();
-    if (this.context.clientUser.id !== this.requester.id) throw new ForbiddenError();
+    if (!this.requester) {
+      throw Error("Data was not fetched successfully.");
+    }
+    if (this.context.clientUser.id !== this.requester.id) {
+      throw new ForbiddenError("Can not cancel the request because you are not the requester.");
+    }
     await this.service.delete();
   }
 }

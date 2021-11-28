@@ -1,5 +1,5 @@
 import { Controller } from "~/controller";
-import { ClientUser } from "~/models/context/client-user";
+import { ClientUser } from "~/models";
 import { SubmitRequestParams, SubmitRequestAction } from "~/discord/actions/submit-request-action";
 
 export class SubmitRequestController extends Controller<SubmitRequestAction> {

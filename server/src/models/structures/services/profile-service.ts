@@ -1,4 +1,3 @@
-import { NotFoundError } from "~/models/errors/not-found-error";
 import { deleteProfile, getProfileById } from "~/models/repositories/queries/profile";
 import { buildProfile } from "~/models/repositories/builders/profile";
 import { ContextModel } from "~/models/context";
@@ -14,7 +13,9 @@ export class ProfileService extends ContextModel {
 
   public async fetch() {
     const result = await getProfileById(this.profile.target.id, this.profile.id);
-    if (!result) throw new NotFoundError();
+    if (!result) {
+      throw Error("Tried to fetch data, but it wasn't found.");
+    }
     const profile = buildProfile(this.context, result);
     this.profile.setProps(profile);
   }

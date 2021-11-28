@@ -16,14 +16,18 @@ export class RequestService extends ContextModel {
 
   public async fetch() {
     const result = await getRequestById(this.request.target.id, this.request.id);
-    if (!result) throw new NotFoundError();
+    if (!result) {
+      throw Error("Tried to fetch data, but it wasn't found.");
+    }
     const request = buildRequest(this.context, result);
     this.request.setProps(request);
   }
 
   public async createProfile() {
     if (!this.request.requester || !this.request.content) await this.fetch();
-    if (!this.request.requester || !this.request.content) throw Error();
+    if (!this.request.requester || !this.request.content) {
+      throw Error("Data was not fetched successfully.");
+    }
     const result = await createProfile({
       content: this.request.content,
       authorUserId: this.request.requester.id,

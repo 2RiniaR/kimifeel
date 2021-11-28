@@ -1,5 +1,5 @@
-import { Request } from "./request";
-import { Profile } from "./profile";
+import { Request } from "~/models";
+import { Profile } from "~/models";
 import { Context, ContextModel } from "../context";
 import { ForbiddenError } from "~/models/errors/forbidden-error";
 import { UserService } from "~/models/structures/services/user-service";
@@ -24,12 +24,16 @@ export class User extends ContextModel implements UserIdentifier, Partial<UserPr
   }
 
   public async submitRequest(props: SubmitRequestProps): Promise<Request> {
-    if (this.context.clientUser.id === this.id) throw new ForbiddenError();
+    if (this.context.clientUser.id === this.id) {
+      throw new ForbiddenError("Can not submit the request to self.");
+    }
     return await this.service.submitRequest(props);
   }
 
   public async addProfile(props: AddProfileProps) {
-    if (this.context.clientUser.id !== this.id) throw new ForbiddenError();
+    if (this.context.clientUser.id !== this.id) {
+      throw new ForbiddenError("Can not add the profile to other user without requests.");
+    }
     return await this.service.addProfile(props);
   }
 

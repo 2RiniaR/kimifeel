@@ -8,6 +8,12 @@ export type DenyRequestParams = ActionBaseParams & {
   index: number;
 };
 
+export class RequestNotFoundError extends Error {
+  message = "対象のリクエストは見つかりませんでした。既に承認・拒否・キャンセルされた可能性があります。";
+}
+
+export class ForbiddenError extends Error {}
+
 export class DenyRequestAction extends Action<ReactionAddEventContext, DenyRequestParams> {
   protected defineEvent() {
     return new ReactionAddEvent(["❌"]);
@@ -34,6 +40,7 @@ export class DenyRequestSession extends Session<DenyRequestAction> {
   }
 
   async onFailed(error: unknown) {
+    if (error instanceof ForbiddenError) return;
     const embed = new ErrorEmbed({ type: "error", error });
     await this.context.message.reply({ embeds: [embed] });
   }

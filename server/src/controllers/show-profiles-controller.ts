@@ -1,6 +1,6 @@
-import { ShowProfilesAction, ShowProfilesParams } from "~/discord/actions/show-profiles-action";
 import { Controller } from "~/controller";
-import { ClientUser } from "~/models/context/client-user";
+import { ClientUser } from "~/models";
+import { ShowProfilesAction, ShowProfilesParams } from "~/discord/actions/show-profiles-action";
 
 export class ShowProfilesController extends Controller<ShowProfilesAction> {
   requireUsersDiscordId = (ctx: ShowProfilesParams) => [ctx.target];

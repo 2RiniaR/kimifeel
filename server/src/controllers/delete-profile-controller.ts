@@ -1,5 +1,5 @@
 import { Controller } from "~/controller";
-import { ClientUser } from "~/models/context/client-user";
+import { ClientUser } from "~/models";
 import { DeleteProfileParams, DeleteProfileAction } from "~/discord/actions/delete-profile-action";
 
 export class DeleteProfileController extends Controller<DeleteProfileAction> {

@@ -48,7 +48,9 @@ export async function createProfile(props: CreateProps): Promise<ProfileQueryRes
   const { id, index } = await db.runTransaction(async (transaction) => {
     const userDocRef = DocumentScheme.user({ userId: props.userId });
     const userSnapshot = await transaction.get(userDocRef);
-    if (!userSnapshot?.exists) throw Error();
+    if (!userSnapshot?.exists) {
+      throw Error("The profile target user was not found.");
+    }
     const userDoc = userSnapshot.data() as UserDocument;
 
     const profileDoc = (({ content, index, authorUserId }: ProfileDocument) => ({ content, index, authorUserId }))({

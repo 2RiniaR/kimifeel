@@ -1,22 +1,25 @@
 import { ClientUser } from "~/models/context/client-user";
-import { ClientUserService } from "~/models/services/client-user-service";
-import { NotFoundError } from "~/models/errors/not-found-error";
+import { ClientUserManager } from "~/models/managers/client-user-manager";
 import { AnyAction, ListenerOf, ParamsOf, ResultOf } from "~/discord/action";
 
 export abstract class Controller<TAction extends AnyAction> implements ListenerOf<TAction> {
-  private service = new ClientUserService();
+  private service = new ClientUserManager();
 
-  public abstract requireUsersDiscordId(ctx: ParamsOf<TAction>): string[];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public requireUsersDiscordId(_: Omit<ParamsOf<TAction>, "client">): string[] {
+    return [];
+  }
+
   public abstract action(ctx: ParamsOf<TAction>, client: ClientUser): Promise<ResultOf<TAction>>;
 
-  private async checkRegisterUsers(usersDiscordId: string[]) {
-    await Promise.all(usersDiscordId.map((id) => this.service.registerIfNotExist(id)));
+  private async checkRequireUsers(params: ParamsOf<TAction>) {
+    const users = this.requireUsersDiscordId(params);
+    await Promise.all(users.map((id) => this.service.registerIfNotExist(id)));
   }
 
   public async onAction(params: ParamsOf<TAction>): Promise<ResultOf<TAction>> {
-    await this.checkRegisterUsers(this.requireUsersDiscordId(params));
-    const client = await this.service.getByDiscordId(params.client);
-    if (!client) throw new NotFoundError();
+    await this.checkRequireUsers(params);
+    const client = await this.service.registerIfNotExist(params.client);
     return await this.action(params, client);
   }
 }

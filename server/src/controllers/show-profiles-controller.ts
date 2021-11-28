@@ -3,10 +3,10 @@ import { Controller } from "~/controller";
 import { ClientUser } from "~/models/context/client-user";
 
 export class ShowProfilesController extends Controller<ShowProfilesAction> {
-  requireUsersDiscordId = (ctx: ShowProfilesParams) => [ctx.client, ctx.target];
+  requireUsersDiscordId = (ctx: ShowProfilesParams) => [ctx.target];
 
   async action(ctx: ShowProfilesParams, client: ClientUser) {
-    const target = await client.services.users.getByDiscordId(ctx.target);
+    const target = await client.users.getByDiscordId(ctx.target);
     if (!target) throw Error();
 
     const profiles = await target.getProfiles();

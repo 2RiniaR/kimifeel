@@ -3,9 +3,7 @@ import { ClientUser } from "~/models/context/client-user";
 import { AddProfileParams, AddProfileAction } from "~/discord/actions/add-profile-action";
 
 export class AddProfileController extends Controller<AddProfileAction> {
-  requireUsersDiscordId = (ctx: AddProfileParams) => [ctx.client];
-
   async action(ctx: AddProfileParams, client: ClientUser) {
-    await client.user.addProfile({ content: ctx.content });
+    await client.asUser().addProfile({ content: ctx.content });
   }
 }

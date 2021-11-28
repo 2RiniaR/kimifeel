@@ -1,10 +1,11 @@
 import { User } from "./user";
 import { Context, ContextModel } from "../context";
-import { NotFoundError } from "~/models/errors/not-found-error";
+import { ProfileService } from "~/models/structures/services/profile-service";
 
 export class Profile extends ContextModel implements ProfileIdentifier, Partial<ProfileProps> {
-  public id: string;
-  public target: User;
+  private readonly service = new ProfileService(this);
+  public readonly id: string;
+  public readonly target: User;
   public author?: User;
   public content?: string;
   public index?: number;
@@ -23,13 +24,11 @@ export class Profile extends ContextModel implements ProfileIdentifier, Partial<
   }
 
   public async fetch() {
-    const clone = await this.repositories.profiles.getById(this.context, this.target.id, this.id);
-    if (!clone) throw new NotFoundError();
-    this.setProps(clone);
+    await this.service.fetch();
   }
 
   public async delete() {
-    await this.repositories.profiles.delete(this);
+    await this.service.delete();
   }
 }
 

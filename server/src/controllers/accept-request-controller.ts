@@ -4,10 +4,8 @@ import { AcceptRequestParams, AcceptRequestAction } from "~/discord/actions/acce
 import { Controller } from "~/controller";
 
 export class AcceptRequestController extends Controller<AcceptRequestAction> {
-  requireUsersDiscordId = (ctx: AcceptRequestParams) => [ctx.client];
-
   async action(ctx: AcceptRequestParams, client: ClientUser) {
-    const request = await client.services.requests.getByIndex(ctx.index);
+    const request = await client.requests.getByIndex(ctx.index);
     if (!request) throw Error();
 
     try {

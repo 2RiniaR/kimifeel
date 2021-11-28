@@ -1,11 +1,12 @@
 import { Request } from "./request";
 import { Profile } from "./profile";
 import { Context, ContextModel } from "../context";
-import { NotFoundError } from "~/models/errors/not-found-error";
 import { ForbiddenError } from "~/models/errors/forbidden-error";
+import { UserService } from "~/models/structures/services/user-service";
 
 export class User extends ContextModel implements UserIdentifier, Partial<UserProps> {
-  public id: string;
+  private readonly service = new UserService(this);
+  public readonly id: string;
   public discordId?: string;
 
   public constructor(ctx: Context, props: UserIdentifier & Partial<UserProps>) {
@@ -19,31 +20,21 @@ export class User extends ContextModel implements UserIdentifier, Partial<UserPr
   }
 
   public async fetch() {
-    const clone = await this.repositories.users.getById(this.context, this.id);
-    if (!clone) throw new NotFoundError();
-    this.setProps(clone);
+    await this.service.fetch();
   }
 
   public async submitRequest(props: SubmitRequestProps): Promise<Request> {
     if (this.context.clientUser.id === this.id) throw new ForbiddenError();
-    return await this.repositories.requests.create(this.context, {
-      target: this,
-      content: props.content,
-      requester: this.context.clientUser.user
-    });
+    return await this.service.submitRequest(props);
   }
 
   public async addProfile(props: AddProfileProps) {
     if (this.context.clientUser.id !== this.id) throw new ForbiddenError();
-    await this.repositories.profiles.create(this.context, {
-      target: this,
-      author: this,
-      content: props.content
-    });
+    return await this.service.addProfile(props);
   }
 
   public async getProfiles(): Promise<Profile[]> {
-    return await this.repositories.profiles.getAll(this.context, { user: this });
+    return await this.service.getProfiles();
   }
 }
 
@@ -55,10 +46,10 @@ export type UserProps = {
   discordId: string;
 };
 
-type SubmitRequestProps = {
+export type SubmitRequestProps = {
   content: string;
 };
 
-type AddProfileProps = {
+export type AddProfileProps = {
   content: string;
 };

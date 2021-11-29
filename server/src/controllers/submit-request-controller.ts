@@ -9,7 +9,7 @@ export class SubmitRequestController extends Controller<SubmitRequestAction> {
     const target = await client.users.getByDiscordId(ctx.target);
     if (!target) throw Error();
 
-    const request = await target.submitRequest({ content: ctx.content });
+    const request = await target.submitRequest(ctx.content);
 
     if (!request.index) throw Error();
     return {

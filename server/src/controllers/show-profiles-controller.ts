@@ -13,12 +13,9 @@ export class ShowProfilesController extends Controller<ShowProfilesAction> {
 
     return await Promise.all(
       profiles.map(async (profile) => {
-        if (!profile.author || !profile.content || !profile.index) await profile.fetch();
-        if (!profile.author || !profile.content || !profile.index) throw Error();
-        if (!profile.author.discordId) await profile.author.fetch();
-        if (!profile.author.discordId) throw Error();
+        const author = await client.users.fetch(profile.author);
         return {
-          author: profile.author.discordId,
+          author: author.discordId,
           content: profile.content,
           index: profile.index
         };

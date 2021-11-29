@@ -1,10 +1,9 @@
 import { ClientUser } from "~/models";
-import { createUserIfNotExist } from "~/models/repositories/queries/user";
-import { buildClientUser } from "~/models/repositories/builders/client-user";
+import { ImaginaryUser } from "~/models/structures/user";
 
 export class ClientUserManager {
   public async registerIfNotExist(discordId: string): Promise<ClientUser> {
-    const result = await createUserIfNotExist({ discordId });
-    return buildClientUser(result);
+    const user = new ImaginaryUser({ discordId });
+    return await user.createIfNotExist();
   }
 }

@@ -2,43 +2,67 @@ import { Request } from "~/models";
 import { Profile } from "~/models";
 import { Context, ContextModel } from "../context";
 import { ForbiddenError } from "~/models/errors/forbidden-error";
-import { UserService } from "~/models/structures/services/user-service";
+import { ImaginaryUserService, UserService } from "~/models/structures/services/user-service";
+import { ImaginaryProfile } from "~/models/structures/profile";
+import { ImaginaryRequest } from "~/models/structures/request";
 
-export class User extends ContextModel implements UserIdentifier, Partial<UserProps> {
+export class IdentityUser extends ContextModel implements UserIdentifier {
   private readonly service = new UserService(this);
   public readonly id: string;
-  public discordId?: string;
 
-  public constructor(ctx: Context, props: UserIdentifier & Partial<UserProps>) {
+  public constructor(ctx: Context, props: UserIdentifier) {
     super(ctx);
     this.id = props.id;
-    this.setProps(props);
-  }
-
-  public setProps(props: Partial<UserProps>) {
-    this.discordId = props.discordId;
-  }
-
-  public async fetch() {
-    await this.service.fetch();
-  }
-
-  public async submitRequest(props: SubmitRequestProps): Promise<Request> {
-    if (this.context.clientUser.id === this.id) {
-      throw new ForbiddenError("Can not submit the request to self.");
-    }
-    return await this.service.submitRequest(props);
-  }
-
-  public async addProfile(props: AddProfileProps) {
-    if (this.context.clientUser.id !== this.id) {
-      throw new ForbiddenError("Can not add the profile to other user without requests.");
-    }
-    return await this.service.addProfile(props);
   }
 
   public async getProfiles(): Promise<Profile[]> {
     return await this.service.getProfiles();
+  }
+}
+
+export class User extends IdentityUser implements UserProps {
+  public discordId: string;
+
+  public constructor(ctx: Context, props: UserIdentifier & UserProps) {
+    super(ctx, props);
+    this.discordId = props.discordId;
+  }
+
+  public async submitRequest(content: string): Promise<Request> {
+    if (this.context.clientUser.id === this.id) {
+      throw new ForbiddenError("Can not submit the request to self.");
+    }
+    const request = new ImaginaryRequest(this.context, {
+      content,
+      requester: this.context.clientUser.asUser(),
+      user: this
+    });
+    return await request.create();
+  }
+
+  public async addProfile(content: string) {
+    if (this.context.clientUser.id !== this.id) {
+      throw new ForbiddenError("Can not add the profile to other user without requests.");
+    }
+    const profile = new ImaginaryProfile(this.context, {
+      content,
+      author: this,
+      user: this
+    });
+    return await profile.create();
+  }
+}
+
+export class ImaginaryUser implements CreateUserProps {
+  private readonly service = new ImaginaryUserService(this);
+  public readonly discordId: string;
+
+  public constructor(props: CreateUserProps) {
+    this.discordId = props.discordId;
+  }
+
+  public async createIfNotExist() {
+    return await this.service.createIfNotExist();
   }
 }
 
@@ -50,10 +74,6 @@ export type UserProps = {
   discordId: string;
 };
 
-export type SubmitRequestProps = {
-  content: string;
-};
-
-export type AddProfileProps = {
-  content: string;
+export type CreateUserProps = {
+  discordId: string;
 };

@@ -1,17 +1,18 @@
-import { Controller } from "~/controller";
-import { ClientUser, ForbiddenError } from "~/models";
-import * as Action from "~/discord/actions/accept-request-action";
-import { AcceptRequestParams, AcceptRequestAction } from "~/discord/actions/accept-request-action";
+import { Controller } from "controller";
+import { AcceptRequestAction, AcceptRequestParams } from "discord/actions";
+import { NoPermissionActionError, RequestNotFoundActionError } from "discord/errors";
+import { ClientUser } from "models/structures";
+import { ForbiddenError } from "models/errors";
 
 export class AcceptRequestController extends Controller<AcceptRequestAction> {
   async action(ctx: AcceptRequestParams, client: ClientUser) {
     const request = await client.requests.getByIndex(ctx.index);
-    if (!request) throw new Action.RequestNotFoundError();
+    if (!request) throw new RequestNotFoundActionError();
 
     try {
       await request.accept();
     } catch (error) {
-      if (error instanceof ForbiddenError) throw new Action.ForbiddenError();
+      if (error instanceof ForbiddenError) throw new NoPermissionActionError();
       else throw error;
     }
   }

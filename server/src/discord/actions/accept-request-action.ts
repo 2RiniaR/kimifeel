@@ -1,18 +1,12 @@
-import { RequestEmbed } from "../views/request-embed";
-import { ErrorEmbed } from "../views/error-embed";
-import { Session } from "~/discord/session";
-import { ReactionAddEvent, ReactionAddEventContext } from "~/discord/events/reaction-add-event";
-import { Action, ActionBaseParams } from "~/discord/action";
+import { Action, ActionBaseParams } from "../action";
+import { Session } from "../session";
+import { ReactionAddEvent, ReactionAddEventContext } from "../events";
+import { NoPermissionActionError } from "../errors";
+import { RequestEmbed, ErrorEmbed } from "../views";
 
 export type AcceptRequestParams = ActionBaseParams & {
   index: number;
 };
-
-export class RequestNotFoundError extends Error {
-  message = "対象のリクエストは見つかりませんでした。既に承認・拒否・キャンセルされた可能性があります。";
-}
-
-export class ForbiddenError extends Error {}
 
 export class AcceptRequestAction extends Action<ReactionAddEventContext, AcceptRequestParams> {
   protected defineEvent() {
@@ -40,8 +34,8 @@ export class AcceptRequestSession extends Session<AcceptRequestAction> {
   }
 
   async onFailed(error: unknown) {
-    if (error instanceof ForbiddenError) return;
-    const embed = new ErrorEmbed({ type: "error", error });
+    if (error instanceof NoPermissionActionError) return;
+    const embed = new ErrorEmbed(error);
     await this.context.message.reply({ embeds: [embed] });
   }
 }

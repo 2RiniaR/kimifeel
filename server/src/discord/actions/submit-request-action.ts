@@ -1,9 +1,8 @@
 import { GuildMember } from "discord.js";
-import { ErrorEmbed } from "../views/error-embed";
-import { SlashCommandEvent, SlashCommandEventContext } from "~/discord/events/slash-command-event";
-import { RequestEmbed } from "~/discord/views/request-embed";
-import { Action, ActionBaseParams } from "~/discord/action";
-import { Session } from "~/discord/session";
+import { Action, ActionBaseParams } from "../action";
+import { ErrorEmbed, RequestEmbed } from "../views";
+import { SlashCommandEvent, SlashCommandEventContext } from "../events";
+import { Session } from "../session";
 
 export type SubmitRequestParams = ActionBaseParams & {
   target: string;
@@ -48,7 +47,7 @@ export class SubmitRequestSession extends Session<SubmitRequestAction> {
   }
 
   protected async onFailed(error: unknown): Promise<void> {
-    const embed = new ErrorEmbed({ type: "error", error });
+    const embed = new ErrorEmbed(error);
     await this.context.interaction.reply({ embeds: [embed] });
   }
 

@@ -1,5 +1,4 @@
-import { ClientUser } from "~/models";
-import { ImaginaryUser } from "~/models/structures/user";
+import { ImaginaryUser, ClientUser } from "../structures";
 
 export class ClientUserManager {
   public async registerIfNotExist(discordId: string): Promise<ClientUser> {

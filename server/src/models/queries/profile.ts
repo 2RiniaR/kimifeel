@@ -1,12 +1,6 @@
-import { db } from "~/firebase";
-import {
-  DocumentScheme,
-  ProfileDocument,
-  ProfileDocumentPath,
-  UserDocument,
-  UserDocumentPath
-} from "~/models/repositories/scheme";
-import { MultipleQueryResult, SingleQueryResult } from "~/models/repositories/queries/index";
+import { DocumentScheme, ProfileDocument, ProfileDocumentPath, UserDocument, UserDocumentPath } from "../scheme";
+import { MultipleQueryResult, SingleQueryResult } from "./results";
+import { db } from "firebase";
 
 export type ProfileQueryResult = ProfileDocument & ProfileDocumentPath;
 

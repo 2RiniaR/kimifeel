@@ -1,5 +1,5 @@
 import { Client, Guild, GuildMember } from "discord.js";
-import { settingsManager } from "~/settings";
+import { settingsManager } from "settings";
 
 export class TargetGuildManager {
   private readonly client: Client;

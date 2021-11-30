@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import { getUserReference } from "~/discord/utils/user";
+import { getUserReference } from "../utils/get-user-reference";
 
 export type RequestEmbedProps = {
   index: number;

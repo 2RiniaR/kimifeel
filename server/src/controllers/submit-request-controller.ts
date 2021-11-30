@@ -1,6 +1,8 @@
-import { Controller } from "~/controller";
-import { ClientUser } from "~/models";
-import { SubmitRequestParams, SubmitRequestAction } from "~/discord/actions/submit-request-action";
+import { Controller } from "controller";
+import { ProfileContentLengthLimitActionError } from "discord/errors";
+import { SubmitRequestAction, SubmitRequestParams } from "discord/actions";
+import { ContentLengthLimitError } from "models/errors";
+import { ClientUser } from "models/structures";
 
 export class SubmitRequestController extends Controller<SubmitRequestAction> {
   requireUsersDiscordId = (ctx: SubmitRequestParams) => [ctx.target];
@@ -9,11 +11,15 @@ export class SubmitRequestController extends Controller<SubmitRequestAction> {
     const target = await client.users.getByDiscordId(ctx.target);
     if (!target) throw Error();
 
-    const request = await target.submitRequest(ctx.content);
-
-    if (!request.index) throw Error();
-    return {
-      index: request.index
-    };
+    try {
+      const request = await target.submitRequest(ctx.content);
+      return { index: request.index };
+    } catch (error) {
+      if (error instanceof ContentLengthLimitError) {
+        throw new ProfileContentLengthLimitActionError(error.limit, error.actual);
+      } else {
+        throw error;
+      }
+    }
   }
 }

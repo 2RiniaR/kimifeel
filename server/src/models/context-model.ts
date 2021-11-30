@@ -1,4 +1,4 @@
-import { Context } from ".";
+import { Context } from "./context";
 
 export abstract class ContextModel {
   public readonly context: Context;

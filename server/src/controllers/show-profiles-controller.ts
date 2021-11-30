@@ -1,6 +1,6 @@
-import { Controller } from "~/controller";
-import { ClientUser } from "~/models";
-import { ShowProfilesAction, ShowProfilesParams } from "~/discord/actions/show-profiles-action";
+import { Controller } from "controller";
+import { ShowProfilesAction, ShowProfilesParams } from "discord/actions";
+import { ClientUser } from "models/structures";
 
 export class ShowProfilesController extends Controller<ShowProfilesAction> {
   requireUsersDiscordId = (ctx: ShowProfilesParams) => [ctx.target];
@@ -10,16 +10,13 @@ export class ShowProfilesController extends Controller<ShowProfilesAction> {
     if (!target) throw Error();
 
     const profiles = await target.getProfiles();
-
-    return await Promise.all(
-      profiles.map(async (profile) => {
-        const author = await client.users.fetch(profile.author);
-        return {
-          author: author.discordId,
-          content: profile.content,
-          index: profile.index
-        };
-      })
-    );
+    return await profiles.mapAsync(async (profile) => {
+      const author = await client.users.fetch(profile.author);
+      return {
+        author: author.discordId,
+        content: profile.content,
+        index: profile.index
+      };
+    });
   }
 }

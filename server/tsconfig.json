@@ -11,9 +11,7 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "baseUrl": "src",
-    "paths": {
-      "~/*": ["./*"]
-    }
+    "paths": { }
   },
   "include": [
     "src/**/*.ts"

@@ -1,4 +1,4 @@
-import { AnyAction, ContextOf, ListenerOf, ParamsOf, ResultOf } from "~/discord/action";
+import { AnyAction, ContextOf, ListenerOf, ParamsOf, ResultOf } from "./action";
 
 export abstract class Session<TAction extends AnyAction> {
   public context: ContextOf<TAction>;

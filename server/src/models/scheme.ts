@@ -1,4 +1,4 @@
-import { db } from "~/firebase";
+import { db } from "firebase";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace DocumentScheme {

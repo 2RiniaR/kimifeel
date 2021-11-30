@@ -1,17 +1,19 @@
-import { AcceptRequestAction } from "~/discord/actions/accept-request-action";
-import { AcceptRequestController } from "~/controllers/accept-request-controller";
-import { AddProfileAction } from "~/discord/actions/add-profile-action";
-import { AddProfileController } from "~/controllers/add-profile-controller";
-import { CancelRequestAction } from "~/discord/actions/cancel-request-action";
-import { CancelRequestController } from "~/controllers/cancel-request-controller";
-import { DeleteProfileAction } from "~/discord/actions/delete-profile-action";
-import { DeleteProfileController } from "~/controllers/delete-profile-controller";
-import { DenyRequestAction } from "~/discord/actions/deny-request-action";
-import { DenyRequestController } from "~/controllers/deny-request-controller";
-import { ShowProfilesAction } from "~/discord/actions/show-profiles-action";
-import { ShowProfilesController } from "~/controllers/show-profiles-controller";
-import { SubmitRequestAction } from "~/discord/actions/submit-request-action";
-import { SubmitRequestController } from "~/controllers/submit-request-controller";
+import { DeleteProfileController } from "./controllers/delete-profile-controller";
+import { AddProfileController } from "./controllers/add-profile-controller";
+import { ShowProfilesController } from "./controllers/show-profiles-controller";
+import { CancelRequestController } from "./controllers/cancel-request-controller";
+import { SubmitRequestController } from "./controllers/submit-request-controller";
+import { AcceptRequestController } from "./controllers/accept-request-controller";
+import { DenyRequestController } from "./controllers/deny-request-controller";
+import {
+  AcceptRequestAction,
+  AddProfileAction,
+  CancelRequestAction,
+  DeleteProfileAction,
+  DenyRequestAction,
+  ShowProfilesAction,
+  SubmitRequestAction
+} from "./discord/actions";
 
 new AcceptRequestAction().register(new AcceptRequestController());
 new AddProfileAction().register(new AddProfileController());

@@ -1,10 +1,11 @@
-import { Context } from ".";
-import { User, UserIdentifier, UserProps } from "../structures/user";
-import { UserManager } from "~/models/managers/user-manager";
-import { ProfileManager } from "~/models/managers/profile-manager";
-import { RequestManager } from "~/models/managers/request-manager";
+import { Context } from "../context";
+import { ProfileManager } from "../managers/profile-manager";
+import { RequestManager } from "../managers/request-manager";
+import { User, UserProps } from "./user";
+import { UserIdentifier } from "./identity-user";
+import { UserManager } from "../managers/user-manager";
 
-export class ClientUser implements UserIdentifier, UserProps {
+export class ClientUser {
   public readonly discordId: string;
   public readonly id: string;
   private readonly context: Context;

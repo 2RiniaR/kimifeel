@@ -1,7 +1,7 @@
-import { ErrorEmbed } from "../views/error-embed";
-import { Action, ActionBaseParams } from "~/discord/action";
-import { SlashCommandEvent, SlashCommandEventContext } from "~/discord/events/slash-command-event";
-import { Session } from "~/discord/session";
+import { Action, ActionBaseParams } from "../action";
+import { ErrorEmbed } from "../views";
+import { SlashCommandEvent, SlashCommandEventContext } from "../events";
+import { Session } from "../session";
 
 export type AddProfileParams = ActionBaseParams & {
   content: string;
@@ -39,7 +39,7 @@ export class AddProfileSession extends Session<AddProfileAction> {
   }
 
   async onFailed(error: unknown) {
-    const embed = new ErrorEmbed({ type: "error", error });
+    const embed = new ErrorEmbed(error);
     await this.context.interaction.reply({ embeds: [embed] });
   }
 }

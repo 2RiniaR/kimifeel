@@ -1,7 +1,7 @@
-import { IdentityProfile, Profile } from "../structures/profile";
-import { ContextModel } from "../context";
-import { buildProfile } from "~/models/repositories/builders/profile";
-import { getProfileById, getProfileByIndex } from "~/models/repositories/queries/profile";
+import { getProfileById, getProfileByIndex } from "../queries/profile";
+import { ContextModel } from "../context-model";
+import { IdentityProfile, Profile } from "../structures";
+import { buildProfile } from "../builders/profile";
 
 export class ProfileManager extends ContextModel {
   public async getByIndex(index: number): Promise<Profile | undefined> {

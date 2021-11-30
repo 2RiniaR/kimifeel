@@ -1,4 +1,4 @@
-import { Event } from "~/discord/event";
+import { Event } from "./event";
 
 export abstract class Action<
   TEventContext extends object | void = void,

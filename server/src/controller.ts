@@ -1,6 +1,6 @@
-import { ClientUser } from "~/models/context/client-user";
-import { ClientUserManager } from "~/models/managers/client-user-manager";
-import { AnyAction, ListenerOf, ParamsOf, ResultOf } from "~/discord/action";
+import { AnyAction, ListenerOf, ParamsOf, ResultOf } from "./discord/action";
+import { ClientUserManager } from "./models/managers/client-user-manager";
+import { ClientUser } from "./models/structures";
 
 export abstract class Controller<TAction extends AnyAction> implements ListenerOf<TAction> {
   private service = new ClientUserManager();

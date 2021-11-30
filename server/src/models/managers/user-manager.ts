@@ -1,7 +1,7 @@
-import { IdentityUser, User } from "../structures/user";
-import { ContextModel } from "../context/";
-import { getUserByDiscordId, getUserById } from "~/models/repositories/queries/user";
-import { buildUser } from "~/models/repositories/builders/user";
+import { IdentityUser, User } from "../structures";
+import { getUserByDiscordId, getUserById } from "../queries/user";
+import { ContextModel } from "../context-model";
+import { buildUser } from "../builders/user";
 
 export class UserManager extends ContextModel {
   public async getByDiscordId(discordId: string): Promise<User | undefined> {

@@ -1,5 +1,5 @@
 import { Client, Intents } from "discord.js";
-import { settingsManager } from "~/settings";
+import { settingsManager } from "settings";
 
 export class ClientManager {
   private readonly _client = new Client({

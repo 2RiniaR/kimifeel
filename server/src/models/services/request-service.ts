@@ -1,7 +1,7 @@
-import { createRequest, deleteRequest } from "~/models/repositories/queries/request";
-import { ContextModel } from "~/models/context";
-import { IdentityRequest, ImaginaryRequest } from "~/models/structures/request";
-import { buildRequest } from "~/models/repositories/builders/request";
+import { IdentityRequest, ImaginaryRequest } from "../structures";
+import { buildRequest } from "../builders/request";
+import { ContextModel } from "../context-model";
+import { createRequest, deleteRequest } from "../queries/request";
 
 export class RequestService extends ContextModel {
   private readonly request: IdentityRequest;
@@ -26,9 +26,9 @@ export class ImaginaryRequestService extends ContextModel {
 
   public async create() {
     const result = await createRequest({
-      userId: this.request.user.id,
-      requesterUserId: this.request.requester.id,
-      content: this.request.content
+      userId: this.request.profile.user.id,
+      requesterUserId: this.request.profile.author.id,
+      content: this.request.profile.content
     });
     return buildRequest(this.context, result);
   }

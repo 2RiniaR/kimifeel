@@ -1,6 +1,6 @@
-import { DocumentScheme, UserDocument, UserDocumentPath } from "~/models/repositories/scheme";
-import { MultipleQueryResult, SingleQueryResult } from "~/models/repositories/queries/index";
-import { db } from "~/firebase";
+import { DocumentScheme, UserDocument, UserDocumentPath } from "../scheme";
+import { MultipleQueryResult, SingleQueryResult } from "./results";
+import { db } from "firebase";
 
 export type UserQueryResult = UserDocument & UserDocumentPath;
 

@@ -1,7 +1,7 @@
-import { IdentityRequest, Request } from "../structures/request";
-import { ContextModel } from "../context";
-import { buildRequest } from "~/models/repositories/builders/request";
-import { getRequestById, getRequestByIndex } from "~/models/repositories/queries/request";
+import { getRequestById, getRequestByIndex } from "../queries/request";
+import { IdentityRequest, Request } from "../structures";
+import { buildRequest } from "../builders/request";
+import { ContextModel } from "../context-model";
 
 export class RequestManager extends ContextModel {
   public async getByIndex(index: number): Promise<Request | undefined> {

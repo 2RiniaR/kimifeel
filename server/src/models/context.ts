@@ -1,4 +1,4 @@
-import { ClientUser } from ".";
+import { ClientUser } from "./structures";
 
 export class Context {
   public readonly clientUser: ClientUser;

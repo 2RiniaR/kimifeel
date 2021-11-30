@@ -1,6 +1,6 @@
-import { Event } from "~/discord/event";
 import { CommandInteraction, GuildMember } from "discord.js";
-import { clientManager, targetGuildManager } from "~/discord";
+import { Event } from "../event";
+import { clientManager, targetGuildManager } from "../index";
 
 export type SlashCommandEventContext = {
   interaction: CommandInteraction;

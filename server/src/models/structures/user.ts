@@ -1,27 +1,12 @@
-import { Request } from "~/models";
-import { Profile } from "~/models";
-import { Context, ContextModel } from "../context";
-import { ForbiddenError } from "~/models/errors/forbidden-error";
-import { ImaginaryUserService, UserService } from "~/models/structures/services/user-service";
-import { ImaginaryProfile } from "~/models/structures/profile";
-import { ImaginaryRequest } from "~/models/structures/request";
+import { Request } from "./request";
+import { IdentityUser, UserIdentifier } from "./identity-user";
+import { Context } from "../context";
+import { ImaginaryProfile } from "./imaginary-profile";
+import { ImaginaryRequest } from "./imaginary-request";
+import { ForbiddenError } from "../errors";
 
-export class IdentityUser extends ContextModel implements UserIdentifier {
-  private readonly service = new UserService(this);
-  public readonly id: string;
-
-  public constructor(ctx: Context, props: UserIdentifier) {
-    super(ctx);
-    this.id = props.id;
-  }
-
-  public async getProfiles(): Promise<Profile[]> {
-    return await this.service.getProfiles();
-  }
-}
-
-export class User extends IdentityUser implements UserProps {
-  public discordId: string;
+export class User extends IdentityUser {
+  public readonly discordId: string;
 
   public constructor(ctx: Context, props: UserIdentifier & UserProps) {
     super(ctx, props);
@@ -53,27 +38,6 @@ export class User extends IdentityUser implements UserProps {
   }
 }
 
-export class ImaginaryUser implements CreateUserProps {
-  private readonly service = new ImaginaryUserService(this);
-  public readonly discordId: string;
-
-  public constructor(props: CreateUserProps) {
-    this.discordId = props.discordId;
-  }
-
-  public async createIfNotExist() {
-    return await this.service.createIfNotExist();
-  }
-}
-
-export type UserIdentifier = {
-  id: string;
-};
-
 export type UserProps = {
-  discordId: string;
-};
-
-export type CreateUserProps = {
   discordId: string;
 };

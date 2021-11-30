@@ -12,7 +12,7 @@ export class RequestService extends ContextModel {
   }
 
   public async delete() {
-    await deleteRequest(this.context.clientUser.id, this.request.id);
+    await deleteRequest(this.request.target.id, this.request.id);
   }
 }
 

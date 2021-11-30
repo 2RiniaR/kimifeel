@@ -8,14 +8,22 @@ export type ReactionAddEventContext = {
   message: Message;
 };
 
+export type ReactionAddEventOptions = {
+  allowBot: boolean;
+  myMessageOnly: boolean;
+};
+
 export class ReactionAddEvent extends Event<ReactionAddEventContext> {
   emojis: string[];
-  allowBot: boolean;
+  options: ReactionAddEventOptions;
 
-  constructor(emojis: string[] = [], allowBot = false) {
+  constructor(emojis: string[] = [], options?: Partial<ReactionAddEventOptions>) {
     super();
     this.emojis = emojis;
-    this.allowBot = allowBot;
+    this.options = {
+      allowBot: options?.allowBot ?? false,
+      myMessageOnly: options?.myMessageOnly ?? false
+    };
   }
 
   private static async fetchReaction(reaction: MessageReaction | PartialMessageReaction): Promise<MessageReaction> {
@@ -31,7 +39,18 @@ export class ReactionAddEvent extends Event<ReactionAddEventContext> {
 
   override register(listener: (props: ReactionAddEventContext) => Promise<void>): void {
     clientManager.client.on("messageReactionAdd", async (rawReaction, user) => {
-      if (!this.emojis.includes(rawReaction.emoji.toString()) || (!this.allowBot && user.bot)) return;
+      const messageCheckPassed =
+        !this.options.myMessageOnly ||
+        (rawReaction.message.author &&
+          clientManager.client.user &&
+          rawReaction.message.author.id === clientManager.client.user.id);
+      if (
+        !this.emojis.includes(rawReaction.emoji.toString()) ||
+        (!this.options.allowBot && user.bot) ||
+        !messageCheckPassed
+      )
+        return;
+
       const member = await targetGuildManager.getMember(user.id);
       if (!member) return;
       const reaction = await ReactionAddEvent.fetchReaction(rawReaction);

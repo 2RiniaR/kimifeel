@@ -1,10 +1,10 @@
-import { DeleteProfileController } from "./controllers/delete-profile-controller";
-import { AddProfileController } from "./controllers/add-profile-controller";
-import { ShowProfilesController } from "./controllers/show-profiles-controller";
-import { CancelRequestController } from "./controllers/cancel-request-controller";
-import { SubmitRequestController } from "./controllers/submit-request-controller";
-import { AcceptRequestController } from "./controllers/accept-request-controller";
-import { DenyRequestController } from "./controllers/deny-request-controller";
+import { DeleteProfileController } from "controllers/delete-profile-controller";
+import { AddProfileController } from "controllers/add-profile-controller";
+import { ShowProfilesController } from "controllers/show-profiles-controller";
+import { CancelRequestController } from "controllers/cancel-request-controller";
+import { SubmitRequestController } from "controllers/submit-request-controller";
+import { AcceptRequestController } from "controllers/accept-request-controller";
+import { DenyRequestController } from "controllers/deny-request-controller";
 import {
   AcceptRequestAction,
   AddProfileAction,
@@ -13,7 +13,7 @@ import {
   DenyRequestAction,
   ShowProfilesAction,
   SubmitRequestAction
-} from "./discord/actions";
+} from "discord/actions";
 
 new AcceptRequestAction().register(new AcceptRequestController());
 new AddProfileAction().register(new AddProfileController());

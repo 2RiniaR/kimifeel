@@ -10,18 +10,13 @@ export abstract class Session<TAction extends AnyAction> {
     this.listener = listener;
   }
 
-  protected abstract fetchParams(): Promise<ParamsOf<TAction> | undefined>;
+  protected abstract fetch(): Promise<ParamsOf<TAction>>;
   protected abstract onSucceed(): Promise<void>;
   protected abstract onFailed(error: unknown): Promise<void>;
 
   public async run(): Promise<void> {
-    const params = await this.fetchParams();
-    if (!params) {
-      await this.onFailed(Error());
-      return;
-    }
-
     try {
+      const params = await this.fetch();
       this.result = await this.listener.onAction(params);
     } catch (error) {
       console.error(error);
@@ -29,6 +24,10 @@ export abstract class Session<TAction extends AnyAction> {
       return;
     }
 
-    await this.onSucceed();
+    try {
+      await this.onSucceed();
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

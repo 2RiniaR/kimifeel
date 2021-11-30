@@ -7,16 +7,26 @@ export type SlashCommandEventContext = {
   member: GuildMember;
 };
 
+export type SlashCommandEventOptions = {
+  allowBot: boolean;
+};
+
 export class SlashCommandEvent extends Event<SlashCommandEventContext> {
   commandName: string;
   subCommandName?: string;
-  allowBot: boolean;
+  options: SlashCommandEventOptions;
 
-  constructor(commandName: string, subCommandName: string | undefined = undefined, allowBot = false) {
+  constructor(
+    commandName: string,
+    subCommandName: string | undefined = undefined,
+    options?: Partial<SlashCommandEventOptions>
+  ) {
     super();
     this.commandName = commandName;
     this.subCommandName = subCommandName;
-    this.allowBot = allowBot;
+    this.options = {
+      allowBot: options?.allowBot ?? false
+    };
   }
 
   register(listener: (props: SlashCommandEventContext) => Promise<void>): void {
@@ -27,7 +37,7 @@ export class SlashCommandEvent extends Event<SlashCommandEventContext> {
         (this.subCommandName && interaction.options.getSubcommand() !== this.subCommandName) ||
         !interaction.channel ||
         !interaction.channel.isText() ||
-        (!this.allowBot && interaction.user.bot)
+        (!this.options.allowBot && interaction.user.bot)
       )
         return;
       const requester = await targetGuildManager.getMember(interaction.user.id);

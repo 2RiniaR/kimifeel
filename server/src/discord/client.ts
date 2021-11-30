@@ -4,7 +4,7 @@ import { settingsManager } from "settings";
 export class ClientManager {
   private readonly _client = new Client({
     partials: ["CHANNEL"],
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES]
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS]
   });
 
   public constructor() {

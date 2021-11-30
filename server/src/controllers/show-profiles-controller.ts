@@ -13,7 +13,7 @@ export class ShowProfilesController extends Controller<ShowProfilesAction> {
     return await profiles.mapAsync(async (profile) => {
       const author = await client.users.fetch(profile.author);
       return {
-        author: author.discordId,
+        authorUserId: author.discordId,
         content: profile.content,
         index: profile.index
       };

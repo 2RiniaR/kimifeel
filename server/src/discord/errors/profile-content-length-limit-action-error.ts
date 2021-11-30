@@ -1,15 +1,18 @@
 import { ActionError } from "./action-error";
 
 export class ProfileContentLengthLimitActionError extends ActionError {
-  public readonly limit: number;
+  public readonly min: number;
+  public readonly max: number;
   public readonly actual: number;
   public readonly message: string;
   public readonly messageType = "invalid";
+  public readonly title = "プロフィールの本文が長すぎます。";
 
-  public constructor(limit: number, actual: number) {
+  public constructor(min: number, max: number, actual: number) {
     super();
-    this.limit = limit;
+    this.min = min;
+    this.max = max;
     this.actual = actual;
-    this.message = `プロフィールの本文が長すぎます。${this.limit.toString()}文字以下にしてください。（現在: ${this.actual.toString()}文字）`;
+    this.message = `${this.min.toString()}文字以下・${this.max.toString()}文字以下にしてください。（現在: ${this.actual.toString()}文字）`;
   }
 }

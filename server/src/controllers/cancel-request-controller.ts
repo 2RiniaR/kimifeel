@@ -5,8 +5,12 @@ import { ClientUser } from "models/structures";
 import { ForbiddenError } from "models/errors";
 
 export class CancelRequestController extends Controller<CancelRequestAction> {
+  requireUsersDiscordId = (ctx: CancelRequestParams) => [ctx.target];
+
   async action(ctx: CancelRequestParams, client: ClientUser) {
-    const request = await client.requests.getByIndex(ctx.index);
+    const target = await client.users.getByDiscordId(ctx.target);
+    if (!target) throw Error("The require user was not registered.");
+    const request = await target.getRequestByIndex(ctx.index);
     if (!request) throw new RequestNotFoundActionError();
 
     try {

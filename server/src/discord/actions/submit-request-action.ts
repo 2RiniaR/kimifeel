@@ -1,8 +1,9 @@
-import { GuildMember } from "discord.js";
+import { GuildMember, Message } from "discord.js";
 import { Action, ActionBaseParams } from "../action";
 import { ErrorEmbed, RequestEmbed } from "../views";
 import { SlashCommandEvent, SlashCommandEventContext } from "../events";
 import { Session } from "../session";
+import { DiscordFetchFailedActionError, NoBotActionError } from "../errors";
 
 export type SubmitRequestParams = ActionBaseParams & {
   target: string;
@@ -15,7 +16,7 @@ export type SubmitRequestResult = {
 
 export class SubmitRequestAction extends Action<SlashCommandEventContext, SubmitRequestParams, SubmitRequestResult> {
   protected defineEvent() {
-    return new SlashCommandEvent("request-profile");
+    return new SlashCommandEvent("request-profile", undefined, { allowBot: false });
   }
 
   protected async onEvent(context: SlashCommandEventContext) {
@@ -28,15 +29,16 @@ export class SubmitRequestSession extends Session<SubmitRequestAction> {
   private target!: GuildMember;
   private content!: string;
 
-  protected async fetchParams() {
+  protected async fetch(): Promise<SubmitRequestParams> {
     await Promise.resolve();
 
     const target = this.context.interaction.options.getMember("target");
-    if (!(target instanceof GuildMember)) return;
+    if (!(target instanceof GuildMember)) throw new DiscordFetchFailedActionError();
     this.target = target;
+    if (this.target.user.bot) throw new NoBotActionError();
 
     const content = this.context.interaction.options.getString("content");
-    if (!content) return;
+    if (!content) throw new DiscordFetchFailedActionError();
     this.content = content;
 
     return {
@@ -48,7 +50,7 @@ export class SubmitRequestSession extends Session<SubmitRequestAction> {
 
   protected async onFailed(error: unknown): Promise<void> {
     const embed = new ErrorEmbed(error);
-    await this.context.interaction.reply({ embeds: [embed] });
+    await this.context.interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   protected async onSucceed(): Promise<void> {
@@ -61,9 +63,8 @@ export class SubmitRequestSession extends Session<SubmitRequestAction> {
       targetUserName: this.target.displayName,
       targetUserId: this.target.id
     });
-    const message = await this.context.interaction.channel?.send({ embeds: [embed] });
-    if (!message) return;
-
-    await message.react("✅❌⛔");
+    const message = await this.context.interaction.reply({ embeds: [embed], fetchReply: true });
+    if (!(message instanceof Message)) return;
+    await ["✅", "❌", "⛔"].mapAsync((emoji) => message.react(emoji));
   }
 }

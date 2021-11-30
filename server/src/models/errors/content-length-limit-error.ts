@@ -1,10 +1,12 @@
 export class ContentLengthLimitError extends Error {
-  public readonly limit: number;
+  public readonly min: number;
+  public readonly max: number;
   public readonly actual: number;
 
-  public constructor(limit: number, actual: number) {
+  public constructor(min: number, max: number, actual: number) {
     super();
-    this.limit = limit;
+    this.min = min;
+    this.max = max;
     this.actual = actual;
   }
 }

@@ -1,27 +1,15 @@
-import { MessageEmbed } from "discord.js";
-import { getUserReference } from "../utils/get-user-reference";
+import { getProfileMarkdown, ProfileMarkdownProps } from "./get-profile-markdown";
+import { SystemMessageEmbed } from "./system-message-embed";
 
 export type ProfileListEmbedProps = {
   targetName: string;
   targetAvatarURL: string;
-  elements: ProfileListElement[];
+  elements: ProfileMarkdownProps[];
 };
 
-export type ProfileListElement = {
-  index: number;
-  content: string;
-  author: string;
-};
-
-export class ProfileListEmbed extends MessageEmbed {
+export class ProfileListEmbed extends SystemMessageEmbed {
   public constructor(props: ProfileListEmbedProps) {
-    super();
-    this.setColor("GREEN")
-      .setAuthor(props.targetName, props.targetAvatarURL)
-      .setDescription(props.elements.map((element) => ProfileListEmbed.stringifyElement(element)).join("\n"));
-  }
-
-  private static stringifyElement({ index, content, author }: ProfileListElement): string {
-    return `**No.${index}** - *by ${getUserReference(author)}*\`\`\`\n${content}\n\`\`\``;
+    super("info", "プロフィール一覧", props.elements.map((element) => getProfileMarkdown(element)).join("\n"));
+    this.setAuthor(props.targetName, props.targetAvatarURL);
   }
 }

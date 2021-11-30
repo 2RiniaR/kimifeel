@@ -16,7 +16,7 @@ export class SubmitRequestController extends Controller<SubmitRequestAction> {
       return { index: request.index };
     } catch (error) {
       if (error instanceof ContentLengthLimitError) {
-        throw new ProfileContentLengthLimitActionError(error.limit, error.actual);
+        throw new ProfileContentLengthLimitActionError(error.min, error.max, error.actual);
       } else {
         throw error;
       }

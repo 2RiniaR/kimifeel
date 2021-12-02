@@ -29,3 +29,7 @@ export class IdentityUser extends ContextModel implements UserIdentifier {
 export type UserIdentifier = {
   id: string;
 };
+
+export type GetProfilesProps = {
+
+}

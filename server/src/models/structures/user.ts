@@ -1,7 +1,6 @@
 import { Request } from "./request";
 import { IdentityUser, UserIdentifier } from "./identity-user";
 import { Context } from "../context";
-import { ImaginaryProfile } from "./imaginary-profile";
 import { ImaginaryRequest } from "./imaginary-request";
 import { ForbiddenError } from "../errors";
 
@@ -23,18 +22,6 @@ export class User extends IdentityUser {
       user: this
     });
     return await request.create();
-  }
-
-  public async addProfile(content: string) {
-    if (this.context.clientUser.id !== this.id) {
-      throw new ForbiddenError("Can not add the profile to other user without requests.");
-    }
-    const profile = new ImaginaryProfile(this.context, {
-      content,
-      author: this,
-      user: this
-    });
-    return await profile.create();
   }
 }
 

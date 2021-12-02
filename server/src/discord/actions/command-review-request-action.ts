@@ -1,0 +1,58 @@
+import { SessionIn } from "../session";
+import { SlashCommandEvent } from "../events";
+import { NoPermissionActionError, RequestNotFoundActionError } from "../errors";
+import { ErrorEmbed, RequestAcceptedEmbed } from "../views";
+import { ActionWith, EndpointParamsOf, EndpointResultOf } from "../action";
+import { ChangeRequestControlType, ChangeRequestEndpoint } from "../endpoints";
+import { ContextOf, OptionsOf } from "../event";
+
+export class CommandReviewRequestAction extends ActionWith<SlashCommandEvent, ChangeRequestEndpoint> {
+  readonly options: OptionsOf<SlashCommandEvent> = {
+    commandName: "review-request",
+    allowBot: false
+  };
+
+  onEvent(context: ContextOf<SlashCommandEvent>): Promise<void> {
+    return new ReactionChangeRequestSession(context, this.endpoint).run();
+  }
+}
+
+class ReactionChangeRequestSession extends SessionIn<CommandReviewRequestAction> {
+  async fetch(): Promise<EndpointParamsOf<CommandReviewRequestAction>> {
+    await Promise.resolve();
+
+    const index = this.context.interaction.options.getInteger("number");
+    if (!index) throw new Error();
+
+    const review = this.context.interaction.options.getString("review");
+    if (!review) throw new Error();
+    if (!(review in ["accept", "deny"])) throw new Error();
+
+    return {
+      clientDiscordId: this.context.member.id,
+      index,
+      targetDiscordId: this.context.member.id,
+      controlType: review as ChangeRequestControlType
+    };
+  }
+
+  async onSucceed(result: EndpointResultOf<CommandReviewRequestAction>) {
+    const embed = new RequestAcceptedEmbed({
+      userName: this.context.member.displayName,
+      userAvatarURL: this.context.member.displayAvatarURL(),
+      profile: {
+        authorUserId: result.authorDiscordId,
+        index: result.index,
+        content: result.content
+      }
+    });
+    await this.context.interaction.reply({ embeds: [embed] });
+  }
+
+  async onFailed(error: unknown) {
+    if (error instanceof NoPermissionActionError) return;
+    if (error instanceof RequestNotFoundActionError) return;
+    const embed = new ErrorEmbed(error);
+    await this.context.interaction.reply({ embeds: [embed] });
+  }
+}

@@ -11,4 +11,8 @@ export class ProfileManager extends ContextModel {
     }
     return buildProfile(this.context, result);
   }
+
+  public async getRandomly(count: number): Promise<Profile[]> {
+
+  }
 }

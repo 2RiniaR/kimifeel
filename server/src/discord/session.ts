@@ -1,23 +1,29 @@
-import { AnyAction, ContextOf, ListenerOf, ParamsOf, ResultOf } from "./action";
+import { Endpoint, EndpointParamsBase, EndpointResultBase } from "./endpoint";
+import { EventContextBase } from "./event";
+import { AnyAction, EndpointParamsOf, EndpointResultOf, EventContextOf } from "./action";
 
-export abstract class Session<TAction extends AnyAction> {
-  public context: ContextOf<TAction>;
-  public listener: ListenerOf<TAction>;
-  public result!: ResultOf<TAction>;
+export abstract class Session<
+  TEventContext extends EventContextBase,
+  TEndpointParams extends EndpointParamsBase,
+  TEndpointResult extends EndpointResultBase
+> {
+  public context: TEventContext;
+  public endpoint: Endpoint<TEndpointParams, TEndpointResult>;
 
-  public constructor(context: ContextOf<TAction>, listener: ListenerOf<TAction>) {
+  public constructor(context: TEventContext, endpoint: Endpoint<TEndpointParams, TEndpointResult>) {
     this.context = context;
-    this.listener = listener;
+    this.endpoint = endpoint;
   }
 
-  protected abstract fetch(): Promise<ParamsOf<TAction>>;
-  protected abstract onSucceed(): Promise<void>;
+  protected abstract fetch(): Promise<TEndpointParams>;
+  protected abstract onSucceed(result: TEndpointResult): Promise<void>;
   protected abstract onFailed(error: unknown): Promise<void>;
 
   public async run(): Promise<void> {
+    let result: TEndpointResult;
     try {
       const params = await this.fetch();
-      this.result = await this.listener.onAction(params);
+      result = await this.endpoint.invoke(params);
     } catch (error) {
       console.error(error);
       await this.onFailed(error);
@@ -25,9 +31,15 @@ export abstract class Session<TAction extends AnyAction> {
     }
 
     try {
-      await this.onSucceed();
+      await this.onSucceed(result);
     } catch (error) {
       console.error(error);
     }
   }
 }
+
+export abstract class SessionIn<TAction extends AnyAction> extends Session<
+  EventContextOf<TAction>,
+  EndpointParamsOf<TAction>,
+  EndpointResultOf<TAction>
+> {}

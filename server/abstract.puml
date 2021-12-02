@@ -1,5 +1,55 @@
 @startuml Kimifeel
 
+hide empty members
 
+class Firebase
+
+package discord #BBBBDD {
+    class Endpoint
+    class View
+    class Session
+    class Action
+    class Event
+
+    Action - Session
+    Action -up-> Event
+    Action -up-> Endpoint
+    Action -left-> View
+}
+
+package models #DDBBBB {
+    class ContextModel
+    class Context
+    class Client
+    class ClientManager
+    class IdentityModel
+    class Model
+    class ModelService
+    class ModelManager
+    class Queries
+    class Builder
+
+    ContextModel *-- Context
+    IdentityModel -down-|> ContextModel
+    ModelManager -down-|> ContextModel
+    Model -down-|> IdentityModel
+    
+    ClientManager -left-> Client
+    IdentityModel o-left- ModelService
+    Client -down-> ModelManager
+
+    Queries -up-> Firebase
+    Builder --> Context
+    ModelService --> Builder
+    ModelService -up-> Queries
+    ModelManager o-left- ModelService
+}
+
+package controllers #BBDDDD {
+    class Controller
+
+    Controller --> ClientManager
+    Controller --> Endpoint
+}
 
 @enduml

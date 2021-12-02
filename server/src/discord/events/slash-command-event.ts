@@ -8,41 +8,37 @@ export type SlashCommandEventContext = {
 };
 
 export type SlashCommandEventOptions = {
+  commandName: string;
+  subCommandGroupName?: string;
+  subCommandName?: string;
   allowBot: boolean;
 };
 
-export class SlashCommandEvent extends Event<SlashCommandEventContext> {
-  commandName: string;
-  subCommandName?: string;
-  options: SlashCommandEventOptions;
+export class SlashCommandEvent extends Event<SlashCommandEventContext, SlashCommandEventOptions> {
+  public activate() {
+    clientManager.client.on("interactionCreate", async (interaction) => {
+      if (!interaction.isCommand()) return;
+      const listeners = this.listeners.filter(
+        (listener) =>
+          SlashCommandEvent.checkCommandName(interaction, listener.options) &&
+          SlashCommandEvent.checkBot(interaction, listener.options)
+      );
+      const member = await targetGuildManager.getMember(interaction.user.id);
+      if (!member) return;
 
-  constructor(
-    commandName: string,
-    subCommandName: string | undefined = undefined,
-    options?: Partial<SlashCommandEventOptions>
-  ) {
-    super();
-    this.commandName = commandName;
-    this.subCommandName = subCommandName;
-    this.options = {
-      allowBot: options?.allowBot ?? false
-    };
+      const context: SlashCommandEventContext = { interaction, member };
+      await listeners.mapAsync((listener) => listener.onEvent(context));
+    });
   }
 
-  register(listener: (props: SlashCommandEventContext) => Promise<void>): void {
-    clientManager.client.on("interactionCreate", async (interaction) => {
-      if (
-        !interaction.isCommand() ||
-        interaction.commandName !== this.commandName ||
-        (this.subCommandName && interaction.options.getSubcommand() !== this.subCommandName) ||
-        !interaction.channel ||
-        !interaction.channel.isText() ||
-        (!this.options.allowBot && interaction.user.bot)
-      )
-        return;
-      const requester = await targetGuildManager.getMember(interaction.user.id);
-      if (!requester) return;
-      await listener({ interaction, member: requester });
-    });
+  private static checkCommandName(interaction: CommandInteraction, options: SlashCommandEventOptions) {
+    const mainValid = interaction.commandName === options.commandName;
+    const subGroupValid = interaction.options.getSubcommandGroup() === options.subCommandGroupName;
+    const subValid = interaction.options.getSubcommand() === options.subCommandName;
+    return mainValid && subGroupValid && subValid;
+  }
+
+  private static checkBot(interaction: CommandInteraction, options: SlashCommandEventOptions) {
+    return options.allowBot || !interaction.user.bot;
   }
 }

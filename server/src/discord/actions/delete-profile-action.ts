@@ -1,10 +1,10 @@
-import { Action, ActionBaseParams } from "../action";
+import { Endpoint, EndpointParamsBase } from "../endpoint";
 import { ErrorEmbed, ProfileDeletedEmbed } from "../views";
 import { SlashCommandEvent, SlashCommandEventContext } from "../events";
 import { Session } from "../session";
 import { DiscordFetchFailedActionError } from "../errors";
 
-export type DeleteProfileParams = ActionBaseParams & {
+export type DeleteProfileParams = EndpointParamsBase & {
   index: number;
 };
 
@@ -14,7 +14,7 @@ export type DeleteProfileResult = {
   authorUserId: string;
 };
 
-export class DeleteProfileAction extends Action<SlashCommandEventContext, DeleteProfileParams, DeleteProfileResult> {
+export class DeleteProfileAction extends Endpoint<SlashCommandEventContext, DeleteProfileParams, DeleteProfileResult> {
   protected defineEvent() {
     return new SlashCommandEvent("delete-profile", undefined, { allowBot: false });
   }
@@ -36,7 +36,7 @@ export class DeleteProfileSession extends Session<DeleteProfileAction> {
     this.index = index;
 
     return {
-      client: this.context.member.id,
+      clientDiscordId: this.context.member.id,
       index: this.index
     };
   }

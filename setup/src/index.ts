@@ -18,18 +18,6 @@ function getEnvironmentVariable(name: string): string {
 function getCommands(): object[] {
   return [
     {
-      name: "add-profile",
-      description: "自分のプロフィールを追加する",
-      options: [
-        {
-          type: 3,
-          name: "content",
-          description: "追加するプロフィールの内容",
-          required: true
-        }
-      ]
-    },
-    {
       name: "delete-profile",
       description: "自分のプロフィールを削除する",
       options: [
@@ -41,18 +29,300 @@ function getCommands(): object[] {
         }
       ]
     },
+
     {
-      name: "show-profile",
-      description: "ユーザーのプロフィールを表示する",
+      name: "show-received-request",
+      description: "届いているリクエストを表示する",
       options: [
         {
-          type: 6,
-          name: "target",
-          description: "表示するユーザー",
-          required: true
+          type: 1,
+          name: "latest",
+          description: "届いているリクエストを、新しいものから表示する",
+          options: [
+            {
+              type: 4,
+              name: "page",
+              description: "表示するページ（指定がない場合は1ページ目）",
+              required: false
+            }
+          ]
+        },
+        {
+          type: 1,
+          name: "oldest",
+          description: "届いているリクエストを、古いものから表示する",
+          options: [
+            {
+              type: 4,
+              name: "page",
+              description: "表示するページ（指定がない場合は1ページ目）",
+              required: false
+            }
+          ]
+        },
+        {
+          type: 1,
+          name: "number",
+          description: "届いているリクエストを、番号を指定して表示する",
+          options: [
+            {
+              type: 4,
+              name: "number",
+              description: "表示するリクエストの番号",
+              required: true
+            }
+          ]
         }
       ]
     },
+
+    {
+      name: "show-sent-request",
+      description: "送信済みのリクエストを表示する",
+      options: [
+        {
+          type: 1,
+          name: "latest",
+          description: "送信済みのリクエストを、新しいものから表示する",
+          options: [
+            {
+              type: 4,
+              name: "page",
+              description: "表示するページ（指定がない場合は1ページ目）",
+              required: false
+            }
+          ]
+        },
+        {
+          type: 1,
+          name: "oldest",
+          description: "送信済みのリクエストを、古いものから表示する",
+          options: [
+            {
+              type: 4,
+              name: "page",
+              description: "表示するページ（指定がない場合は1ページ目）",
+              required: false
+            }
+          ]
+        },
+        {
+          type: 1,
+          name: "number",
+          description: "送信済みのリクエストを、番号を指定して表示する",
+          options: [
+            {
+              type: 4,
+              name: "number",
+              description: "表示するリクエストの番号",
+              required: true
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      name: "show-profile",
+      description: "プロフィールを表示する",
+      options: [
+        {
+          type: 2,
+          name: "user",
+          description: "指定したユーザーのプロフィールを表示する",
+          options: [
+            {
+              type: 1,
+              name: "random",
+              description: "指定したユーザーのプロフィールを、ランダムに表示する",
+              options: [
+                {
+                  type: 6,
+                  name: "target",
+                  description: "ユーザー",
+                  required: true
+                },
+                {
+                  type: 6,
+                  name: "author",
+                  description: "記述者",
+                  required: false
+                },
+                {
+                  type: 3,
+                  name: "content",
+                  description: "含む文字列",
+                  required: false
+                }
+              ]
+            },
+
+            {
+              type: 1,
+              name: "oldest",
+              description: "指定したユーザーのプロフィールを、古いものから表示する",
+              options: [
+                {
+                  type: 6,
+                  name: "target",
+                  description: "ユーザー",
+                  required: true
+                },
+                {
+                  type: 4,
+                  name: "page",
+                  description: "表示するページ（指定がない場合は1ページ目）",
+                  required: false
+                },
+                {
+                  type: 6,
+                  name: "author",
+                  description: "記述者",
+                  required: false
+                },
+                {
+                  type: 3,
+                  name: "content",
+                  description: "含む文字列",
+                  required: false
+                }
+              ]
+            },
+
+            {
+              type: 1,
+              name: "latest",
+              description: "指定したユーザーのプロフィールを、新しいものから表示する",
+              options: [
+                {
+                  type: 6,
+                  name: "target",
+                  description: "ユーザー",
+                  required: true
+                },
+                {
+                  type: 4,
+                  name: "page",
+                  description: "表示するページ（指定がない場合は1ページ目）",
+                  required: false
+                },
+                {
+                  type: 6,
+                  name: "author",
+                  description: "記述者",
+                  required: false
+                },
+                {
+                  type: 3,
+                  name: "content",
+                  description: "含む文字列",
+                  required: false
+                }
+              ]
+            },
+
+            {
+              type: 1,
+              name: "number",
+              description: "指定したユーザーのプロフィールを、番号を指定して表示する",
+              options: [
+                {
+                  type: 6,
+                  name: "target",
+                  description: "ユーザー",
+                  required: true
+                },
+                {
+                  type: 4,
+                  name: "number",
+                  description: "表示する番号",
+                  required: true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          type: 2,
+          name: "global",
+          description: "すべてのユーザーのプロフィールを表示する",
+          options: [
+            {
+              type: 1,
+              name: "random",
+              description: "すべてのユーザーのプロフィールを、ランダムに表示する",
+              options: [
+                {
+                  type: 6,
+                  name: "author",
+                  description: "記述者",
+                  required: false
+                },
+                {
+                  type: 3,
+                  name: "content",
+                  description: "含む文字列",
+                  required: false
+                }
+              ]
+            },
+
+            {
+              type: 1,
+              name: "oldest",
+              description: "すべてのユーザーのプロフィールを、古いものから表示する",
+              options: [
+                {
+                  type: 4,
+                  name: "page",
+                  description: "表示するページ（指定がない場合は1ページ目）",
+                  required: false
+                },
+                {
+                  type: 6,
+                  name: "author",
+                  description: "記述者",
+                  required: false
+                },
+                {
+                  type: 3,
+                  name: "content",
+                  description: "含む文字列",
+                  required: false
+                }
+              ]
+            },
+
+            {
+              type: 1,
+              name: "latest",
+              description: "すべてのユーザーのプロフィールを、新しいものから表示する",
+              options: [
+                {
+                  type: 4,
+                  name: "page",
+                  description: "表示するページ（指定がない場合は1ページ目）",
+                  required: false
+                },
+                {
+                  type: 6,
+                  name: "author",
+                  description: "記述者",
+                  required: false
+                },
+                {
+                  type: 3,
+                  name: "content",
+                  description: "含む文字列",
+                  required: false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
     {
       name: "request-profile",
       description: "プロフィールの追加をリクエストする",

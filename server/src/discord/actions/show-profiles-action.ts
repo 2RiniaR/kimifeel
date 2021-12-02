@@ -1,17 +1,17 @@
 import { GuildMember } from "discord.js";
-import { Action, ActionBaseParams } from "../action";
+import { Endpoint, EndpointParamsBase } from "../endpoint";
 import { ErrorEmbed, ProfileListEmbed, ProfileMarkdownProps } from "../views";
 import { SlashCommandEvent, SlashCommandEventContext } from "../events";
 import { Session } from "../session";
 import { DiscordFetchFailedActionError, NoBotActionError } from "../errors";
 
-export type ShowProfilesParams = ActionBaseParams & {
+export type ShowProfilesParams = EndpointParamsBase & {
   target: string;
 };
 
 export type ShowProfilesResult = ProfileMarkdownProps[];
 
-export class ShowProfilesAction extends Action<SlashCommandEventContext, ShowProfilesParams, ShowProfilesResult> {
+export class ShowProfilesAction extends Endpoint<SlashCommandEventContext, ShowProfilesParams, ShowProfilesResult> {
   protected defineEvent() {
     return new SlashCommandEvent("show-profile", undefined, { allowBot: false });
   }
@@ -34,7 +34,7 @@ export class ShowProfilesSession extends Session<ShowProfilesAction> {
     if (this.target.user.bot) throw new NoBotActionError();
 
     return {
-      client: this.context.member.id,
+      clientDiscordId: this.context.member.id,
       target: this.target.id
     };
   }

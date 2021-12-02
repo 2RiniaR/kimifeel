@@ -1,15 +1,15 @@
-import { Action, ActionBaseParams } from "../action";
+import { Endpoint, EndpointParamsBase } from "../endpoint";
 import { RequestEmbed, ErrorEmbed, RequestCanceledEmbed } from "../views";
 import { ReactionAddEvent, ReactionAddEventContext } from "../events";
 import { Session } from "../session";
 import { DiscordFetchFailedActionError, NoPermissionActionError, RequestNotFoundActionError } from "../errors";
 
-export type CancelRequestParams = ActionBaseParams & {
+export type CancelRequestParams = EndpointParamsBase & {
   target: string;
   index: number;
 };
 
-export class CancelRequestAction extends Action<ReactionAddEventContext, CancelRequestParams> {
+export class CancelRequestAction extends Endpoint<ReactionAddEventContext, CancelRequestParams> {
   protected defineEvent() {
     return new ReactionAddEvent(["⛔"], { allowBot: false, myMessageOnly: true });
   }
@@ -25,7 +25,7 @@ export class CancelRequestSession extends Session<CancelRequestAction> {
     await Promise.resolve();
     if (this.context.message.embeds.length === 0) throw new DiscordFetchFailedActionError();
     return {
-      client: this.context.member.id,
+      clientDiscordId: this.context.member.id,
       index: RequestEmbed.getIndex(this.context.message.embeds[0]),
       target: RequestEmbed.getUserId(this.context.message.embeds[0])
     };

@@ -4,7 +4,7 @@ import { SubmitRequestAction, SubmitRequestParams } from "discord/actions";
 import { ContentLengthLimitError } from "models/errors";
 import { ClientUser } from "models/structures";
 
-export class SubmitRequestController extends Controller<SubmitRequestAction> {
+export class CreateRequestController extends Controller<SubmitRequestAction> {
   requireUsersDiscordId = (ctx: SubmitRequestParams) => [ctx.target];
 
   async action(ctx: SubmitRequestParams, client: ClientUser) {

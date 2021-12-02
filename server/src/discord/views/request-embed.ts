@@ -24,15 +24,15 @@ export class RequestEmbed extends MessageEmbed {
       .addField(RequestEmbed.IndexFieldName, props.index.toString(), true);
   }
 
-  public static getUserId(embed: MessageEmbed): string {
+  public static getUserId(embed: MessageEmbed): string | undefined {
     const indexField = embed.fields.find((field) => field.name === RequestEmbed.UserIdFieldName);
-    if (!indexField) throw Error("Index field in the embed didn't exist.");
+    if (!indexField) return;
     return removeUserReference(indexField.value);
   }
 
-  public static getIndex(embed: MessageEmbed): number {
+  public static getIndex(embed: MessageEmbed): number | undefined {
     const indexField = embed.fields.find((field) => field.name === RequestEmbed.IndexFieldName);
-    if (!indexField) throw Error("Index field in the embed didn't exist.");
+    if (!indexField) return;
     return parseInt(indexField.value);
   }
 

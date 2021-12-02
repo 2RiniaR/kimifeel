@@ -1,11 +1,11 @@
 import { GuildMember, Message } from "discord.js";
-import { Action, ActionBaseParams } from "../action";
+import { Endpoint, EndpointParamsBase } from "../endpoint";
 import { ErrorEmbed, RequestEmbed } from "../views";
 import { SlashCommandEvent, SlashCommandEventContext } from "../events";
 import { Session } from "../session";
 import { DiscordFetchFailedActionError, NoBotActionError } from "../errors";
 
-export type SubmitRequestParams = ActionBaseParams & {
+export type SubmitRequestParams = EndpointParamsBase & {
   target: string;
   content: string;
 };
@@ -14,7 +14,7 @@ export type SubmitRequestResult = {
   index: number;
 };
 
-export class SubmitRequestAction extends Action<SlashCommandEventContext, SubmitRequestParams, SubmitRequestResult> {
+export class SubmitRequestAction extends Endpoint<SlashCommandEventContext, SubmitRequestParams, SubmitRequestResult> {
   protected defineEvent() {
     return new SlashCommandEvent("request-profile", undefined, { allowBot: false });
   }
@@ -42,7 +42,7 @@ export class SubmitRequestSession extends Session<SubmitRequestAction> {
     this.content = content;
 
     return {
-      client: this.context.member.id,
+      clientDiscordId: this.context.member.id,
       target: this.target.id,
       content: this.content
     };

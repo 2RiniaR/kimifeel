@@ -1,15 +1,15 @@
-import { Action, ActionBaseParams } from "../action";
+import { Endpoint, EndpointParamsBase } from "../endpoint";
 import { RequestEmbed, ErrorEmbed, RequestDeniedEmbed } from "../views";
 import { ReactionAddEvent, ReactionAddEventContext } from "../events";
 import { Session } from "../session";
 import { DiscordFetchFailedActionError, NoPermissionActionError, RequestNotFoundActionError } from "../errors";
 
-export type DenyRequestParams = ActionBaseParams & {
+export type DenyRequestParams = EndpointParamsBase & {
   target: string;
   index: number;
 };
 
-export class DenyRequestAction extends Action<ReactionAddEventContext, DenyRequestParams> {
+export class DenyRequestAction extends Endpoint<ReactionAddEventContext, DenyRequestParams> {
   protected defineEvent() {
     return new ReactionAddEvent(["❌"], { allowBot: false, myMessageOnly: true });
   }
@@ -25,7 +25,7 @@ export class DenyRequestSession extends Session<DenyRequestAction> {
     await Promise.resolve();
     if (this.context.message.embeds.length === 0) throw new DiscordFetchFailedActionError();
     return {
-      client: this.context.member.id,
+      clientDiscordId: this.context.member.id,
       index: RequestEmbed.getIndex(this.context.message.embeds[0]),
       target: RequestEmbed.getUserId(this.context.message.embeds[0])
     };

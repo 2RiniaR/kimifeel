@@ -1,4 +1,4 @@
-import { ActionError } from "./action-error";
+import { ActionError } from "../../discord/errors/action-error";
 
 export class ProfileContentLengthLimitActionError extends ActionError {
   public readonly min: number;

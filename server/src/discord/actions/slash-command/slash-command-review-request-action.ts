@@ -1,24 +1,28 @@
 import { SessionIn } from "../session";
-import { SlashCommandEvent } from "../events";
+import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "../events";
 import { NoPermissionActionError, RequestNotFoundActionError } from "../errors";
 import { ErrorEmbed, RequestAcceptedEmbed } from "../views";
 import { ActionWith, EndpointParamsOf, EndpointResultOf } from "../action";
-import { ChangeRequestControlType, ChangeRequestEndpoint } from "../endpoints";
-import { ContextOf, OptionsOf } from "../event";
+import {
+  ChangeRequestControlType,
+  ChangeRequestEndpoint,
+  ChangeRequestEndpointParams,
+  ChangeRequestEndpointResult
+} from "../endpoints";
 
 export class CommandReviewRequestAction extends ActionWith<SlashCommandEvent, ChangeRequestEndpoint> {
-  readonly options: OptionsOf<SlashCommandEvent> = {
+  readonly options: SlashCommandEventOptions = {
     commandName: "review-request",
     allowBot: false
   };
 
-  onEvent(context: ContextOf<SlashCommandEvent>): Promise<void> {
-    return new ReactionChangeRequestSession(context, this.endpoint).run();
+  async onEvent(context: SlashCommandEventContext) {
+    await new ReactionChangeRequestSession(context, this.endpoint).run();
   }
 }
 
 class ReactionChangeRequestSession extends SessionIn<CommandReviewRequestAction> {
-  async fetch(): Promise<EndpointParamsOf<CommandReviewRequestAction>> {
+  async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
 
     const index = this.context.interaction.options.getInteger("number");
@@ -36,7 +40,7 @@ class ReactionChangeRequestSession extends SessionIn<CommandReviewRequestAction>
     };
   }
 
-  async onSucceed(result: EndpointResultOf<CommandReviewRequestAction>) {
+  async onSucceed(result: ChangeRequestEndpointResult) {
     const embed = new RequestAcceptedEmbed({
       userName: this.context.member.displayName,
       userAvatarURL: this.context.member.displayAvatarURL(),

@@ -1,21 +1,21 @@
 import { Endpoint, EndpointParamsBase } from "../endpoint";
 import { ProfileMarkdownProps } from "../views";
 
-export type GetProfilesConditions = {
+export type GetProfilesEndpointConditions = {
   ownerDiscordId?: string;
   authorDiscordId?: string;
   content?: string;
 };
 
-export type GetProfilesParams = EndpointParamsBase &
+export type GetProfilesEndpointParams = EndpointParamsBase &
   (
     | ({
         method: "oldest" | "latest";
         page: number;
-      } & GetProfilesConditions)
+      } & GetProfilesEndpointConditions)
     | ({
         method: "random";
-      } & GetProfilesConditions)
+      } & GetProfilesEndpointConditions)
     | {
         method: "specific";
         ownerDiscordId: string;
@@ -23,6 +23,6 @@ export type GetProfilesParams = EndpointParamsBase &
       }
   );
 
-export type GetProfilesResult = ProfileMarkdownProps[];
+export type GetProfilesEndpointResult = ProfileMarkdownProps[];
 
-export class GetProfilesEndpoint extends Endpoint<GetProfilesParams, GetProfilesResult> {}
+export class GetProfilesEndpoint extends Endpoint<GetProfilesEndpointParams, GetProfilesEndpointResult> {}

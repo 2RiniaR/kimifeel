@@ -2,16 +2,16 @@ import { Endpoint, EndpointParamsBase } from "../endpoint";
 
 export type ChangeRequestControlType = "accept" | "deny" | "cancel";
 
-export type ChangeRequestParams = EndpointParamsBase & {
+export type ChangeRequestEndpointParams = EndpointParamsBase & {
   targetDiscordId: string;
   index: number;
   controlType: ChangeRequestControlType;
 };
 
-export type ChangeRequestResult = {
+export type ChangeRequestEndpointResult = {
   index: number;
   content: string;
   authorDiscordId: string;
 };
 
-export class ChangeRequestEndpoint extends Endpoint<ChangeRequestParams, ChangeRequestResult> {}
+export class ChangeRequestEndpoint extends Endpoint<ChangeRequestEndpointParams, ChangeRequestEndpointResult> {}

@@ -1,7 +1,7 @@
 import { Endpoint, EndpointParamsBase } from "../endpoint";
 import { ProfileMarkdownProps } from "../views";
 
-type GetReceivedRequestsParams =
+type GetReceivedRequestsEndpointParams =
   | {
       method: "latest" | "oldest";
       page: number;
@@ -22,9 +22,9 @@ type GetSentRequestsParams =
       index: number;
     };
 
-export type GetRequestsParams = EndpointParamsBase &
-  (({ genre: "received" } & GetReceivedRequestsParams) | ({ genre: "sent" } & GetSentRequestsParams));
+export type GetRequestsEndpointParams = EndpointParamsBase &
+  (({ genre: "received" } & GetReceivedRequestsEndpointParams) | ({ genre: "sent" } & GetSentRequestsParams));
 
-export type GetRequestsResult = ProfileMarkdownProps[];
+export type GetRequestsEndpointResult = ProfileMarkdownProps[];
 
-export class GetRequestsEndpoint extends Endpoint<GetRequestsParams, GetRequestsResult> {}
+export class GetRequestsEndpoint extends Endpoint<GetRequestsEndpointParams, GetRequestsEndpointResult> {}

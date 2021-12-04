@@ -1,10 +1,14 @@
 import { SessionIn } from "../session";
-import { ReactionAddEvent } from "../events";
+import { ReactionAddEvent, ReactionAddEventContext, ReactionAddEventOptions } from "../events";
 import { DiscordFetchFailedActionError, NoPermissionActionError, RequestNotFoundActionError } from "../errors";
 import { RequestEmbed, ErrorEmbed, RequestAcceptedEmbed } from "../views";
-import { ActionWith, EndpointParamsOf, EndpointResultOf } from "../action";
-import { ChangeRequestControlType, ChangeRequestEndpoint } from "../endpoints";
-import { ContextOf, OptionsOf } from "../event";
+import { ActionWith } from "../action";
+import {
+  ChangeRequestControlType,
+  ChangeRequestEndpoint,
+  ChangeRequestEndpointParams,
+  ChangeRequestEndpointResult
+} from "../endpoints";
 
 export class ReactionChangeRequestAction extends ActionWith<ReactionAddEvent, ChangeRequestEndpoint> {
   public static emojiToChange: { [emoji: string]: ChangeRequestControlType } = {
@@ -13,19 +17,19 @@ export class ReactionChangeRequestAction extends ActionWith<ReactionAddEvent, Ch
     "⛔": "cancel"
   };
 
-  readonly options: OptionsOf<ReactionAddEvent> = {
+  readonly options: ReactionAddEventOptions = {
     emojis: Object.keys(ReactionChangeRequestAction.emojiToChange),
     allowBot: false,
     myMessageOnly: true
   };
 
-  onEvent(context: ContextOf<ReactionAddEvent>): Promise<void> {
+  onEvent(context: ReactionAddEventContext): Promise<void> {
     return new ReactionChangeRequestSession(context, this.endpoint).run();
   }
 }
 
 class ReactionChangeRequestSession extends SessionIn<ReactionChangeRequestAction> {
-  async fetch(): Promise<EndpointParamsOf<ReactionChangeRequestAction>> {
+  async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
 
     if (this.context.message.embeds.length === 0) {
@@ -51,7 +55,7 @@ class ReactionChangeRequestSession extends SessionIn<ReactionChangeRequestAction
     };
   }
 
-  async onSucceed(result: EndpointResultOf<ReactionChangeRequestAction>) {
+  async onSucceed(result: ChangeRequestEndpointResult) {
     const embed = new RequestAcceptedEmbed({
       userName: this.context.member.displayName,
       userAvatarURL: this.context.member.displayAvatarURL(),

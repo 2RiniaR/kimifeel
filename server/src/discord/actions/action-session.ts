@@ -1,8 +1,8 @@
-import { Endpoint, EndpointParamsBase, EndpointResultBase } from "./endpoint";
-import { EventContextBase } from "./event";
-import { AnyAction, EndpointParamsOf, EndpointResultOf, EventContextOf } from "./action";
+import { Endpoint, EndpointParamsBase, EndpointResultBase } from "../../endpoint";
+import { EventContextBase } from "../event";
+import { AnyAction, EndpointParamsOf, EndpointResultOf, EventContextOf } from "../action";
 
-export abstract class Session<
+export abstract class ActionSession<
   TEventContext extends EventContextBase,
   TEndpointParams extends EndpointParamsBase,
   TEndpointResult extends EndpointResultBase
@@ -38,7 +38,7 @@ export abstract class Session<
   }
 }
 
-export abstract class SessionIn<TAction extends AnyAction> extends Session<
+export abstract class SessionIn<TAction extends AnyAction> extends ActionSession<
   EventContextOf<TAction>,
   EndpointParamsOf<TAction>,
   EndpointResultOf<TAction>

@@ -1,4 +1,4 @@
-import { ActionError } from "./action-error";
+import { ActionError } from "../../discord/errors/action-error";
 
 export class RequestNotFoundActionError extends ActionError {
   public readonly title = "対象のリクエストは見つかりませんでした。";

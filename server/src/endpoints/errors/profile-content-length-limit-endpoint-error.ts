@@ -1,11 +1,10 @@
-import { ActionError } from "../../discord/errors/action-error";
+import { EndpointError } from "./endpoint-error";
 
-export class ProfileContentLengthLimitActionError extends ActionError {
+export class ProfileContentLengthLimitEndpointError extends EndpointError {
   public readonly min: number;
   public readonly max: number;
   public readonly actual: number;
   public readonly message: string;
-  public readonly messageType = "invalid";
   public readonly title = "プロフィールの本文が長すぎます。";
 
   public constructor(min: number, max: number, actual: number) {

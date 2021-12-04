@@ -7,7 +7,7 @@ import {
   DeleteProfileEndpoint,
   GetProfilesEndpoint,
   GetRequestsEndpoint
-} from "./endpoints";
+} from "../endpoints";
 
 export const clientManager = new ClientManager();
 export const targetGuildManager = new TargetGuildManager(clientManager.client);

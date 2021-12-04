@@ -1,35 +1,31 @@
-import { SessionIn } from "../session";
-import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "../events";
-import { NoPermissionActionError, RequestNotFoundActionError } from "../errors";
-import { ErrorEmbed, RequestAcceptedEmbed } from "../views";
-import { ActionWith, EndpointParamsOf, EndpointResultOf } from "../action";
+import { ActionSessionIn } from "discord/actions/action-session";
+import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
+import { NoPermissionActionError, RequestNotFoundEndpointError } from "discord/errors";
+import { ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
+import { ActionWith } from "discord/action";
 import {
   ChangeRequestControlType,
   ChangeRequestEndpoint,
   ChangeRequestEndpointParams,
   ChangeRequestEndpointResult
-} from "../endpoints";
+} from "endpoints";
 
-export class CommandReviewRequestAction extends ActionWith<SlashCommandEvent, ChangeRequestEndpoint> {
+export class SlashCommandReviewRequestAction extends ActionWith<SlashCommandEvent, ChangeRequestEndpoint> {
   readonly options: SlashCommandEventOptions = {
     commandName: "review-request",
     allowBot: false
   };
 
   async onEvent(context: SlashCommandEventContext) {
-    await new ReactionChangeRequestSession(context, this.endpoint).run();
+    await new SlashCommandChangeRequestSession(context, this.endpoint).run();
   }
 }
 
-class ReactionChangeRequestSession extends SessionIn<CommandReviewRequestAction> {
+class SlashCommandChangeRequestSession extends ActionSessionIn<SlashCommandReviewRequestAction> {
   async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
-
-    const index = this.context.interaction.options.getInteger("number");
-    if (!index) throw new Error();
-
-    const review = this.context.interaction.options.getString("review");
-    if (!review) throw new Error();
+    const index = this.context.interaction.options.getInteger("number", true);
+    const review = this.context.interaction.options.getString("review", true);
     if (!(review in ["accept", "deny"])) throw new Error();
 
     return {
@@ -55,7 +51,7 @@ class ReactionChangeRequestSession extends SessionIn<CommandReviewRequestAction>
 
   async onFailed(error: unknown) {
     if (error instanceof NoPermissionActionError) return;
-    if (error instanceof RequestNotFoundActionError) return;
+    if (error instanceof RequestNotFoundEndpointError) return;
     const embed = new ErrorEmbed(error);
     await this.context.interaction.reply({ embeds: [embed] });
   }

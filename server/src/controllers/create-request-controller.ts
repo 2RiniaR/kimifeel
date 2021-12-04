@@ -1,14 +1,14 @@
-import { Controller } from "controller";
-import { ProfileContentLengthLimitActionError } from "discord/errors";
-import { SubmitRequestAction, SubmitRequestParams } from "discord/actions";
+import { ControllerFor } from "controller";
 import { ContentLengthLimitError } from "models/errors";
 import { ClientUser } from "models/structures";
+import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "endpoints";
+import { ProfileContentLengthLimitEndpointError } from "endpoints/errors";
 
-export class CreateRequestController extends Controller<SubmitRequestAction> {
-  requireUsersDiscordId = (ctx: SubmitRequestParams) => [ctx.target];
+export class CreateRequestController extends ControllerFor<CreateRequestEndpoint> {
+  requireUsersDiscordId = (ctx: CreateRequestEndpointParams) => [ctx.targetDiscordId];
 
-  async action(ctx: SubmitRequestParams, client: ClientUser) {
-    const target = await client.users.getByDiscordId(ctx.target);
+  async action(ctx: CreateRequestEndpointParams, client: ClientUser): Promise<CreateRequestEndpointResult> {
+    const target = await client.users.getByDiscordId(ctx.targetDiscordId);
     if (!target) throw Error();
 
     try {
@@ -16,7 +16,7 @@ export class CreateRequestController extends Controller<SubmitRequestAction> {
       return { index: request.index };
     } catch (error) {
       if (error instanceof ContentLengthLimitError) {
-        throw new ProfileContentLengthLimitActionError(error.min, error.max, error.actual);
+        throw new ProfileContentLengthLimitEndpointError(error.min, error.max, error.actual);
       } else {
         throw error;
       }

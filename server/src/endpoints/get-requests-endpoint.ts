@@ -1,5 +1,5 @@
 import { Endpoint, EndpointParamsBase } from "../endpoint";
-import { ProfileMarkdownProps } from "../views";
+import { ProfileMarkdownProps } from "../discord/views";
 
 type GetReceivedRequestsEndpointParams =
   | {

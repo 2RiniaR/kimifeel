@@ -7,15 +7,15 @@ import { DenyRequestController } from "controllers/deny-request-controller";
 import {
   ReactionChangeRequestAction,
   CancelRequestAction,
-  DeleteProfileAction,
+  SlashCommandDeleteProfileAction,
   DenyRequestAction,
-  ShowProfilesAction,
-  SubmitRequestAction
+  SlashCommandShowProfilesAction,
+  CommandSendRequestAction
 } from "discord/actions";
 
 new ReactionChangeRequestAction().listen(new ChangeRequestController());
 new CancelRequestAction().listen(new CancelRequestController());
-new DeleteProfileAction().listen(new DeleteProfileController());
+new SlashCommandDeleteProfileAction().listen(new DeleteProfileController());
 new DenyRequestAction().listen(new DenyRequestController());
-new ShowProfilesAction().listen(new GetProfilesController());
-new SubmitRequestAction().listen(new CreateRequestController());
+new SlashCommandShowProfilesAction().listen(new GetProfilesController());
+new CommandSendRequestAction().listen(new CreateRequestController());

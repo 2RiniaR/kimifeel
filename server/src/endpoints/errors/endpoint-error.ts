@@ -1,12 +1,8 @@
-import { SystemMessageType } from "../views";
-
-export class ActionError extends Error {
-  public readonly messageType?: SystemMessageType;
+export class EndpointError extends Error {
   public readonly title?: string;
 
-  public constructor(messageType?: SystemMessageType, title?: string) {
+  public constructor(title?: string) {
     super();
-    this.messageType = messageType;
     this.title = title;
   }
 }

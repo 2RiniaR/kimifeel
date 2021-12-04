@@ -1,14 +1,14 @@
-import { SessionIn } from "../session";
-import { ReactionAddEvent, ReactionAddEventContext, ReactionAddEventOptions } from "../events";
-import { DiscordFetchFailedActionError, NoPermissionActionError, RequestNotFoundActionError } from "../errors";
-import { RequestEmbed, ErrorEmbed, RequestAcceptedEmbed } from "../views";
-import { ActionWith } from "../action";
+import { ActionSessionIn } from "discord/actions/action-session";
+import { ReactionAddEvent, ReactionAddEventContext, ReactionAddEventOptions } from "discord/events";
+import { DiscordFetchFailedActionError, NoPermissionActionError, RequestNotFoundEndpointError } from "discord/errors";
+import { RequestEmbed, ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
+import { ActionWith } from "discord/action";
 import {
   ChangeRequestControlType,
   ChangeRequestEndpoint,
   ChangeRequestEndpointParams,
   ChangeRequestEndpointResult
-} from "../endpoints";
+} from "endpoints";
 
 export class ReactionChangeRequestAction extends ActionWith<ReactionAddEvent, ChangeRequestEndpoint> {
   public static emojiToChange: { [emoji: string]: ChangeRequestControlType } = {
@@ -28,7 +28,7 @@ export class ReactionChangeRequestAction extends ActionWith<ReactionAddEvent, Ch
   }
 }
 
-class ReactionChangeRequestSession extends SessionIn<ReactionChangeRequestAction> {
+class ReactionChangeRequestSession extends ActionSessionIn<ReactionChangeRequestAction> {
   async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
 
@@ -70,7 +70,7 @@ class ReactionChangeRequestSession extends SessionIn<ReactionChangeRequestAction
 
   async onFailed(error: unknown) {
     if (error instanceof NoPermissionActionError) return;
-    if (error instanceof RequestNotFoundActionError) return;
+    if (error instanceof RequestNotFoundEndpointError) return;
     const embed = new ErrorEmbed(error);
     await this.context.message.reply({ embeds: [embed] });
   }

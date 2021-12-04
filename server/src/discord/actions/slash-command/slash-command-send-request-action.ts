@@ -1,31 +1,31 @@
 import { GuildMember, Message } from "discord.js";
-import { ErrorEmbed, RequestEmbed } from "../views";
-import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "../events";
-import { SessionIn } from "../session";
-import { DiscordFetchFailedActionError, NoBotActionError } from "../errors";
-import { ActionWith } from "../action";
-import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "../endpoints";
-import { ReactionChangeRequestAction } from "./reaction-change-request-action";
+import { ErrorEmbed, RequestEmbed } from "discord/views";
+import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
+import { ActionSessionIn } from "discord/actions/action-session";
+import { DiscordFetchFailedActionError, NoBotActionError } from "discord/errors";
+import { ActionWith } from "discord/action";
+import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "endpoints";
+import { ReactionChangeRequestAction } from "../reaction/reaction-change-request-action";
 
-export class CommandSendRequestAction extends ActionWith<SlashCommandEvent, CreateRequestEndpoint> {
+export class SlashCommandSendRequestAction extends ActionWith<SlashCommandEvent, CreateRequestEndpoint> {
   readonly options: SlashCommandEventOptions = {
     commandName: "send-request",
     allowBot: false
   };
 
   async onEvent(context: SlashCommandEventContext) {
-    await new CommandSendRequestSession(context, this.endpoint).run();
+    await new SlashCommandSendRequestSession(context, this.endpoint).run();
   }
 }
 
-class CommandSendRequestSession extends SessionIn<CommandSendRequestAction> {
+class SlashCommandSendRequestSession extends ActionSessionIn<SlashCommandSendRequestAction> {
   private target!: GuildMember;
   private content!: string;
 
   protected async fetch(): Promise<CreateRequestEndpointParams> {
     await Promise.resolve();
 
-    const target = this.context.interaction.options.getMember("target");
+    const target = this.context.interaction.options.getMember("target", true);
     if (!(target instanceof GuildMember)) {
       throw new DiscordFetchFailedActionError();
     }
@@ -35,11 +35,7 @@ class CommandSendRequestSession extends SessionIn<CommandSendRequestAction> {
       throw new NoBotActionError();
     }
 
-    const content = this.context.interaction.options.getString("content");
-    if (!content) {
-      throw new DiscordFetchFailedActionError();
-    }
-    this.content = content;
+    this.content = this.context.interaction.options.getString("content", true);
 
     return {
       clientDiscordId: this.context.member.id,

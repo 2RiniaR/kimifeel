@@ -1,9 +1,9 @@
-import { SessionIn } from "../session";
-import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "../events";
-import { NoPermissionActionError, RequestNotFoundActionError } from "../errors";
-import { ErrorEmbed, RequestAcceptedEmbed } from "../views";
-import { ActionWith } from "../action";
-import { ChangeRequestEndpoint, ChangeRequestEndpointParams, ChangeRequestEndpointResult } from "../endpoints";
+import { ActionSessionIn } from "discord/actions/action-session";
+import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
+import { NoPermissionActionError, RequestNotFoundEndpointError } from "discord/errors";
+import { ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
+import { ActionWith } from "discord/action";
+import { ChangeRequestEndpoint, ChangeRequestEndpointParams, ChangeRequestEndpointResult } from "endpoints";
 
 export class SlashCommandCancelRequestAction extends ActionWith<SlashCommandEvent, ChangeRequestEndpoint> {
   readonly options: SlashCommandEventOptions = {
@@ -16,15 +16,11 @@ export class SlashCommandCancelRequestAction extends ActionWith<SlashCommandEven
   }
 }
 
-class SlashCommandChangeRequestSession extends SessionIn<SlashCommandCancelRequestAction> {
+class SlashCommandChangeRequestSession extends ActionSessionIn<SlashCommandCancelRequestAction> {
   async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
-
-    const index = this.context.interaction.options.getInteger("number");
-    if (!index) throw new Error();
-
-    const target = this.context.interaction.options.getUser("target");
-    if (!target) throw new Error();
+    const index = this.context.interaction.options.getInteger("number", true);
+    const target = this.context.interaction.options.getUser("target", true);
 
     return {
       clientDiscordId: this.context.member.id,
@@ -49,7 +45,7 @@ class SlashCommandChangeRequestSession extends SessionIn<SlashCommandCancelReque
 
   async onFailed(error: unknown) {
     if (error instanceof NoPermissionActionError) return;
-    if (error instanceof RequestNotFoundActionError) return;
+    if (error instanceof RequestNotFoundEndpointError) return;
     const embed = new ErrorEmbed(error);
     await this.context.interaction.reply({ embeds: [embed] });
   }

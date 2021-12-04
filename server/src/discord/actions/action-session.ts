@@ -38,7 +38,7 @@ export abstract class ActionSession<
   }
 }
 
-export abstract class SessionIn<TAction extends AnyAction> extends ActionSession<
+export abstract class ActionSessionIn<TAction extends AnyAction> extends ActionSession<
   EventContextOf<TAction>,
   EndpointParamsOf<TAction>,
   EndpointResultOf<TAction>

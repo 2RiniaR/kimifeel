@@ -1,18 +1,17 @@
 import { ControllerFor } from "controller";
-import { NoPermissionActionError, RequestNotFoundActionError } from "discord/errors";
 import { ClientUser } from "models/structures";
 import { ForbiddenError } from "models/errors";
-import { ChangeRequestEndpoint } from "../discord/endpoints";
-import { ParamsOf, ResultOf } from "../discord/endpoint";
+import { ChangeRequestEndpoint, ChangeRequestEndpointParams, ChangeRequestEndpointResult } from "endpoints";
+import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 
 export class ChangeRequestController extends ControllerFor<ChangeRequestEndpoint> {
-  requireUsersDiscordId = (ctx: ParamsOf<ChangeRequestEndpoint>) => [ctx.targetDiscordId];
+  requireUsersDiscordId = (ctx: ChangeRequestEndpointParams) => [ctx.targetDiscordId];
 
-  async action(ctx: ParamsOf<ChangeRequestEndpoint>, client: ClientUser): Promise<ResultOf<ChangeRequestEndpoint>> {
+  async action(ctx: ChangeRequestEndpointParams, client: ClientUser): Promise<ChangeRequestEndpointResult> {
     const target = await client.users.getByDiscordId(ctx.targetDiscordId);
     if (!target) throw Error("The require user was not registered.");
     const request = await target.getRequestByIndex(ctx.index);
-    if (!request) throw new RequestNotFoundActionError();
+    if (!request) throw new RequestNotFoundEndpointError();
 
     try {
       const profile = await request.accept();
@@ -23,7 +22,7 @@ export class ChangeRequestController extends ControllerFor<ChangeRequestEndpoint
         authorDiscordId: author.discordId
       };
     } catch (error) {
-      if (error instanceof ForbiddenError) throw new NoPermissionActionError();
+      if (error instanceof ForbiddenError) throw new NoPermissionEndpointError();
       else throw error;
     }
   }

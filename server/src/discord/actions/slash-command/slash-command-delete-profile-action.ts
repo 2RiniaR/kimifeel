@@ -1,34 +1,28 @@
-import { ErrorEmbed, ProfileDeletedEmbed } from "../views";
-import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "../events";
-import { SessionIn } from "../session";
-import { DiscordFetchFailedActionError } from "../errors";
-import { ActionWith } from "../action";
-import { DeleteProfileEndpoint, DeleteProfileEndpointParams, DeleteProfileEndpointResult } from "../endpoints";
+import { ErrorEmbed, ProfileDeletedEmbed } from "discord/views";
+import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
+import { ActionSessionIn } from "discord/actions/action-session";
+import { ActionWith } from "discord/action";
+import { DeleteProfileEndpoint, DeleteProfileEndpointParams, DeleteProfileEndpointResult } from "endpoints";
 
-export class CommandDeleteProfileAction extends ActionWith<SlashCommandEvent, DeleteProfileEndpoint> {
+export class SlashCommandDeleteProfileAction extends ActionWith<SlashCommandEvent, DeleteProfileEndpoint> {
   readonly options: SlashCommandEventOptions = {
     commandName: "delete-profile",
     allowBot: false
   };
 
   async onEvent(context: SlashCommandEventContext) {
-    await new CommandDeleteProfileSession(context, this.endpoint).run();
+    await new SlashCommandDeleteProfileSession(context, this.endpoint).run();
   }
 }
 
-class CommandDeleteProfileSession extends SessionIn<CommandDeleteProfileAction> {
-  index!: number;
-
+class SlashCommandDeleteProfileSession extends ActionSessionIn<SlashCommandDeleteProfileAction> {
   async fetch(): Promise<DeleteProfileEndpointParams> {
     await Promise.resolve();
-
-    const index = this.context.interaction.options.getInteger("number");
-    if (!index) throw new DiscordFetchFailedActionError();
-    this.index = index;
+    const index = this.context.interaction.options.getInteger("number", true);
 
     return {
       clientDiscordId: this.context.member.id,
-      index: this.index
+      index
     };
   }
 

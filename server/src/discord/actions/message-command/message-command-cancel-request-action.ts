@@ -1,35 +1,40 @@
-import { SessionIn } from "../../session";
-import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "../../events";
-import { NoPermissionActionError, RequestNotFoundActionError } from "../../errors";
-import { ErrorEmbed, RequestAcceptedEmbed } from "../../views";
-import { ActionWith } from "../../action";
-import { ChangeRequestEndpoint, ChangeRequestEndpointParams, ChangeRequestEndpointResult } from "../../endpoints";
+import { ActionSessionIn } from "discord/actions/action-session";
+import { MessageCommandEvent, MessageCommandEventContext, MessageCommandEventOptions } from "discord/events";
+import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
+import { ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
+import { ActionWith } from "discord/action";
+import { ChangeRequestEndpoint, ChangeRequestEndpointParams, ChangeRequestEndpointResult } from "endpoints";
+import { basePhrase } from "./phrases";
+import { InvalidArgumentCountError } from "../../errors/invalid-argument-count-error";
 
-export class SlashCommandCancelRequestAction extends ActionWith<SlashCommandEvent, ChangeRequestEndpoint> {
-  readonly options: SlashCommandEventOptions = {
-    commandName: "cancel-request",
+const prefixes = [`${basePhrase} cancel-request`, `${basePhrase} request cancel`];
+const expectedArguments = ["リクエスト対象のユーザーID", "リクエストの番号"];
+const commandFormat = prefixes.map((prefix) => `${prefix} ${expectedArguments.join(" ")}`);
+
+export class MessageCommandCancelRequestAction extends ActionWith<MessageCommandEvent, ChangeRequestEndpoint> {
+  public readonly options: MessageCommandEventOptions = {
+    prefixes,
     allowBot: false
   };
 
-  async onEvent(context: SlashCommandEventContext) {
-    await new SlashCommandChangeRequestSession(context, this.endpoint).run();
+  async onEvent(context: MessageCommandEventContext) {
+    await new MessageCommandChangeRequestSession(context, this.endpoint).run();
   }
 }
 
-class SlashCommandChangeRequestSession extends SessionIn<SlashCommandCancelRequestAction> {
+class MessageCommandChangeRequestSession extends ActionSessionIn<MessageCommandCancelRequestAction> {
   async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
-
-    const index = this.context.interaction.options.getInteger("number");
-    if (!index) throw new Error();
-
-    const target = this.context.interaction.options.getUser("target");
-    if (!target) throw new Error();
+    if (this.context.arguments.length !== expectedArguments.length) {
+      throw new InvalidArgumentCountError(expectedArguments.length, this.context.arguments.length, commandFormat);
+    }
+    const targetDiscordId = this.context.arguments[0];
+    const index = parseInt(this.context.arguments[1]);
 
     return {
       clientDiscordId: this.context.member.id,
       index,
-      targetDiscordId: target.id,
+      targetDiscordId: targetDiscordId,
       controlType: "cancel"
     };
   }
@@ -44,13 +49,13 @@ class SlashCommandChangeRequestSession extends SessionIn<SlashCommandCancelReque
         content: result.content
       }
     });
-    await this.context.interaction.reply({ embeds: [embed] });
+    await this.context.message.reply({ embeds: [embed] });
   }
 
   async onFailed(error: unknown) {
-    if (error instanceof NoPermissionActionError) return;
-    if (error instanceof RequestNotFoundActionError) return;
+    if (error instanceof NoPermissionEndpointError) return;
+    if (error instanceof RequestNotFoundEndpointError) return;
     const embed = new ErrorEmbed(error);
-    await this.context.interaction.reply({ embeds: [embed] });
+    await this.context.message.reply({ embeds: [embed] });
   }
 }

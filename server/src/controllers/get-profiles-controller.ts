@@ -1,18 +1,17 @@
 import { ControllerFor } from "controller";
 import { ClientUser } from "models/structures";
-import { GetProfilesEndpoint } from "../discord/endpoints";
-import { ParamsOf, ResultOf } from "../discord/endpoint";
+import { GetProfilesEndpoint, GetProfilesEndpointParams, GetProfilesEndpointResult } from "endpoints";
 
 export class GetProfilesController extends ControllerFor<GetProfilesEndpoint> {
-  requireUsersDiscordId = (ctx: ParamsOf<GetProfilesEndpoint>) => {
+  requireUsersDiscordId = (ctx: GetProfilesEndpointParams) => {
     const users: string[] = [];
-    if ("author" in ctx && ctx.author) users.push(ctx.author);
-    if ("owner" in ctx && ctx.owner) users.push(ctx.owner);
+    if ("authorDiscordId" in ctx && ctx.authorDiscordId) users.push(ctx.authorDiscordId);
+    if ("ownerDiscordId" in ctx && ctx.ownerDiscordId) users.push(ctx.ownerDiscordId);
     return users;
   };
 
-  async action(ctx: ParamsOf<GetProfilesEndpoint>, client: ClientUser): Promise<ResultOf<GetProfilesEndpoint>> {
-    const target = await client.users.getByDiscordId(ctx.target);
+  async action(ctx: GetProfilesEndpointParams, client: ClientUser): Promise<GetProfilesEndpointResult> {
+    const target = await client.users.getByDiscordId(ctx.ownerDiscordId);
     if (!target) throw Error();
 
     const profiles = await target.getProfiles();

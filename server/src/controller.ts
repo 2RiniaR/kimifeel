@@ -5,7 +5,7 @@ import {
   EndpointResultBase,
   ParamsOf,
   ResultOf
-} from "./discord/endpoint";
+} from "./endpoint";
 import { ClientUserManager } from "./models/managers/client-user-manager";
 import { ClientUser } from "./models/structures";
 

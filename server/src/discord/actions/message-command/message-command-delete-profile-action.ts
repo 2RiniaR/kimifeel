@@ -1,34 +1,30 @@
-import { ErrorEmbed, ProfileDeletedEmbed } from "../../views";
-import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "../../events";
-import { SessionIn } from "../../session";
-import { DiscordFetchFailedActionError } from "../../errors";
-import { ActionWith } from "../../action";
-import { DeleteProfileEndpoint, DeleteProfileEndpointParams, DeleteProfileEndpointResult } from "../../endpoints";
+import { ErrorEmbed, ProfileDeletedEmbed } from "discord/views";
+import { MessageCommandEventContext, MessageCommandEvent, MessageCommandEventOptions } from "discord/events";
+import { ActionSessionIn } from "discord/actions/action-session";
+import { ActionWith } from "discord/action";
+import { DeleteProfileEndpoint, DeleteProfileEndpointParams, DeleteProfileEndpointResult } from "endpoints";
+import { basePhrase } from "./phrases";
 
-export class SlashCommandDeleteProfileAction extends ActionWith<SlashCommandEvent, DeleteProfileEndpoint> {
-  readonly options: SlashCommandEventOptions = {
-    commandName: "delete-profile",
+export class MessageCommandDeleteProfileAction extends ActionWith<MessageCommandEvent, DeleteProfileEndpoint> {
+  readonly options: MessageCommandEventOptions = {
+    prefixes: [`${basePhrase} delete-profile`, `${basePhrase} profile delete`],
     allowBot: false
   };
 
-  async onEvent(context: SlashCommandEventContext) {
-    await new CommandDeleteProfileSession(context, this.endpoint).run();
+  async onEvent(context: MessageCommandEventContext) {
+    await new MessageCommandDeleteProfileSession(context, this.endpoint).run();
   }
 }
 
-class CommandDeleteProfileSession extends SessionIn<SlashCommandDeleteProfileAction> {
-  index!: number;
-
+class MessageCommandDeleteProfileSession extends ActionSessionIn<MessageCommandDeleteProfileAction> {
   async fetch(): Promise<DeleteProfileEndpointParams> {
     await Promise.resolve();
-
-    const index = this.context.interaction.options.getInteger("number");
-    if (!index) throw new DiscordFetchFailedActionError();
-    this.index = index;
+    if (this.context.arguments.length < 1) throw new Error();
+    const index = parseInt(this.context.arguments[0]);
 
     return {
       clientDiscordId: this.context.member.id,
-      index: this.index
+      index
     };
   }
 
@@ -42,11 +38,11 @@ class CommandDeleteProfileSession extends SessionIn<SlashCommandDeleteProfileAct
         content: result.content
       }
     });
-    await this.context.interaction.reply({ embeds: [embed] });
+    await this.context.message.reply({ embeds: [embed] });
   }
 
   async onFailed(error: unknown) {
     const embed = new ErrorEmbed(error);
-    await this.context.interaction.reply({ embeds: [embed], ephemeral: true });
+    await this.context.message.reply({ embeds: [embed] });
   }
 }

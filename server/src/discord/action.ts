@@ -1,5 +1,5 @@
 import { AnyEvent, ContextOf, Event, EventContextBase, EventListener, EventOptionsBase, OptionsOf } from "./event";
-import { AnyEndpoint, Endpoint, EndpointParamsBase, EndpointResultBase, ParamsOf, ResultOf } from "./endpoint";
+import { AnyEndpoint, Endpoint, EndpointParamsBase, EndpointResultBase, ParamsOf, ResultOf } from "../endpoint";
 
 export abstract class Action<
   TEventContext extends EventContextBase,

@@ -19,3 +19,4 @@ export type EventOptionsBase = object | void;
 export type AnyEvent = Event<EventContextBase, EventOptionsBase>;
 export type ContextOf<TEvent extends AnyEvent> = TEvent extends Event<infer U, EventOptionsBase> ? U : never;
 export type OptionsOf<TEvent extends AnyEvent> = TEvent extends Event<EventContextBase, infer U> ? U : never;
+export type ListenerOf<TEvent extends AnyEvent> = EventListener<ContextOf<TEvent>, OptionsOf<TEvent>>;

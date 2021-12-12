@@ -1,4 +1,4 @@
-import { UserDocument, UserDocumentPath } from "models/scheme";
+import { UserDocument, UserDocumentPath } from "firestore/scheme";
 import { MultipleQueryResult, SingleQueryResult } from "../query-results";
 
 export type UserQueryResult = UserDocument & UserDocumentPath;

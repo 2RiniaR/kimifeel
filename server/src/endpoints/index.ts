@@ -1,3 +1,4 @@
+export * from "./base";
 export * from "./change-request-endpoint";
 export * from "./create-request-endpoint";
 export * from "./delete-profile-endpoint";

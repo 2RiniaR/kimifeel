@@ -1,4 +1,4 @@
-import { Endpoint, EndpointParamsBase } from "../endpoint";
+import { Endpoint, EndpointParamsBase } from "./base";
 
 export type CreateRequestEndpointParams = EndpointParamsBase & {
   targetDiscordId: string;

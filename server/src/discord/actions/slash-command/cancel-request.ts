@@ -1,8 +1,8 @@
-import { ActionSessionIn } from "discord/actions/action-session";
+import { SessionIn } from "../session";
+import { ActionWith } from "../base";
 import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
-import { NoPermissionActionError, RequestNotFoundEndpointError } from "discord/actions/errors";
+import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 import { ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
-import { ActionWith } from "discord/actions/action";
 import { ChangeRequestEndpoint, ChangeRequestEndpointParams, ChangeRequestEndpointResult } from "endpoints";
 
 export class SlashCommandCancelRequestAction extends ActionWith<SlashCommandEvent, ChangeRequestEndpoint> {
@@ -16,7 +16,7 @@ export class SlashCommandCancelRequestAction extends ActionWith<SlashCommandEven
   }
 }
 
-class SlashCommandChangeRequestSession extends ActionSessionIn<SlashCommandCancelRequestAction> {
+class SlashCommandChangeRequestSession extends SessionIn<SlashCommandCancelRequestAction> {
   async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
     const index = this.context.interaction.options.getInteger("number", true);
@@ -44,7 +44,7 @@ class SlashCommandChangeRequestSession extends ActionSessionIn<SlashCommandCance
   }
 
   async onFailed(error: unknown) {
-    if (error instanceof NoPermissionActionError) return;
+    if (error instanceof NoPermissionEndpointError) return;
     if (error instanceof RequestNotFoundEndpointError) return;
     const embed = new ErrorEmbed(error);
     await this.context.interaction.reply({ embeds: [embed] });

@@ -1,8 +1,8 @@
-import { ActionSessionIn } from "discord/actions/action-session";
-import { MessageCommandEvent, MessageCommandEventContext, MessageCommandEventOptions } from "discord/events";
+import { SessionIn } from "../session";
+import { ActionWith } from "../base";
+import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 import { ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
-import { ActionWith } from "discord/actions/action";
 import {
   ChangeRequestControlType,
   ChangeRequestEndpoint,
@@ -11,28 +11,43 @@ import {
 } from "endpoints";
 import { basePhrase } from "./phrases";
 
-export class MessageCommandReviewRequestAction extends ActionWith<MessageCommandEvent, ChangeRequestEndpoint> {
-  readonly options: MessageCommandEventOptions = {
-    prefixes: [`${basePhrase} review-request`, `${basePhrase} request review`],
-    allowBot: false
-  };
+const format = {
+  prefixes: [`${basePhrase} reveiew-request`, `${basePhrase} request review`],
+  arguments: [
+    {
+      name: "リクエストの番号",
+      description: "",
+      type: "integer"
+    },
+    {
+      name: "操作",
+      description: "",
+      type: "string"
+    }
+  ],
+  options: {}
+} as const;
 
-  async onEvent(context: MessageCommandEventContext) {
+export class MessageCommandReviewRequestAction extends ActionWith<
+  MessageCommandEvent<typeof format>,
+  ChangeRequestEndpoint
+> {
+  readonly options = { format, allowBot: false };
+
+  async onEvent(context: MessageCommandEventContext<typeof format>) {
     await new MessageCommandChangeRequestSession(context, this.endpoint).run();
   }
 }
 
-class MessageCommandChangeRequestSession extends ActionSessionIn<MessageCommandReviewRequestAction> {
+class MessageCommandChangeRequestSession extends SessionIn<MessageCommandReviewRequestAction> {
   async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
-    if (this.context.arguments.length < 2) throw new Error();
-    const index = parseInt(this.context.arguments[0]);
-    const review = this.context.arguments[1];
+    const review = this.context.command.arguments[1];
     if (!(review in ["accept", "deny"])) throw new Error();
 
     return {
       clientDiscordId: this.context.member.id,
-      index,
+      index: this.context.command.arguments[0],
       targetDiscordId: this.context.member.id,
       controlType: review as ChangeRequestControlType
     };

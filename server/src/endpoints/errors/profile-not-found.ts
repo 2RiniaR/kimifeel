@@ -1,4 +1,4 @@
-import { EndpointError } from "./endpoint-error";
+import { EndpointError } from "./base";
 
 export class ProfileNotFoundEndpointError extends EndpointError {
   public readonly title = "対象のプロフィールは見つかりませんでした。";

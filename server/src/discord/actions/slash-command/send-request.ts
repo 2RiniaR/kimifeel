@@ -1,11 +1,11 @@
 import { GuildMember, Message } from "discord.js";
+import { SessionIn } from "../session";
+import { DiscordFetchFailedActionError, NoBotActionError } from "../errors";
+import { ActionWith } from "../base";
 import { ErrorEmbed, RequestEmbed } from "discord/views";
 import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
-import { ActionSessionIn } from "discord/actions/action-session";
-import { DiscordFetchFailedActionError, NoBotActionError } from "discord/actions/errors";
-import { ActionWith } from "discord/actions/action";
 import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "endpoints";
-import { ReactionChangeRequestAction } from "../reaction/reaction-change-request-action";
+import { ReactionChangeRequestAction } from "../reaction/change-request";
 
 export class SlashCommandSendRequestAction extends ActionWith<SlashCommandEvent, CreateRequestEndpoint> {
   readonly options: SlashCommandEventOptions = {
@@ -18,7 +18,7 @@ export class SlashCommandSendRequestAction extends ActionWith<SlashCommandEvent,
   }
 }
 
-class SlashCommandSendRequestSession extends ActionSessionIn<SlashCommandSendRequestAction> {
+class SlashCommandSendRequestSession extends SessionIn<SlashCommandSendRequestAction> {
   private target!: GuildMember;
   private content!: string;
 

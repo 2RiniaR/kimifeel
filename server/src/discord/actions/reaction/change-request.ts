@@ -1,8 +1,9 @@
-import { ActionSessionIn } from "discord/actions/action-session";
+import { SessionIn } from "../session";
 import { ReactionAddEvent, ReactionAddEventContext, ReactionAddEventOptions } from "discord/events";
-import { DiscordFetchFailedActionError, NoPermissionActionError, RequestNotFoundEndpointError } from "discord/actions/errors";
+import { DiscordFetchFailedActionError } from "../errors";
+import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 import { RequestEmbed, ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
-import { ActionWith } from "discord/actions/action";
+import { ActionWith } from "../base";
 import {
   ChangeRequestControlType,
   ChangeRequestEndpoint,
@@ -28,7 +29,7 @@ export class ReactionChangeRequestAction extends ActionWith<ReactionAddEvent, Ch
   }
 }
 
-class ReactionChangeRequestSession extends ActionSessionIn<ReactionChangeRequestAction> {
+class ReactionChangeRequestSession extends SessionIn<ReactionChangeRequestAction> {
   async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
 
@@ -69,7 +70,7 @@ class ReactionChangeRequestSession extends ActionSessionIn<ReactionChangeRequest
   }
 
   async onFailed(error: unknown) {
-    if (error instanceof NoPermissionActionError) return;
+    if (error instanceof NoPermissionEndpointError) return;
     if (error instanceof RequestNotFoundEndpointError) return;
     const embed = new ErrorEmbed(error);
     await this.context.message.reply({ embeds: [embed] });

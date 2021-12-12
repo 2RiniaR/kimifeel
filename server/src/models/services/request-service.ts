@@ -1,7 +1,7 @@
 import { IdentityRequest, ImaginaryRequest } from "../structures";
 import { buildRequest } from "../builders/request";
 import { ContextModel } from "../context-model";
-import { createRequest, deleteRequest } from "../queries/request";
+import { createRequest, deleteRequest } from "firestore/queries/request-queries";
 
 export class RequestService extends ContextModel {
   private readonly request: IdentityRequest;

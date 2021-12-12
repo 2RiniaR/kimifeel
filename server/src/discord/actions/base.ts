@@ -1,5 +1,13 @@
-import { AnyEvent, ContextOf, Event, EventContextBase, EventListener, EventOptionsBase, OptionsOf } from "./event";
-import { AnyEndpoint, Base, EndpointParamsBase, EndpointResultBase, ParamsOf, ResultOf } from "../endpoints/endpoint";
+import {
+  AnyEvent,
+  ContextOf,
+  Event,
+  EventContextBase,
+  EventListener,
+  EventOptionsBase,
+  OptionsOf
+} from "discord/events";
+import { AnyEndpoint, Endpoint, EndpointParamsBase, EndpointResultBase, ParamsOf, ResultOf } from "endpoints";
 
 export abstract class Action<
   TEventContext extends EventContextBase,
@@ -8,12 +16,12 @@ export abstract class Action<
   TEndpointResult extends EndpointResultBase
 > implements EventListener<TEventContext, TEventOption>
 {
-  public readonly endpoint: Base<TEndpointParams, TEndpointResult>;
+  public readonly endpoint: Endpoint<TEndpointParams, TEndpointResult>;
   public readonly event: Event<TEventContext, TEventOption>;
   public abstract readonly options: TEventOption;
 
   protected constructor(
-    endpoint: Base<TEndpointParams, TEndpointResult>,
+    endpoint: Endpoint<TEndpointParams, TEndpointResult>,
     event: Event<TEventContext, TEventOption>
   ) {
     this.event = event;

@@ -18,11 +18,11 @@ export class IdentityUser extends ContextModel implements UserIdentifier {
   }
 
   public async getProfileByIndex(index: number): Promise<Profile | undefined> {
-    return await this.service.getProfileByIndex(index);
+    return await this.service.findProfileByIndex(index);
   }
 
   public async getRequestByIndex(index: number): Promise<Request | undefined> {
-    return await this.service.getRequestByIndex(index);
+    return await this.service.findRequestByIndex(index);
   }
 }
 

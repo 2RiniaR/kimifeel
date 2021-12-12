@@ -1,6 +1,6 @@
 import { GuildMember, Message, MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js";
 import { clientManager, targetGuildManager } from "../index";
-import { Event } from "./event";
+import { Event } from "./base";
 
 export type ReactionAddEventContext = {
   reaction: MessageReaction;

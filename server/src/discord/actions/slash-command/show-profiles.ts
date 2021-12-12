@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js";
-import { NoBotActionError } from "discord/actions/errors";
-import { ActionWith } from "discord/actions/action";
+import { NoBotActionError } from "../errors";
+import { ActionWith } from "../base";
+import { SessionIn } from "../session";
 import { GetProfilesEndpoint, GetProfilesEndpointParams, GetProfilesEndpointResult } from "endpoints";
 import { ErrorEmbed, ProfileListEmbed } from "discord/views";
-import { ActionSessionIn } from "discord/actions/action-session";
 import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
 
 export class SlashCommandShowProfilesAction extends ActionWith<SlashCommandEvent, GetProfilesEndpoint> {
@@ -155,7 +155,7 @@ const commandParamsGetters: Record<CommandTypes, (context: SlashCommandEventCont
   }
 } as const;
 
-class SlashCommandShowProfilesSession extends ActionSessionIn<SlashCommandShowProfilesAction> {
+class SlashCommandShowProfilesSession extends SessionIn<SlashCommandShowProfilesAction> {
   private target!: GuildMember;
 
   async fetch(): Promise<GetProfilesEndpointParams> {

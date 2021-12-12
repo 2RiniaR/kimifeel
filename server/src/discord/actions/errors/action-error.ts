@@ -1,4 +1,4 @@
-import { SystemMessageType } from "../views";
+import { SystemMessageType } from "../../views";
 
 export class ActionError extends Error {
   public readonly messageType?: SystemMessageType;

@@ -1,6 +1,6 @@
 import { Context } from "../context";
 import { Request, IdentityUser } from "../structures";
-import { RequestQueryResult } from "../queries/request";
+import { RequestQueryResult } from "firestore/queries/request-queries";
 
 export function buildRequest(context: Context, result: RequestQueryResult): Request {
   return new Request(context, {

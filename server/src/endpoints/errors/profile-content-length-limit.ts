@@ -1,4 +1,4 @@
-import { EndpointError } from "./endpoint-error";
+import { EndpointError } from "./base";
 
 export class ProfileContentLengthLimitEndpointError extends EndpointError {
   public readonly min: number;

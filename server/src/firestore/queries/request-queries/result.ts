@@ -1,4 +1,4 @@
-import { RequestDocument, RequestDocumentPath } from "models/scheme";
+import { RequestDocument, RequestDocumentPath } from "firestore/scheme";
 import { MultipleQueryResult, SingleQueryResult } from "../query-results";
 
 export type RequestQueryResult = RequestDocument & RequestDocumentPath;

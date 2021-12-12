@@ -1,4 +1,4 @@
-import { DocumentScheme, RequestDocument, UserDocument, UserDocumentPath } from "models/scheme";
+import { DocumentScheme, RequestDocument, UserDocument, UserDocumentPath } from "firestore/scheme";
 import { db } from "firebase";
 import { RequestQueryResult } from "./result";
 

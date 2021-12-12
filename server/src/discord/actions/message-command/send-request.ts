@@ -1,42 +1,59 @@
 import { GuildMember } from "discord.js";
+import { SessionIn } from "../session";
+import { ActionWith } from "../base";
+import { ReactionChangeRequestAction } from "../reaction/change-request";
 import { ErrorEmbed, RequestEmbed } from "discord/views";
-import { MessageCommandEvent, MessageCommandEventContext, MessageCommandEventOptions } from "discord/events";
-import { ActionSessionIn } from "discord/actions/action-session";
+import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { DiscordFetchFailedActionError, NoBotActionError } from "discord/actions/errors";
-import { ActionWith } from "discord/actions/action";
 import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "endpoints";
-import { ReactionChangeRequestAction } from "../reaction/reaction-change-request-action";
+import { targetGuildManager } from "discord";
 import { basePhrase } from "./phrases";
-import { targetGuildManager } from "../../index";
 
-export class MessageCommandSendRequestAction extends ActionWith<MessageCommandEvent, CreateRequestEndpoint> {
-  readonly options: MessageCommandEventOptions = {
-    prefixes: [`${basePhrase} send-request`, `${basePhrase} request send`],
-    allowBot: false
-  };
+const format = {
+  prefixes: [`${basePhrase} send-request`, `${basePhrase} request send`],
+  arguments: [
+    {
+      name: "送信先ユーザーのID",
+      description: "",
+      type: "string"
+    },
+    {
+      name: "内容",
+      description: "",
+      type: "string"
+    }
+  ],
+  options: {}
+} as const;
 
-  async onEvent(context: MessageCommandEventContext) {
+export class MessageCommandSendRequestAction extends ActionWith<
+  MessageCommandEvent<typeof format>,
+  CreateRequestEndpoint
+> {
+  readonly options = { format, allowBot: false };
+
+  async onEvent(context: MessageCommandEventContext<typeof format>) {
     await new MessageCommandSendRequestSession(context, this.endpoint).run();
   }
 }
 
-class MessageCommandSendRequestSession extends ActionSessionIn<MessageCommandSendRequestAction> {
+class MessageCommandSendRequestSession extends SessionIn<MessageCommandSendRequestAction> {
   private target!: GuildMember;
   private content!: string;
 
   protected async fetch(): Promise<CreateRequestEndpointParams> {
-    await Promise.resolve();
-    if (this.context.arguments.length < 2) throw new Error();
-
-    const targetId = this.context.arguments[0];
+    const targetId = this.context.command.arguments[0];
     const target = await targetGuildManager.getMember(targetId);
-    if (!target) throw new DiscordFetchFailedActionError();
+    if (!target) {
+      throw new DiscordFetchFailedActionError();
+    }
+
     this.target = target;
     if (this.target.user.bot) {
       throw new NoBotActionError();
     }
 
-    this.content = this.context.arguments[1];
+    this.content = this.context.command.arguments[1];
 
     return {
       clientDiscordId: this.context.member.id,

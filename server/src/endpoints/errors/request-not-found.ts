@@ -1,4 +1,4 @@
-import { EndpointError } from "./endpoint-error";
+import { EndpointError } from "./base";
 
 export class RequestNotFoundEndpointError extends EndpointError {
   public readonly title = "対象のリクエストは見つかりませんでした。";

@@ -1,4 +1,4 @@
-import { Endpoint, EndpointParamsBase } from "../endpoint";
+import { Endpoint, EndpointParamsBase } from "./base";
 
 export type DeleteProfileEndpointParams = EndpointParamsBase & {
   index: number;

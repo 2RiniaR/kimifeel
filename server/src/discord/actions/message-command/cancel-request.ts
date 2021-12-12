@@ -1,43 +1,50 @@
-import { ActionSessionIn } from "discord/actions/action-session";
-import { MessageCommandEvent, MessageCommandEventContext, MessageCommandEventOptions } from "discord/events";
+import { SessionIn } from "../session";
+import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 import { ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
-import { ActionWith } from "discord/actions/action";
+import { ActionWith } from "../base";
 import { ChangeRequestEndpoint, ChangeRequestEndpointParams, ChangeRequestEndpointResult } from "endpoints";
 import { basePhrase } from "./phrases";
-import { InvalidArgumentCountError } from "../../events/message-command-event/errors/invalid-argument-count-error";
 
-const expectedArguments = ["リクエスト対象のユーザーID", "リクエストの番号"];
 const format = {
   prefixes: [`${basePhrase} cancel-request`, `${basePhrase} request cancel`],
-  arguments: ["string", "integer"],
+  arguments: [
+    {
+      name: "リクエスト対象のユーザーID",
+      description: "",
+      type: "userId"
+    },
+    {
+      name: "リクエストの番号",
+      description: "",
+      type: "integer"
+    }
+  ],
   options: {}
 } as const;
 
-export class MessageCommandCancelRequestAction extends ActionWith<MessageCommandEvent<typeof format>, ChangeRequestEndpoint> {
+export class MessageCommandCancelRequestAction extends ActionWith<
+  MessageCommandEvent<typeof format>,
+  ChangeRequestEndpoint
+> {
   public readonly options = {
     format,
     allowBot: false
   };
 
-  async onEvent(context: MessageCommandEventContext) {
+  async onEvent(context: MessageCommandEventContext<typeof format>) {
     await new MessageCommandChangeRequestSession(context, this.endpoint).run();
   }
 }
 
-class MessageCommandChangeRequestSession extends ActionSessionIn<MessageCommandCancelRequestAction> {
+class MessageCommandChangeRequestSession extends SessionIn<MessageCommandCancelRequestAction> {
   async fetch(): Promise<ChangeRequestEndpointParams> {
     await Promise.resolve();
-    if (this.context.arguments.length !== expectedArguments.length) {
-      throw new InvalidArgumentCountError(expectedArguments.length, this.context.arguments.length, commandFormat);
-    }
-    const targetDiscordId = this.context.arguments[0];
-    const index = parseInt(this.context.arguments[1]);
 
     return {
-      clientDiscordId: this.context..id,
-      index,
-      targetDiscordId: targetDiscordId,
+      clientDiscordId: this.context.member.id,
+      index: this.context.command.arguments[1],
+      targetDiscordId: this.context.command.arguments[0],
       controlType: "cancel"
     };
   }

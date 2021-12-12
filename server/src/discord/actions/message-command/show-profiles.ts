@@ -1,9 +1,8 @@
 import { GuildMember } from "discord.js";
-import { NoBotActionError } from "discord/actions/errors";
-import { ActionWith } from "discord/actions/action";
+import { ActionWith } from "../base";
+import { SessionIn } from "../session";
 import { GetProfilesEndpoint, GetProfilesEndpointParams, GetProfilesEndpointResult } from "endpoints";
 import { ErrorEmbed, ProfileListEmbed } from "discord/views";
-import { ActionSessionIn } from "discord/actions/action-session";
 import { MessageCommandEvent, MessageCommandEventContext, MessageCommandEventOptions } from "discord/events";
 import { basePhrase } from "./phrases";
 
@@ -131,7 +130,7 @@ const commandParamsGetters: Record<CommandTypes, (context: MessageCommandEventCo
   }
 } as const;
 
-class MessageCommandShowProfilesSession extends ActionSessionIn<MessageCommandShowProfilesAction> {
+class MessageCommandShowProfilesSession extends SessionIn<MessageCommandShowProfilesAction> {
   private target!: GuildMember;
 
   async fetch(): Promise<GetProfilesEndpointParams> {

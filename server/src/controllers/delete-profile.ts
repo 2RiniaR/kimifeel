@@ -1,4 +1,4 @@
-import { ControllerFor } from "controllers/controller";
+import { ControllerFor } from "./base";
 import { ClientUser } from "models/structures";
 import { DeleteProfileEndpoint, DeleteProfileEndpointParams, DeleteProfileEndpointResult } from "endpoints";
 import { ProfileNotFoundEndpointError } from "endpoints/errors";

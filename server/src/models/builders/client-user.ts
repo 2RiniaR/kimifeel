@@ -1,4 +1,4 @@
-import { UserQueryResult } from "../queries/user";
+import { UserQueryResult } from "firestore/queries/user-queries";
 import { ClientUser } from "../structures";
 
 export function buildClientUser(result: UserQueryResult): ClientUser {

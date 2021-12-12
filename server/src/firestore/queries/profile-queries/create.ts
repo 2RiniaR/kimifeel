@@ -1,4 +1,4 @@
-import { DocumentScheme, ProfileDocument, UserDocument, UserDocumentPath } from "models/scheme";
+import { DocumentScheme, ProfileDocument, UserDocument, UserDocumentPath } from "firestore/scheme";
 import { db } from "firebase";
 import { ProfileQueryResult } from "./result";
 

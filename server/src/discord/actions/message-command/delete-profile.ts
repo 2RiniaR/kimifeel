@@ -1,30 +1,40 @@
 import { ErrorEmbed, ProfileDeletedEmbed } from "discord/views";
-import { MessageCommandEventContext, MessageCommandEvent, MessageCommandEventOptions } from "discord/events";
-import { ActionSessionIn } from "discord/actions/action-session";
-import { ActionWith } from "discord/actions/action";
+import { MessageCommandEventContext, MessageCommandEvent } from "discord/events";
+import { SessionIn } from "../session";
+import { ActionWith } from "../base";
 import { DeleteProfileEndpoint, DeleteProfileEndpointParams, DeleteProfileEndpointResult } from "endpoints";
 import { basePhrase } from "./phrases";
 
-export class MessageCommandDeleteProfileAction extends ActionWith<MessageCommandEvent, DeleteProfileEndpoint> {
-  readonly options: MessageCommandEventOptions = {
-    prefixes: [`${basePhrase} delete-profile`, `${basePhrase} profile delete`],
-    allowBot: false
-  };
+const format = {
+  prefixes: [`${basePhrase} delete-profile`, `${basePhrase} profile delete`],
+  arguments: [
+    {
+      name: "プロフィールの番号",
+      description: "",
+      type: "integer"
+    }
+  ],
+  options: {}
+} as const;
 
-  async onEvent(context: MessageCommandEventContext) {
+export class MessageCommandDeleteProfileAction extends ActionWith<
+  MessageCommandEvent<typeof format>,
+  DeleteProfileEndpoint
+> {
+  readonly options = { format, allowBot: false };
+
+  async onEvent(context: MessageCommandEventContext<typeof format>) {
     await new MessageCommandDeleteProfileSession(context, this.endpoint).run();
   }
 }
 
-class MessageCommandDeleteProfileSession extends ActionSessionIn<MessageCommandDeleteProfileAction> {
+class MessageCommandDeleteProfileSession extends SessionIn<MessageCommandDeleteProfileAction> {
   async fetch(): Promise<DeleteProfileEndpointParams> {
     await Promise.resolve();
-    if (this.context.arguments.length < 1) throw new Error();
-    const index = parseInt(this.context.arguments[0]);
 
     return {
       clientDiscordId: this.context.member.id,
-      index
+      index: this.context.command.arguments[0]
     };
   }
 

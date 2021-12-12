@@ -1,4 +1,4 @@
-import { DocumentScheme } from "models/scheme";
+import { DocumentScheme } from "firestore/scheme";
 import { extractFirstResult, extractResult, UserQueryResult } from "./result";
 
 export async function findUserById(userId: string): Promise<UserQueryResult | undefined> {

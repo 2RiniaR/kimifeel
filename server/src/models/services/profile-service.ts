@@ -1,7 +1,7 @@
 import { ContextModel } from "../context-model";
-import { createProfile, deleteProfile } from "../queries/profile";
 import { IdentityProfile, ImaginaryProfile } from "../structures";
 import { buildProfile } from "../builders/profile";
+import { createProfile, deleteProfile } from "firestore/queries/profile-queries";
 
 export class ProfileService extends ContextModel {
   private readonly profile: IdentityProfile;

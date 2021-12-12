@@ -1,4 +1,4 @@
-import { ActionError } from "../errors";
+import { ActionError } from "../actions/errors";
 import { SystemMessageEmbed } from "./system-message-embed";
 
 export class ErrorEmbed extends SystemMessageEmbed {

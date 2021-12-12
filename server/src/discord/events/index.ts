@@ -1,3 +1,4 @@
-export * from "./reaction-add-event";
-export * from "./slash-command-event";
-export * from "./message-command-event";
+export * from "./base";
+export * from "./reaction-add";
+export * from "./slash-command";
+export * from "./message-command";

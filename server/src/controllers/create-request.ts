@@ -1,4 +1,4 @@
-import { ControllerFor } from "controllers/controller";
+import { ControllerFor } from "./base";
 import { ContentLengthLimitError } from "models/errors";
 import { ClientUser } from "models/structures";
 import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "endpoints";

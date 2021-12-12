@@ -1,15 +1,8 @@
-import {
-  AnyEndpoint,
-  EndpointListener,
-  EndpointParamsBase,
-  EndpointResultBase,
-  ParamsOf,
-  ResultOf
-} from "./endpoint";
-import { ClientUserManager } from "./models/managers/client-user-manager";
-import { ClientUser } from "./models/structures";
+import { AnyEndpoint, EndpointListener, EndpointParamsBase, EndpointResultBase, ParamsOf, ResultOf } from "endpoints";
+import { ClientUserManager } from "../models/managers/client-user-manager";
+import { ClientUser } from "../models/structures";
 
-export abstract class Controller<TEndpointParams extends EndpointParamsBase, TEndpointResult extends EndpointResultBase>
+export abstract class Base<TEndpointParams extends EndpointParamsBase, TEndpointResult extends EndpointResultBase>
   implements EndpointListener<TEndpointParams, TEndpointResult>
 {
   private service = new ClientUserManager();
@@ -33,7 +26,7 @@ export abstract class Controller<TEndpointParams extends EndpointParamsBase, TEn
   }
 }
 
-export abstract class ControllerFor<TEndpoint extends AnyEndpoint> extends Controller<
+export abstract class ControllerFor<TEndpoint extends AnyEndpoint> extends Base<
   ParamsOf<TEndpoint>,
   ResultOf<TEndpoint>
 > {}

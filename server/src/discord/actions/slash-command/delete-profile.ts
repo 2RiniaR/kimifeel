@@ -1,7 +1,7 @@
+import { SessionIn } from "../session";
+import { ActionWith } from "../base";
 import { ErrorEmbed, ProfileDeletedEmbed } from "discord/views";
 import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
-import { ActionSessionIn } from "discord/actions/action-session";
-import { ActionWith } from "discord/actions/action";
 import { DeleteProfileEndpoint, DeleteProfileEndpointParams, DeleteProfileEndpointResult } from "endpoints";
 
 export class SlashCommandDeleteProfileAction extends ActionWith<SlashCommandEvent, DeleteProfileEndpoint> {
@@ -15,7 +15,7 @@ export class SlashCommandDeleteProfileAction extends ActionWith<SlashCommandEven
   }
 }
 
-class SlashCommandDeleteProfileSession extends ActionSessionIn<SlashCommandDeleteProfileAction> {
+class SlashCommandDeleteProfileSession extends SessionIn<SlashCommandDeleteProfileAction> {
   async fetch(): Promise<DeleteProfileEndpointParams> {
     await Promise.resolve();
     const index = this.context.interaction.options.getInteger("number", true);

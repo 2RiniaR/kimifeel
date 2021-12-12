@@ -1,4 +1,4 @@
-import { DocumentScheme } from "models/scheme";
+import { DocumentScheme } from "firestore/scheme";
 import { extractAllResults, RequestQueryResult } from "./result";
 
 type RangeProps = {

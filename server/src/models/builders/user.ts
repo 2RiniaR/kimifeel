@@ -1,5 +1,5 @@
 import { Context } from "../context";
-import { UserQueryResult } from "../queries/user";
+import { UserQueryResult } from "firestore/queries/user-queries";
 import { User } from "../structures";
 
 export function buildUser(context: Context, result: UserQueryResult): User {

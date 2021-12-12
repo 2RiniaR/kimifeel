@@ -1,25 +1,27 @@
 import { GuildMember, Message } from "discord.js";
-import { Event } from "../event";
+import { Event } from "discord/events";
 import { clientManager, targetGuildManager } from "../../index";
-import { parseCommand } from "./command-parser";
-import { NamedCommandFormat, NamedCommandParseResult } from "./named-command-format";
+import { parseCommand, CommandFormatOn, CommandResultOf } from "command-parser";
+import { parameterTypes } from "./types";
 
-export type MessageCommandEventContext<TFormat extends NamedCommandFormat = NamedCommandFormat> = {
-  message: Message;
-  member: GuildMember;
-  command: NamedCommandParseResult<TFormat>;
+export type MessageCommandFormat = CommandFormatOn<typeof parameterTypes>;
+
+export type MessageCommandEventContext<TFormat extends MessageCommandFormat> = {
+  readonly message: Message;
+  readonly member: GuildMember;
+  readonly command: CommandResultOf<typeof parameterTypes, TFormat>;
 };
 
-export type MessageCommandEventOptions<TFormat extends NamedCommandFormat = NamedCommandFormat> = {
-  format: TFormat;
-  allowBot: boolean;
+export type MessageCommandEventOptions<TFormat extends MessageCommandFormat> = {
+  readonly format: TFormat;
+  readonly allowBot: boolean;
 };
 
-function checkBot(message: Message, options: MessageCommandEventOptions) {
+function checkBot(message: Message, options: MessageCommandEventOptions<MessageCommandFormat>) {
   return options.allowBot || !message.author.bot;
 }
 
-export class MessageCommandEvent<TFormat extends NamedCommandFormat> extends Event<
+export class MessageCommandEvent<TFormat extends MessageCommandFormat> extends Event<
   MessageCommandEventContext<TFormat>,
   MessageCommandEventOptions<TFormat>
 > {
@@ -28,7 +30,7 @@ export class MessageCommandEvent<TFormat extends NamedCommandFormat> extends Eve
       const sessions = this.listeners
         .map((listener) => {
           if (!checkBot(message, listener.options)) return;
-          const command = parseCommand(message.content, listener.options.format);
+          const command = parseCommand(message.content, listener.options.format, parameterTypes);
           if (!command) return;
           return { listener, command };
         })
@@ -39,7 +41,7 @@ export class MessageCommandEvent<TFormat extends NamedCommandFormat> extends Eve
       if (!member) return;
 
       await sessions.forEachAsync(async ({ listener, command }) => {
-        const context = { member, message, command };
+        const context: MessageCommandEventContext<TFormat> = { member, message, command };
         await listener.onEvent(context);
       });
     });

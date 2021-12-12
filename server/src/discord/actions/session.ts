@@ -2,7 +2,7 @@ import { Endpoint, EndpointParamsBase, EndpointResultBase } from "endpoints";
 import { EventContextBase } from "discord/events";
 import { AnyAction, EndpointParamsOf, EndpointResultOf, EventContextOf } from "./base";
 
-export abstract class ActionSession<
+export abstract class Session<
   TEventContext extends EventContextBase,
   TEndpointParams extends EndpointParamsBase,
   TEndpointResult extends EndpointResultBase
@@ -38,7 +38,7 @@ export abstract class ActionSession<
   }
 }
 
-export abstract class ActionSessionIn<TAction extends AnyAction> extends ActionSession<
+export abstract class SessionIn<TAction extends AnyAction> extends Session<
   EventContextOf<TAction>,
   EndpointParamsOf<TAction>,
   EndpointResultOf<TAction>

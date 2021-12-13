@@ -1,9 +1,9 @@
 import { ErrorEmbed, ProfileDeletedEmbed } from "discord/views";
 import { MessageCommandEventContext, MessageCommandEvent } from "discord/events";
-import { SessionIn } from "../session";
 import { ActionWith } from "../base";
 import { DeleteProfileEndpoint, DeleteProfileEndpointParams, DeleteProfileEndpointResult } from "endpoints";
 import { basePhrase } from "./phrases";
+import { MessageCommandSession } from "./session";
 
 const format = {
   prefixes: [`${basePhrase} delete-profile`, `${basePhrase} profile delete`],
@@ -17,24 +17,24 @@ const format = {
   options: {}
 } as const;
 
-export class MessageCommandDeleteProfileAction extends ActionWith<
-  MessageCommandEvent<typeof format>,
-  DeleteProfileEndpoint
-> {
-  readonly options = { format, allowBot: false };
+export class MessageCommandDeleteProfileAction extends ActionWith<MessageCommandEvent, DeleteProfileEndpoint> {
+  readonly options = { prefixes: format.prefixes, allowBot: false };
 
-  async onEvent(context: MessageCommandEventContext<typeof format>) {
-    await new MessageCommandDeleteProfileSession(context, this.endpoint).run();
+  async onEvent(context: MessageCommandEventContext) {
+    await new MessageCommandDeleteProfileSession(context, this.endpoint, format).run();
   }
 }
 
-class MessageCommandDeleteProfileSession extends SessionIn<MessageCommandDeleteProfileAction> {
+class MessageCommandDeleteProfileSession extends MessageCommandSession<
+  MessageCommandDeleteProfileAction,
+  typeof format
+> {
   async fetch(): Promise<DeleteProfileEndpointParams> {
     await Promise.resolve();
 
     return {
       clientDiscordId: this.context.member.id,
-      index: this.context.command.arguments[0]
+      index: this.command.arguments[0]
     };
   }
 

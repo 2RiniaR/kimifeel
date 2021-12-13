@@ -4,14 +4,9 @@ hide empty members
 
 class Endpoints
 
-package Clients #DDDDFF {
-    together {
-        class WebAPI
-        class DiscordClient
-    }
-    WebAPI -> Endpoints
-    DiscordClient -> Endpoints
-    WebAPI -[hidden]- DiscordClient
+package Discord #DDDDFF {
+    Actions --> Endpoints
+    Actions -l> Events
 }
 
 Controllers --> Endpoints

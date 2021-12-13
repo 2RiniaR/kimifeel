@@ -17,10 +17,32 @@ import {
   GetRequestsController
 } from "./controllers";
 
-new AcceptRequestEndpoint().listen(new AcceptRequestController());
-new CancelRequestEndpoint().listen(new CancelRequestController());
-new DenyRequestEndpoint().listen(new DenyRequestController());
-new CreateRequestEndpoint().listen(new CreateRequestController());
-new DeleteProfileEndpoint().listen(new DeleteProfileController());
-new GetProfilesEndpoint().listen(new GetProfilesController());
-new GetRequestsEndpoint().listen(new GetRequestsController());
+export function buildApplication() {
+  const endpoints = {
+    acceptRequest: new AcceptRequestEndpoint(),
+    cancelRequest: new CancelRequestEndpoint(),
+    denyRequest: new DenyRequestEndpoint(),
+    createRequest: new CreateRequestEndpoint(),
+    deleteProfile: new DeleteProfileEndpoint(),
+    getProfiles: new GetProfilesEndpoint(),
+    getRequests: new GetRequestsEndpoint()
+  } as const;
+
+  const controllers = {
+    acceptRequest: new AcceptRequestController(),
+    cancelRequest: new CancelRequestController(),
+    denyRequest: new DenyRequestController(),
+    createRequest: new CreateRequestController(),
+    deleteProfile: new DeleteProfileController(),
+    getProfiles: new GetProfilesController(),
+    getRequests: new GetRequestsController()
+  } as const;
+
+  endpoints.acceptRequest.listen(controllers.acceptRequest);
+  endpoints.cancelRequest.listen(controllers.cancelRequest);
+  endpoints.denyRequest.listen(controllers.denyRequest);
+  endpoints.createRequest.listen(controllers.createRequest);
+  endpoints.deleteProfile.listen(controllers.deleteProfile);
+  endpoints.getProfiles.listen(controllers.getProfiles);
+  endpoints.getRequests.listen(controllers.getRequests);
+}

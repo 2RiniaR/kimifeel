@@ -1,5 +1,4 @@
 import { GuildMember } from "discord.js";
-import { SessionIn } from "../session";
 import { ActionWith } from "../base";
 import { ErrorEmbed, RequestSentEmbed } from "discord/views";
 import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
@@ -10,6 +9,7 @@ import { basePhrase } from "./phrases";
 import { ReactionAcceptRequestAction } from "../reaction/accept-request";
 import { ReactionCancelRequestAction } from "../reaction/cancel-request";
 import { ReactionDenyRequestAction } from "../reaction/deny-request";
+import { MessageCommandSession } from "./session";
 
 const format = {
   prefixes: [`${basePhrase} send-request`, `${basePhrase} request send`],
@@ -17,7 +17,7 @@ const format = {
     {
       name: "送信先ユーザーのID",
       description: "",
-      type: "string"
+      type: "userId"
     },
     {
       name: "内容",
@@ -28,23 +28,20 @@ const format = {
   options: {}
 } as const;
 
-export class MessageCommandSendRequestAction extends ActionWith<
-  MessageCommandEvent<typeof format>,
-  CreateRequestEndpoint
-> {
-  readonly options = { format, allowBot: false };
+export class MessageCommandSendRequestAction extends ActionWith<MessageCommandEvent, CreateRequestEndpoint> {
+  readonly options = { prefixes: format.prefixes, allowBot: false };
 
-  async onEvent(context: MessageCommandEventContext<typeof format>) {
-    await new MessageCommandSendRequestSession(context, this.endpoint).run();
+  async onEvent(context: MessageCommandEventContext) {
+    await new MessageCommandSendRequestSession(context, this.endpoint, format).run();
   }
 }
 
-class MessageCommandSendRequestSession extends SessionIn<MessageCommandSendRequestAction> {
+class MessageCommandSendRequestSession extends MessageCommandSession<MessageCommandSendRequestAction, typeof format> {
   private target!: GuildMember;
   private content!: string;
 
   protected async fetch(): Promise<CreateRequestEndpointParams> {
-    const targetId = this.context.command.arguments[0];
+    const targetId = this.command.arguments[0];
     const target = await targetGuildManager.getMember(targetId);
     if (!target) {
       throw new DiscordFetchFailedActionError();
@@ -55,7 +52,7 @@ class MessageCommandSendRequestSession extends SessionIn<MessageCommandSendReque
       throw new NoBotActionError();
     }
 
-    this.content = this.context.command.arguments[1];
+    this.content = this.command.arguments[1];
 
     return {
       clientDiscordId: this.context.member.id,

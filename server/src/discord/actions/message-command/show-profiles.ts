@@ -1,9 +1,9 @@
 import { ActionWith } from "../base";
-import { SessionIn } from "../session";
 import { GetProfilesEndpoint, GetProfilesEndpointParams, GetProfilesEndpointResult } from "endpoints";
 import { ErrorEmbed, ProfileListEmbed } from "discord/views";
-import { MessageCommandEvent, MessageCommandEventContext, MessageCommandResultOf } from "discord/events";
+import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { basePhrase } from "./phrases";
+import { MessageCommandResult, MessageCommandSession } from "./session";
 
 const format = {
   prefixes: [`${basePhrase} show-profile`, `${basePhrase} profile show`],
@@ -42,22 +42,18 @@ const format = {
   }
 } as const;
 
-export class MessageCommandShowProfilesAction extends ActionWith<
-  MessageCommandEvent<typeof format>,
-  GetProfilesEndpoint
-> {
-  readonly options = { format, allowBot: false };
+export class MessageCommandShowProfilesAction extends ActionWith<MessageCommandEvent, GetProfilesEndpoint> {
+  readonly options = { prefixes: format.prefixes, allowBot: false };
 
-  async onEvent(context: MessageCommandEventContext<typeof format>) {
-    await new MessageCommandShowProfilesSession(context, this.endpoint).run();
+  async onEvent(context: MessageCommandEventContext) {
+    await new MessageCommandShowProfilesSession(context, this.endpoint, format).run();
   }
 }
 
 const commandTypes = ["specific", "ordered", "random"] as const;
-
 type CommandTypes = typeof commandTypes[number];
 
-function getCommandType(command: MessageCommandResultOf<typeof format>): CommandTypes {
+function getCommandType(command: MessageCommandResult<typeof format>): CommandTypes {
   if (command.options.number) return "specific";
   if (command.options.order) return "ordered";
   return "random";
@@ -65,33 +61,33 @@ function getCommandType(command: MessageCommandResultOf<typeof format>): Command
 
 const commandParamsGetters: Record<
   CommandTypes,
-  (context: MessageCommandEventContext<typeof format>) => GetProfilesEndpointParams
+  (context: MessageCommandEventContext, command: MessageCommandResult<typeof format>) => GetProfilesEndpointParams
 > = {
-  random: (context): GetProfilesEndpointParams => {
+  random: (context, command): GetProfilesEndpointParams => {
     return {
       clientDiscordId: context.member.id,
       method: "random",
-      ownerDiscordId: context.command.options.user,
-      authorDiscordId: context.command.options.author,
-      content: context.command.options.content
+      ownerDiscordId: command.options.user,
+      authorDiscordId: command.options.author,
+      content: command.options.content
     };
   },
 
-  specific: (context): GetProfilesEndpointParams => {
-    if (!context.command.options.user) throw Error();
-    if (!context.command.options.number) throw Error();
+  specific: (context, command): GetProfilesEndpointParams => {
+    if (!command.options.user) throw Error();
+    if (!command.options.number) throw Error();
     return {
       clientDiscordId: context.member.id,
       method: "specific",
-      ownerDiscordId: context.command.options.user,
-      index: context.command.options.number
+      ownerDiscordId: command.options.user,
+      index: command.options.number
     };
   },
 
-  ordered: (context): GetProfilesEndpointParams => {
+  ordered: (context, command): GetProfilesEndpointParams => {
     const defaultPage = 1;
     const orderTypes = ["random", "latest", "oldest"] as const;
-    const order = context.command.options.order;
+    const order = command.options.order;
     if (order && !(order in orderTypes)) {
       throw Error();
     }
@@ -99,19 +95,19 @@ const commandParamsGetters: Record<
     return {
       clientDiscordId: context.member.id,
       method: (order as "oldest" | "latest" | "random") ?? "random",
-      ownerDiscordId: context.command.options.user,
-      authorDiscordId: context.command.options.author,
-      content: context.command.options.content,
-      page: context.command.options.page ?? defaultPage
+      ownerDiscordId: command.options.user,
+      authorDiscordId: command.options.author,
+      content: command.options.content,
+      page: command.options.page ?? defaultPage
     };
   }
 } as const;
 
-class MessageCommandShowProfilesSession extends SessionIn<MessageCommandShowProfilesAction> {
+class MessageCommandShowProfilesSession extends MessageCommandSession<MessageCommandShowProfilesAction, typeof format> {
   async fetch(): Promise<GetProfilesEndpointParams> {
     await Promise.resolve();
-    const commandType = getCommandType(this.context.command);
-    return commandParamsGetters[commandType](this.context);
+    const commandType = getCommandType(this.command);
+    return commandParamsGetters[commandType](this.context, this.command);
   }
 
   async onSucceed(result: GetProfilesEndpointResult) {

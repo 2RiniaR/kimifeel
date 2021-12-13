@@ -1,10 +1,10 @@
-import { SessionIn } from "../session";
 import { ActionWith } from "../base";
 import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 import { ErrorEmbed, RequestDeniedEmbed } from "discord/views";
 import { DenyRequestEndpoint, DenyRequestEndpointParams, DenyRequestEndpointResult } from "endpoints";
 import { basePhrase } from "./phrases";
+import { MessageCommandSession } from "./session";
 
 const format = {
   prefixes: [`${basePhrase} deny-request`, `${basePhrase} request deny`],
@@ -23,23 +23,20 @@ const format = {
   options: {}
 } as const;
 
-export class MessageCommandDenyRequestAction extends ActionWith<
-  MessageCommandEvent<typeof format>,
-  DenyRequestEndpoint
-> {
-  readonly options = { format, allowBot: false };
+export class MessageCommandDenyRequestAction extends ActionWith<MessageCommandEvent, DenyRequestEndpoint> {
+  readonly options = { prefixes: format.prefixes, allowBot: false };
 
-  async onEvent(context: MessageCommandEventContext<typeof format>) {
-    await new MessageCommandDenyRequestSession(context, this.endpoint).run();
+  async onEvent(context: MessageCommandEventContext) {
+    await new MessageCommandDenyRequestSession(context, this.endpoint, format).run();
   }
 }
 
-class MessageCommandDenyRequestSession extends SessionIn<MessageCommandDenyRequestAction> {
+class MessageCommandDenyRequestSession extends MessageCommandSession<MessageCommandDenyRequestAction, typeof format> {
   async fetch(): Promise<DenyRequestEndpointParams> {
     await Promise.resolve();
     return {
       clientDiscordId: this.context.member.id,
-      index: this.context.command.arguments[0]
+      index: this.command.arguments[0]
     };
   }
 

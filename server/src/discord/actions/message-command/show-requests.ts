@@ -1,9 +1,9 @@
 import { ActionWith } from "../base";
-import { SessionIn } from "../session";
 import { GetRequestsEndpoint, GetRequestsEndpointParams, GetRequestsEndpointResult } from "endpoints";
 import { ErrorEmbed, RequestListEmbed } from "discord/views";
-import { MessageCommandEvent, MessageCommandEventContext, MessageCommandResultOf } from "discord/events";
+import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { basePhrase } from "./phrases";
+import { MessageCommandResult, MessageCommandSession } from "./session";
 
 const format = {
   prefixes: [`${basePhrase} show-request`, `${basePhrase} request show`],
@@ -38,14 +38,11 @@ const format = {
   }
 } as const;
 
-export class MessageCommandShowRequestsAction extends ActionWith<
-  MessageCommandEvent<typeof format>,
-  GetRequestsEndpoint
-> {
-  readonly options = { format, allowBot: false };
+export class MessageCommandShowRequestsAction extends ActionWith<MessageCommandEvent, GetRequestsEndpoint> {
+  readonly options = { prefixes: format.prefixes, allowBot: false };
 
-  async onEvent(context: MessageCommandEventContext<typeof format>) {
-    await new MessageCommandShowRequestsSession(context, this.endpoint).run();
+  async onEvent(context: MessageCommandEventContext) {
+    await new MessageCommandShowRequestsSession(context, this.endpoint, format).run();
   }
 }
 
@@ -53,7 +50,7 @@ const commandTypes = ["received-specific", "sent-specific", "received-ordered", 
 
 type CommandTypes = typeof commandTypes[number];
 
-function getCommandType(command: MessageCommandResultOf<typeof format>): CommandTypes {
+function getCommandType(command: MessageCommandResult<typeof format>): CommandTypes {
   if (command.arguments[0] === "received") {
     if (command.options.order) return "received-ordered";
     else return "received-specific";
@@ -66,22 +63,22 @@ function getCommandType(command: MessageCommandResultOf<typeof format>): Command
 
 const commandParamsGetters: Record<
   CommandTypes,
-  (context: MessageCommandEventContext<typeof format>) => GetRequestsEndpointParams
+  (context: MessageCommandEventContext, command: MessageCommandResult<typeof format>) => GetRequestsEndpointParams
 > = {
-  "received-specific": (context): GetRequestsEndpointParams => {
-    if (!context.command.options.number) throw Error();
+  "received-specific": (context, command): GetRequestsEndpointParams => {
+    if (!command.options.number) throw Error();
     return {
       clientDiscordId: context.member.id,
       genre: "received",
       method: "specific",
-      index: context.command.options.number
+      index: command.options.number
     };
   },
 
-  "received-ordered": (context): GetRequestsEndpointParams => {
+  "received-ordered": (context, command): GetRequestsEndpointParams => {
     const defaultPage = 1;
     const orderTypes = ["latest", "oldest"] as const;
-    const order = context.command.options.order;
+    const order = command.options.order;
     if (!order || !(order in orderTypes)) {
       throw Error();
     }
@@ -90,26 +87,26 @@ const commandParamsGetters: Record<
       clientDiscordId: context.member.id,
       genre: "received",
       method: order as "oldest" | "latest",
-      page: context.command.options.page ?? defaultPage
+      page: command.options.page ?? defaultPage
     };
   },
 
-  "sent-specific": (context): GetRequestsEndpointParams => {
-    if (!context.command.options.user) throw Error();
-    if (!context.command.options.number) throw Error();
+  "sent-specific": (context, command): GetRequestsEndpointParams => {
+    if (!command.options.user) throw Error();
+    if (!command.options.number) throw Error();
     return {
       clientDiscordId: context.member.id,
       genre: "sent",
       method: "specific",
-      targetDiscordId: context.command.options.user,
-      index: context.command.options.number
+      targetDiscordId: command.options.user,
+      index: command.options.number
     };
   },
 
-  "sent-ordered": (context): GetRequestsEndpointParams => {
+  "sent-ordered": (context, command): GetRequestsEndpointParams => {
     const defaultPage = 1;
     const orderTypes = ["latest", "oldest"] as const;
-    const order = context.command.options.order;
+    const order = command.options.order;
     if (!order || !(order in orderTypes)) {
       throw Error();
     }
@@ -118,16 +115,16 @@ const commandParamsGetters: Record<
       clientDiscordId: context.member.id,
       genre: "sent",
       method: order as "oldest" | "latest",
-      page: context.command.options.page ?? defaultPage
+      page: command.options.page ?? defaultPage
     };
   }
 } as const;
 
-class MessageCommandShowRequestsSession extends SessionIn<MessageCommandShowRequestsAction> {
+class MessageCommandShowRequestsSession extends MessageCommandSession<MessageCommandShowRequestsAction, typeof format> {
   async fetch(): Promise<GetRequestsEndpointParams> {
     await Promise.resolve();
-    const commandType = getCommandType(this.context.command);
-    return commandParamsGetters[commandType](this.context);
+    const commandType = getCommandType(this.command);
+    return commandParamsGetters[commandType](this.context, this.command);
   }
 
   async onSucceed(result: GetRequestsEndpointResult) {

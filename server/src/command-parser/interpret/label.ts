@@ -1,7 +1,7 @@
 import { CommandParserError } from "../error-base";
-import { fragmentCommand } from "./fragment";
-import { CommandFormatArguments } from "../base-types";
-import { CommandFormatOn, ConvertTypeSetBase } from "../parser";
+import { CommandFragments } from "../fragment";
+import { CommandFormatArguments } from "./base-types";
+import { CommandFormatOn, ConvertTypeSetBase } from "./interpret";
 
 export class UnexpectedArgumentError extends CommandParserError {
   public readonly expected: number;
@@ -74,15 +74,13 @@ export type InterpretResult<
   readonly options: InterpretOptions<TConvertTypeSet, TFormat>;
 };
 
-export function interpretCommand<
+export function labelCommand<
   TConvertTypeSet extends ConvertTypeSetBase,
   TFormat extends CommandFormatOn<TConvertTypeSet>
 >(
-  command: string,
+  fragments: CommandFragments,
   format: InterpretFormat<TConvertTypeSet, TFormat>
-): InterpretResult<TConvertTypeSet, TFormat> | undefined {
-  const fragments = fragmentCommand(command, format.prefixes);
-  if (!fragments) return;
+): InterpretResult<TConvertTypeSet, TFormat> {
   return {
     prefix: fragments.prefix,
     arguments: checkArgumentCount(fragments.arguments, format.argumentsCount),

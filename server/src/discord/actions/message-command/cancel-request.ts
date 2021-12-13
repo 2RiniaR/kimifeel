@@ -1,10 +1,10 @@
-import { SessionIn } from "../session";
 import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 import { ErrorEmbed, RequestCanceledEmbed } from "discord/views";
 import { ActionWith } from "../base";
 import { CancelRequestEndpoint, CancelRequestEndpointParams, CancelRequestEndpointResult } from "endpoints";
 import { basePhrase } from "./phrases";
+import { MessageCommandSession } from "./session";
 
 const format = {
   prefixes: [`${basePhrase} cancel-request`, `${basePhrase} request cancel`],
@@ -23,28 +23,25 @@ const format = {
   options: {}
 } as const;
 
-export class MessageCommandCancelRequestAction extends ActionWith<
-  MessageCommandEvent<typeof format>,
-  CancelRequestEndpoint
-> {
-  public readonly options = {
-    format,
-    allowBot: false
-  };
+export class MessageCommandCancelRequestAction extends ActionWith<MessageCommandEvent, CancelRequestEndpoint> {
+  readonly options = { prefixes: format.prefixes, allowBot: false };
 
-  async onEvent(context: MessageCommandEventContext<typeof format>) {
-    await new MessageCommandCancelRequestSession(context, this.endpoint).run();
+  async onEvent(context: MessageCommandEventContext) {
+    await new MessageCommandCancelRequestSession(context, this.endpoint, format).run();
   }
 }
 
-class MessageCommandCancelRequestSession extends SessionIn<MessageCommandCancelRequestAction> {
+class MessageCommandCancelRequestSession extends MessageCommandSession<
+  MessageCommandCancelRequestAction,
+  typeof format
+> {
   async fetch(): Promise<CancelRequestEndpointParams> {
     await Promise.resolve();
 
     return {
       clientDiscordId: this.context.member.id,
-      index: this.context.command.arguments[1],
-      targetDiscordId: this.context.command.arguments[0]
+      index: this.command.arguments[1],
+      targetDiscordId: this.command.arguments[0]
     };
   }
 

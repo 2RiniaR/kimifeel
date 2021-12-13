@@ -1,40 +1,30 @@
 import { GuildMember, Message } from "discord.js";
 import { Event } from "discord/events";
-import { clientManager, targetGuildManager } from "../../index";
-import { parseCommand, CommandFormatOn, CommandResultOf } from "command-parser";
-import { parameterTypes } from "./types";
+import { clientManager, targetGuildManager } from "discord";
+import { CommandFragments, fragmentCommand } from "command-parser";
 
-export type MessageCommandFormat = CommandFormatOn<typeof parameterTypes>;
-export type MessageCommandResultOf<TFormat extends MessageCommandFormat> = CommandResultOf<
-  typeof parameterTypes,
-  TFormat
->;
-
-export type MessageCommandEventContext<TFormat extends MessageCommandFormat> = {
+export type MessageCommandEventContext = {
   readonly message: Message;
   readonly member: GuildMember;
-  readonly command: CommandResultOf<typeof parameterTypes, TFormat>;
+  readonly command: CommandFragments;
 };
 
-export type MessageCommandEventOptions<TFormat extends MessageCommandFormat> = {
-  readonly format: TFormat;
+export type MessageCommandEventOptions = {
+  readonly prefixes: readonly string[];
   readonly allowBot: boolean;
 };
 
-function checkBot(message: Message, options: MessageCommandEventOptions<MessageCommandFormat>) {
+function checkBot(message: Message, options: MessageCommandEventOptions) {
   return options.allowBot || !message.author.bot;
 }
 
-export class MessageCommandEvent<TFormat extends MessageCommandFormat> extends Event<
-  MessageCommandEventContext<TFormat>,
-  MessageCommandEventOptions<TFormat>
-> {
+export class MessageCommandEvent extends Event<MessageCommandEventContext, MessageCommandEventOptions> {
   public activate() {
     clientManager.client.on("messageCreate", async (message) => {
       const sessions = this.listeners
         .map((listener) => {
           if (!checkBot(message, listener.options)) return;
-          const command = parseCommand(message.content, listener.options.format, parameterTypes);
+          const command = fragmentCommand(message.content, listener.options.prefixes);
           if (!command) return;
           return { listener, command };
         })
@@ -45,7 +35,7 @@ export class MessageCommandEvent<TFormat extends MessageCommandFormat> extends E
       if (!member) return;
 
       await sessions.forEachAsync(async ({ listener, command }) => {
-        const context: MessageCommandEventContext<TFormat> = { member, message, command };
+        const context = { member, message, command };
         await listener.onEvent(context);
       });
     });

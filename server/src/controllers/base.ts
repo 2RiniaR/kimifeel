@@ -1,5 +1,5 @@
 import { AnyEndpoint, EndpointListener, EndpointParamsBase, EndpointResultBase, ParamsOf, ResultOf } from "endpoints";
-import { ClientUserManager } from "../models/managers/client-user-manager";
+import { ClientUserManager } from "models/managers";
 import { ClientUser } from "../models/structures";
 
 export abstract class Controller<TEndpointParams extends EndpointParamsBase, TEndpointResult extends EndpointResultBase>

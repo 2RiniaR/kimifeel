@@ -1,7 +1,12 @@
 import { SystemMessageEmbed } from "./system-message-embed";
+import { getRequestAbstractMarkdown, RequestMarkdownProps } from "./request-markdown";
+
+export type RequestDeniedEmbedProps = {
+  request: RequestMarkdownProps;
+};
 
 export class RequestDeniedEmbed extends SystemMessageEmbed {
-  public constructor() {
-    super("failed", "リクエストが拒否されました。");
+  public constructor({ request }: RequestDeniedEmbedProps) {
+    super("failed", "リクエストが拒否されました。", getRequestAbstractMarkdown(request));
   }
 }

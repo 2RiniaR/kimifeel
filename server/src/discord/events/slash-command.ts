@@ -30,9 +30,7 @@ export class SlashCommandEvent extends Event<SlashCommandEventContext, SlashComm
     clientManager.client.on("interactionCreate", async (interaction) => {
       if (!interaction.isCommand()) return;
       const listeners = this.listeners.filter(
-        (listener) =>
-          checkCommandName(interaction, listener.options) &&
-          checkBot(interaction, listener.options)
+        (listener) => checkCommandName(interaction, listener.options) && checkBot(interaction, listener.options)
       );
       const member = await targetGuildManager.getMember(interaction.user.id);
       if (!member) return;

@@ -28,7 +28,7 @@ export class UnknownOptionsError extends CommandParserError {
 export type CountOf<
   TConvertTypeSet extends ConvertTypeSetBase,
   TCommandFormatArguments extends CommandFormatArguments<TConvertTypeSet>
-  > = TCommandFormatArguments["length"];
+> = TCommandFormatArguments["length"];
 
 export type InterpretArguments<
   TConvertTypeSet extends ConvertTypeSetBase,
@@ -100,10 +100,10 @@ function checkArgumentCount<
   return values as InterpretArguments<TConvertTypeSet, TFormat>; // sorry.
 }
 
-function checkOptionName<
-  TConvertTypeSet extends ConvertTypeSetBase,
-  TFormat extends CommandFormatOn<TConvertTypeSet>
->(values: { [name: string]: string }, formats: TFormat["options"]): InterpretOptions<TConvertTypeSet, TFormat> {
+function checkOptionName<TConvertTypeSet extends ConvertTypeSetBase, TFormat extends CommandFormatOn<TConvertTypeSet>>(
+  values: { [name: string]: string },
+  formats: TFormat["options"]
+): InterpretOptions<TConvertTypeSet, TFormat> {
   const unknownOptions = Object.keys(values).filter((name) => !(name in formats));
   if (unknownOptions.length > 0) {
     throw new UnknownOptionsError(unknownOptions);

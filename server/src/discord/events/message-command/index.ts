@@ -5,6 +5,10 @@ import { parseCommand, CommandFormatOn, CommandResultOf } from "command-parser";
 import { parameterTypes } from "./types";
 
 export type MessageCommandFormat = CommandFormatOn<typeof parameterTypes>;
+export type MessageCommandResultOf<TFormat extends MessageCommandFormat> = CommandResultOf<
+  typeof parameterTypes,
+  TFormat
+>;
 
 export type MessageCommandEventContext<TFormat extends MessageCommandFormat> = {
   readonly message: Message;

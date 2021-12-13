@@ -23,6 +23,7 @@ export class ProfileManager extends ContextModel {
     if (options.order === "random") {
       props = {
         order: options.order,
+        count: options.count,
         ...condition
       };
     } else {
@@ -46,6 +47,7 @@ export type SearchOptions = {
 } & (
   | {
       order: "random";
+      count: number;
     }
   | {
       order: "latest" | "oldest";

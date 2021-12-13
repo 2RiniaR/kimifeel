@@ -11,27 +11,27 @@ export type RequestEmbedProps = {
   targetUserId: string;
 };
 
-export class RequestEmbed extends MessageEmbed {
+export class RequestSentEmbed extends MessageEmbed {
   public static readonly UserIdFieldName = "To";
   public static readonly IndexFieldName = "Request No.";
 
   public constructor(props: RequestEmbedProps) {
     super();
     this.setAuthor(props.requesterUserName, props.requesterUserAvatarURL)
-      .setDescription(RequestEmbed.buildDescription(props))
+      .setDescription(RequestSentEmbed.buildDescription(props))
       .setColor("AQUA")
-      .addField(RequestEmbed.UserIdFieldName, getUserReference(props.targetUserId), true)
-      .addField(RequestEmbed.IndexFieldName, props.index.toString(), true);
+      .addField(RequestSentEmbed.UserIdFieldName, getUserReference(props.targetUserId), true)
+      .addField(RequestSentEmbed.IndexFieldName, props.index.toString(), true);
   }
 
   public static getUserId(embed: MessageEmbed): string | undefined {
-    const indexField = embed.fields.find((field) => field.name === RequestEmbed.UserIdFieldName);
+    const indexField = embed.fields.find((field) => field.name === RequestSentEmbed.UserIdFieldName);
     if (!indexField) return;
     return removeUserReference(indexField.value);
   }
 
   public static getIndex(embed: MessageEmbed): number | undefined {
-    const indexField = embed.fields.find((field) => field.name === RequestEmbed.IndexFieldName);
+    const indexField = embed.fields.find((field) => field.name === RequestSentEmbed.IndexFieldName);
     if (!indexField) return;
     return parseInt(indexField.value);
   }

@@ -1,7 +1,7 @@
 import { IdentityUser } from "./identity-user";
 import { Context } from "../context";
 import { ContextModel } from "../context-model";
-import { RequestService } from "../services/request-service";
+import { RequestService } from "../services";
 
 export class IdentityRequest extends ContextModel {
   private readonly service = new RequestService(this);

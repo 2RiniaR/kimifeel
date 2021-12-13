@@ -1,6 +1,6 @@
 import { IdentityUser } from "./identity-user";
 import { Context } from "../context";
-import { ProfileService } from "../services/profile-service";
+import { ProfileService } from "../services";
 import { ContextModel } from "../context-model";
 import { ForbiddenError } from "../errors";
 

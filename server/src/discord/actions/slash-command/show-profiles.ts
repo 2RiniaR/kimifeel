@@ -1,4 +1,3 @@
-import { GuildMember } from "discord.js";
 import { NoBotActionError } from "../errors";
 import { ActionWith } from "../base";
 import { SessionIn } from "../session";
@@ -34,7 +33,7 @@ function getCommandType(subCommandGroup: string, subCommand: string): CommandTyp
   if (subCommandGroup === "user" && subCommand === "number") return "user-number";
   if (subCommandGroup === "user" && subCommand === "oldest") return "user-oldest";
   if (subCommandGroup === "user" && subCommand === "latest") return "user-latest";
-  if (subCommandGroup === "global" && subCommand === "number") return "global-random";
+  if (subCommandGroup === "global" && subCommand === "random") return "global-random";
   if (subCommandGroup === "global" && subCommand === "oldest") return "global-oldest";
   if (subCommandGroup === "global" && subCommand === "latest") return "global-latest";
   throw new Error("Unknown command type: " + `/show-profile ${subCommandGroup} ${subCommand}`);
@@ -156,8 +155,6 @@ const commandParamsGetters: Record<CommandTypes, (context: SlashCommandEventCont
 } as const;
 
 class SlashCommandShowProfilesSession extends SessionIn<SlashCommandShowProfilesAction> {
-  private target!: GuildMember;
-
   async fetch(): Promise<GetProfilesEndpointParams> {
     await Promise.resolve();
     const subCommandGroup = this.context.interaction.options.getSubcommandGroup(true);
@@ -167,11 +164,7 @@ class SlashCommandShowProfilesSession extends SessionIn<SlashCommandShowProfiles
   }
 
   async onSucceed(result: GetProfilesEndpointResult) {
-    const listEmbed = new ProfileListEmbed({
-      elements: result,
-      targetName: this.target.displayName,
-      targetAvatarURL: this.target.displayAvatarURL()
-    });
+    const listEmbed = new ProfileListEmbed({ profiles: result });
     await this.context.interaction.reply({ embeds: [listEmbed] });
   }
 

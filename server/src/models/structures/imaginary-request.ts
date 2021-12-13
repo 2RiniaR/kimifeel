@@ -1,7 +1,7 @@
 import { Context } from "../context";
 import { IdentityUser } from "./identity-user";
 import { ContextModel } from "../context-model";
-import { ImaginaryRequestService } from "../services/request-service";
+import { ImaginaryRequestService } from "../services";
 import { ImaginaryProfile } from "./imaginary-profile";
 
 export class ImaginaryRequest extends ContextModel {

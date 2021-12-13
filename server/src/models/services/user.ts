@@ -1,7 +1,7 @@
-import { findAllProfiles, findProfileByIndex } from "firestore/queries/profile-queries";
-import { findRequestByIndex } from "firestore/queries/request-queries";
+import { findProfileByIndex } from "firestore/queries/profile-queries";
+import { findRequestByIndex, searchRequests } from "firestore/queries/request-queries";
 import { createUserIfNotExist } from "firestore/queries/user-queries";
-import { IdentityUser, ImaginaryUser, Profile, Request } from "../structures";
+import { IdentityUser, ImaginaryUser, Profile, Request, SearchRequestsProps } from "../structures";
 import { ContextModel } from "../context-model";
 import { buildProfile } from "../builders/profile";
 import { buildClientUser } from "../builders/client-user";
@@ -15,11 +15,6 @@ export class UserService extends ContextModel {
     this.user = user;
   }
 
-  public async getProfiles(): Promise<Profile[]> {
-    const results = await findAllProfiles(this.user.id);
-    return results.map((result) => buildProfile(this.context, result));
-  }
-
   public async findProfileByIndex(index: number): Promise<Profile | undefined> {
     const result = await findProfileByIndex(this.user.id, index);
     if (!result) return;
@@ -30,6 +25,17 @@ export class UserService extends ContextModel {
     const result = await findRequestByIndex(this.user.id, index);
     if (!result) return;
     return buildRequest(this.context, result);
+  }
+
+  public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {
+    const results = await searchRequests({
+      status: props.status,
+      userId: this.user.id,
+      order: props.order,
+      start: props.start,
+      count: props.count
+    });
+    return results.map((result) => buildRequest(this.context, result));
   }
 }
 

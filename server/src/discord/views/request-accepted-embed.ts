@@ -1,15 +1,12 @@
 import { SystemMessageEmbed } from "./system-message-embed";
-import { getProfileMarkdown, ProfileMarkdownProps } from "./get-profile-markdown";
+import { getProfileMarkdown, ProfileMarkdownProps } from "./profile-markdown";
 
 export type RequestAcceptedEmbedProps = {
-  userName: string;
-  userAvatarURL: string;
   profile: ProfileMarkdownProps;
 };
 
 export class RequestAcceptedEmbed extends SystemMessageEmbed {
-  public constructor({ profile, userName, userAvatarURL }: RequestAcceptedEmbedProps) {
+  public constructor({ profile }: RequestAcceptedEmbedProps) {
     super("succeed", "リクエストが承認されました！", getProfileMarkdown(profile));
-    this.setAuthor(userName, userAvatarURL);
   }
 }

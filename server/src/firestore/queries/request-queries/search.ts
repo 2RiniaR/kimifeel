@@ -1,37 +1,33 @@
 import { DocumentScheme } from "firestore/scheme";
 import { extractAllResults, RequestQueryResult } from "./result";
 
-type RangeProps = {
+export type SearchReceivedProps = {
+  status: "received";
+  order: "latest" | "oldest";
   start: number;
   count: number;
+  userId: string;
 };
 
-type ConditionProps = {
-  ownerUserId?: string;
-  authorUserId?: string;
-  content?: string;
+export type SearchSentProps = {
+  status: "sent";
+  order: "latest" | "oldest";
+  start: number;
+  count: number;
+  userId: string;
 };
 
-export type SearchProps = (({ order: "latest" | "oldest" } & RangeProps) | { order: "random" }) & ConditionProps;
+export type SearchProps = SearchReceivedProps | SearchSentProps;
 
 export async function searchRequests(props: SearchProps): Promise<RequestQueryResult[]> {
   let queryField;
-  if (props.ownerUserId) {
-    queryField = DocumentScheme.requests({ userId: props.ownerUserId });
+  if (props.status === "received") {
+    queryField = DocumentScheme.requests({ userId: props.userId });
   } else {
-    queryField = DocumentScheme.allRequests();
+    queryField = DocumentScheme.allRequests().where("requesterUserId", "==", props.userId);
   }
 
   let query: FirebaseFirestore.Query = queryField;
-
-  if (props.authorUserId) {
-    query = query.where("authorUserId", "==", props.authorUserId);
-  }
-
-  if (props.content) {
-    query = query.where("content", ">=", props.content).where("content", "<=", props.content + "\uf8ff");
-  }
-
   if (props.order === "latest") {
     query = queryField.orderBy("index", "desc").startAt(props.start).limit(props.count);
   } else if (props.order === "oldest") {

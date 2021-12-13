@@ -2,35 +2,33 @@ import { SessionIn } from "../session";
 import { ActionWith } from "../base";
 import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
 import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
-import { ErrorEmbed, RequestCanceledEmbed } from "discord/views";
-import { CancelRequestEndpoint, CancelRequestEndpointParams, CancelRequestEndpointResult } from "endpoints";
+import { ErrorEmbed, RequestDeniedEmbed } from "discord/views";
+import { DenyRequestEndpoint, DenyRequestEndpointParams, DenyRequestEndpointResult } from "endpoints";
 
-export class SlashCommandCancelRequestAction extends ActionWith<SlashCommandEvent, CancelRequestEndpoint> {
+export class SlashCommandDenyRequestAction extends ActionWith<SlashCommandEvent, DenyRequestEndpoint> {
   readonly options: SlashCommandEventOptions = {
-    commandName: "cancel-request",
+    commandName: "deny-request",
     allowBot: false
   };
 
   async onEvent(context: SlashCommandEventContext) {
-    await new SlashCommandCancelRequestSession(context, this.endpoint).run();
+    await new SlashCommandDenyRequestSession(context, this.endpoint).run();
   }
 }
 
-class SlashCommandCancelRequestSession extends SessionIn<SlashCommandCancelRequestAction> {
-  async fetch(): Promise<CancelRequestEndpointParams> {
+class SlashCommandDenyRequestSession extends SessionIn<SlashCommandDenyRequestAction> {
+  async fetch(): Promise<DenyRequestEndpointParams> {
     await Promise.resolve();
     const index = this.context.interaction.options.getInteger("number", true);
-    const target = this.context.interaction.options.getUser("target", true);
 
     return {
       clientDiscordId: this.context.member.id,
-      index,
-      targetDiscordId: target.id
+      index
     };
   }
 
-  async onSucceed(result: CancelRequestEndpointResult) {
-    const embed = new RequestCanceledEmbed({ request: result });
+  async onSucceed(result: DenyRequestEndpointResult) {
+    const embed = new RequestDeniedEmbed({ request: result });
     await this.context.interaction.reply({ embeds: [embed] });
   }
 

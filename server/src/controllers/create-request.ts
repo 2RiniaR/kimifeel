@@ -13,7 +13,12 @@ export class CreateRequestController extends ControllerFor<CreateRequestEndpoint
 
     try {
       const request = await target.submitRequest(ctx.content);
-      return { index: request.index };
+      return {
+        index: request.index,
+        content: request.profile.content,
+        requesterUserId: client.asUser().discordId,
+        targetUserId: target.discordId
+      };
     } catch (error) {
       if (error instanceof ContentLengthLimitError) {
         throw new ProfileContentLengthLimitEndpointError(error.min, error.max, error.actual);

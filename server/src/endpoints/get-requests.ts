@@ -1,5 +1,5 @@
 import { Endpoint, EndpointParamsBase } from "./base";
-import { ProfileMarkdownProps } from "../discord/views";
+import { RequestMarkdownProps } from "../discord/views";
 
 type GetReceivedRequestsEndpointParams =
   | {
@@ -25,6 +25,6 @@ type GetSentRequestsParams =
 export type GetRequestsEndpointParams = EndpointParamsBase &
   (({ genre: "received" } & GetReceivedRequestsEndpointParams) | ({ genre: "sent" } & GetSentRequestsParams));
 
-export type GetRequestsEndpointResult = ProfileMarkdownProps[];
+export type GetRequestsEndpointResult = RequestMarkdownProps[];
 
 export class GetRequestsEndpoint extends Endpoint<GetRequestsEndpointParams, GetRequestsEndpointResult> {}

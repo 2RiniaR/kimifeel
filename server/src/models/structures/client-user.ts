@@ -1,9 +1,7 @@
 import { Context } from "../context";
-import { ProfileManager } from "../managers/profile-manager";
-import { RequestManager } from "../managers/request-manager";
+import { ProfileManager, RequestManager, UserManager } from "../managers";
 import { User, UserProps } from "./user";
 import { UserIdentifier } from "./identity-user";
-import { UserManager } from "../managers/user-manager";
 
 export class ClientUser {
   public readonly discordId: string;

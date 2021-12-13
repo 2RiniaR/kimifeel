@@ -1,9 +1,9 @@
 import { SessionIn } from "../session";
 import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
-import { ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
+import { ErrorEmbed, RequestCanceledEmbed } from "discord/views";
 import { ActionWith } from "../base";
-import { ChangeRequestEndpoint, ChangeRequestEndpointParams, ChangeRequestEndpointResult } from "endpoints";
+import { CancelRequestEndpoint, CancelRequestEndpointParams, CancelRequestEndpointResult } from "endpoints";
 import { basePhrase } from "./phrases";
 
 const format = {
@@ -25,7 +25,7 @@ const format = {
 
 export class MessageCommandCancelRequestAction extends ActionWith<
   MessageCommandEvent<typeof format>,
-  ChangeRequestEndpoint
+  CancelRequestEndpoint
 > {
   public readonly options = {
     format,
@@ -33,32 +33,23 @@ export class MessageCommandCancelRequestAction extends ActionWith<
   };
 
   async onEvent(context: MessageCommandEventContext<typeof format>) {
-    await new MessageCommandChangeRequestSession(context, this.endpoint).run();
+    await new MessageCommandCancelRequestSession(context, this.endpoint).run();
   }
 }
 
-class MessageCommandChangeRequestSession extends SessionIn<MessageCommandCancelRequestAction> {
-  async fetch(): Promise<ChangeRequestEndpointParams> {
+class MessageCommandCancelRequestSession extends SessionIn<MessageCommandCancelRequestAction> {
+  async fetch(): Promise<CancelRequestEndpointParams> {
     await Promise.resolve();
 
     return {
       clientDiscordId: this.context.member.id,
       index: this.context.command.arguments[1],
-      targetDiscordId: this.context.command.arguments[0],
-      controlType: "cancel"
+      targetDiscordId: this.context.command.arguments[0]
     };
   }
 
-  async onSucceed(result: ChangeRequestEndpointResult) {
-    const embed = new RequestAcceptedEmbed({
-      userName: this.context.member.displayName,
-      userAvatarURL: this.context.member.displayAvatarURL(),
-      profile: {
-        authorUserId: result.authorDiscordId,
-        index: result.index,
-        content: result.content
-      }
-    });
+  async onSucceed(result: CancelRequestEndpointResult) {
+    const embed = new RequestCanceledEmbed({ request: result });
     await this.context.message.reply({ embeds: [embed] });
   }
 

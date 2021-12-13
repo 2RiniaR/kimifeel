@@ -1,6 +1,6 @@
 import { Context } from "../context";
 import { ContextModel } from "../context-model";
-import { UserService } from "../services/user-service";
+import { UserService } from "../services";
 import { Profile } from "./profile";
 import { Request } from "./request";
 
@@ -13,10 +13,6 @@ export class IdentityUser extends ContextModel implements UserIdentifier {
     this.id = props.id;
   }
 
-  public async getProfiles(): Promise<Profile[]> {
-    return await this.service.getProfiles();
-  }
-
   public async getProfileByIndex(index: number): Promise<Profile | undefined> {
     return await this.service.findProfileByIndex(index);
   }
@@ -24,12 +20,19 @@ export class IdentityUser extends ContextModel implements UserIdentifier {
   public async getRequestByIndex(index: number): Promise<Request | undefined> {
     return await this.service.findRequestByIndex(index);
   }
+
+  public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {
+    return await this.service.searchRequests(props);
+  }
 }
 
 export type UserIdentifier = {
   id: string;
 };
 
-export type GetProfilesProps = {
-
-}
+export type SearchRequestsProps = {
+  status: "sent" | "received";
+  order: "latest" | "oldest";
+  start: number;
+  count: number;
+};

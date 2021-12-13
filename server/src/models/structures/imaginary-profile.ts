@@ -1,7 +1,7 @@
 import { IdentityUser } from "./identity-user";
 import { Context } from "../context";
 import { ContextModel } from "../context-model";
-import { ImaginaryProfileService } from "../services/profile-service";
+import { ImaginaryProfileService } from "../services";
 import { ContentLengthLimitError } from "../errors";
 
 export class ImaginaryProfile extends ContextModel {

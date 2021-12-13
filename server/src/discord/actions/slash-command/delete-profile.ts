@@ -27,15 +27,7 @@ class SlashCommandDeleteProfileSession extends SessionIn<SlashCommandDeleteProfi
   }
 
   async onSucceed(result: DeleteProfileEndpointResult) {
-    const embed = new ProfileDeletedEmbed({
-      userName: this.context.member.displayName,
-      userAvatarURL: this.context.member.displayAvatarURL(),
-      profile: {
-        authorUserId: result.authorDiscordId,
-        index: result.index,
-        content: result.content
-      }
-    });
+    const embed = new ProfileDeletedEmbed({ profile: result });
     await this.context.interaction.reply({ embeds: [embed] });
   }
 

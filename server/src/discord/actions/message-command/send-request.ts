@@ -1,13 +1,15 @@
 import { GuildMember } from "discord.js";
 import { SessionIn } from "../session";
 import { ActionWith } from "../base";
-import { ReactionChangeRequestAction } from "../reaction/change-request";
-import { ErrorEmbed, RequestEmbed } from "discord/views";
+import { ErrorEmbed, RequestSentEmbed } from "discord/views";
 import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { DiscordFetchFailedActionError, NoBotActionError } from "discord/actions/errors";
 import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "endpoints";
 import { targetGuildManager } from "discord";
 import { basePhrase } from "./phrases";
+import { ReactionAcceptRequestAction } from "../reaction/accept-request";
+import { ReactionCancelRequestAction } from "../reaction/cancel-request";
+import { ReactionDenyRequestAction } from "../reaction/deny-request";
 
 const format = {
   prefixes: [`${basePhrase} send-request`, `${basePhrase} request send`],
@@ -63,7 +65,7 @@ class MessageCommandSendRequestSession extends SessionIn<MessageCommandSendReque
   }
 
   protected async onSucceed(result: CreateRequestEndpointResult) {
-    const embed = new RequestEmbed({
+    const embed = new RequestSentEmbed({
       index: result.index,
       requesterUserName: this.context.member.displayName,
       requesterUserAvatarURL: this.context.member.displayAvatarURL(),
@@ -74,7 +76,12 @@ class MessageCommandSendRequestSession extends SessionIn<MessageCommandSendReque
     });
 
     const message = await this.context.message.reply({ embeds: [embed] });
-    const emojiCharacters = Object.keys(ReactionChangeRequestAction.emojiToChange);
+
+    const emojiCharacters = [
+      ...ReactionAcceptRequestAction.emojis,
+      ...ReactionCancelRequestAction.emojis,
+      ...ReactionDenyRequestAction.emojis
+    ];
     await emojiCharacters.mapAsync((emoji) => message.react(emoji));
   }
 

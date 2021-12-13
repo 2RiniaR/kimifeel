@@ -2,10 +2,12 @@ import { GuildMember, Message } from "discord.js";
 import { SessionIn } from "../session";
 import { DiscordFetchFailedActionError, NoBotActionError } from "../errors";
 import { ActionWith } from "../base";
-import { ErrorEmbed, RequestEmbed } from "discord/views";
+import { ErrorEmbed, RequestSentEmbed } from "discord/views";
 import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
 import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "endpoints";
-import { ReactionChangeRequestAction } from "../reaction/change-request";
+import { ReactionAcceptRequestAction } from "../reaction/accept-request";
+import { ReactionCancelRequestAction } from "../reaction/cancel-request";
+import { ReactionDenyRequestAction } from "../reaction/deny-request";
 
 export class SlashCommandSendRequestAction extends ActionWith<SlashCommandEvent, CreateRequestEndpoint> {
   readonly options: SlashCommandEventOptions = {
@@ -45,7 +47,7 @@ class SlashCommandSendRequestSession extends SessionIn<SlashCommandSendRequestAc
   }
 
   protected async onSucceed(result: CreateRequestEndpointResult) {
-    const embed = new RequestEmbed({
+    const embed = new RequestSentEmbed({
       index: result.index,
       requesterUserName: this.context.member.displayName,
       requesterUserAvatarURL: this.context.member.displayAvatarURL(),
@@ -58,7 +60,11 @@ class SlashCommandSendRequestSession extends SessionIn<SlashCommandSendRequestAc
     const message = await this.context.interaction.reply({ embeds: [embed], fetchReply: true });
     if (!(message instanceof Message)) return;
 
-    const emojiCharacters = Object.keys(ReactionChangeRequestAction.emojiToChange);
+    const emojiCharacters = [
+      ...ReactionAcceptRequestAction.emojis,
+      ...ReactionCancelRequestAction.emojis,
+      ...ReactionDenyRequestAction.emojis
+    ];
     await emojiCharacters.mapAsync((emoji) => message.react(emoji));
   }
 

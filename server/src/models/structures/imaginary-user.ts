@@ -1,4 +1,4 @@
-import { ImaginaryUserService } from "../services/user-service";
+import { ImaginaryUserService } from "../services";
 
 export class ImaginaryUser {
   private readonly service = new ImaginaryUserService(this);

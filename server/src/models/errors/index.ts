@@ -1,3 +1,3 @@
-export * from "./content-length-limit-error";
-export * from "./forbidden-error";
-export * from "./not-found-error";
+export * from "./content-length-limit";
+export * from "./forbidden";
+export * from "./not-found";

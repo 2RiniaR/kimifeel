@@ -11,7 +11,8 @@ export class DeleteProfileController extends ControllerFor<DeleteProfileEndpoint
     const result: DeleteProfileEndpointResult = {
       index: profile.index,
       content: profile.content,
-      authorDiscordId: author.discordId
+      authorUserId: author.discordId,
+      ownerUserId: client.asUser().discordId
     };
     await profile.delete();
     return result;

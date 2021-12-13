@@ -89,10 +89,7 @@ export type CommandResultOptions<
   [key in keyof TOptions]?: TypeToReturn<TConvertTypeSet[TOptions[key]["type"]]>;
 };
 
-function convertArguments<
-  TConvertTypeSet extends ConvertTypeSetBase,
-  TFormat extends CommandFormatOn<TConvertTypeSet>
-  >(
+function convertArguments<TConvertTypeSet extends ConvertTypeSetBase, TFormat extends CommandFormatOn<TConvertTypeSet>>(
   values: InterpretResult<TConvertTypeSet, TFormat>,
   format: TFormat,
   types: TConvertTypeSet
@@ -111,15 +108,12 @@ function convertArguments<
   return parameters as CommandResultArguments<TConvertTypeSet, TFormat["arguments"]>;
 }
 
-function convertOptions<
-  TConvertTypeSet extends ConvertTypeSetBase,
-  TFormat extends CommandFormatOn<TConvertTypeSet>
->(
+function convertOptions<TConvertTypeSet extends ConvertTypeSetBase, TFormat extends CommandFormatOn<TConvertTypeSet>>(
   values: InterpretResult<TConvertTypeSet, TFormat>,
   format: TFormat,
   types: TConvertTypeSet
 ): CommandResultOptions<TConvertTypeSet, TFormat["options"]> {
-  let results: CommandResultOptions<TConvertTypeSet, TFormat["options"]> = {};
+  const results: CommandResultOptions<TConvertTypeSet, TFormat["options"]> = {};
 
   const options: TFormat["options"] = format.options;
   for (const key in options) {
@@ -147,10 +141,7 @@ export function parseCommand<
     optionsName: format.options
   } as const;
 
-  const interpretation = interpretCommand<TConvertTypeSet, TFormat>(
-    command,
-    interpretFormat
-  );
+  const interpretation = interpretCommand<TConvertTypeSet, TFormat>(command, interpretFormat);
   if (!interpretation) return;
 
   return {

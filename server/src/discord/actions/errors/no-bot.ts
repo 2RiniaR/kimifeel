@@ -1,4 +1,4 @@
-import { ActionError } from "./action-error";
+import { ActionError } from "./base";
 
 export class NoBotActionError extends ActionError {
   public readonly title = "ボットユーザーを選択することはできません。";

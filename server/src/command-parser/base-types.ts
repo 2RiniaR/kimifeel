@@ -1,4 +1,3 @@
-import { SupportTypes } from "./converter";
 import { ConvertTypeSetBase } from "./parser";
 
 type Parameter<TConvertTypeSet extends ConvertTypeSetBase = ConvertTypeSetBase> = {

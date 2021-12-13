@@ -1,18 +1,24 @@
 import { DocumentScheme } from "../../scheme";
 import { extractAllResults, ProfileQueryResult } from "./result";
 
-type RangeProps = {
-  start: number;
-  count: number;
-};
-
 type ConditionProps = {
   ownerUserId?: string;
   authorUserId?: string;
   content?: string;
 };
 
-export type SearchProps = (({ order: "latest" | "oldest" } & RangeProps) | { order: "random" }) & ConditionProps;
+export type SearchProps = (
+  | {
+      order: "latest" | "oldest";
+      start: number;
+      count: number;
+    }
+  | {
+      order: "random";
+      count: number;
+    }
+) &
+  ConditionProps;
 
 export async function searchProfiles(props: SearchProps): Promise<ProfileQueryResult[]> {
   let queryField;
@@ -36,6 +42,8 @@ export async function searchProfiles(props: SearchProps): Promise<ProfileQueryRe
     query = queryField.orderBy("index", "desc").startAt(props.start).limit(props.count);
   } else if (props.order === "oldest") {
     query = queryField.orderBy("index", "asc").startAt(props.start).limit(props.count);
+  } else if (props.order === "random") {
+    query = queryField.limit(props.count);
   }
 
   const snapshot = await query.get();

@@ -2,7 +2,7 @@ import { NoBotActionError } from "../errors";
 import { ActionWith } from "../base";
 import { SessionIn } from "../session";
 import { GetRequestsEndpoint, GetRequestsEndpointParams, GetRequestsEndpointResult } from "endpoints";
-import { ErrorEmbed, ProfileListEmbed } from "discord/views";
+import { ErrorEmbed, RequestListEmbed } from "discord/views";
 import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
 
 export class SlashCommandShowRequestsAction extends ActionWith<SlashCommandEvent, GetRequestsEndpoint> {
@@ -119,7 +119,7 @@ class SlashCommandShowRequestsSession extends SessionIn<SlashCommandShowRequests
   }
 
   async onSucceed(result: GetRequestsEndpointResult) {
-    const listEmbed = new ProfileListEmbed({ profiles: result });
+    const listEmbed = new RequestListEmbed({ requests: result });
     await this.context.interaction.reply({ embeds: [listEmbed] });
   }
 

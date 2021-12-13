@@ -20,10 +20,7 @@ export abstract class Action<
   public readonly event: Event<TEventContext, TEventOption>;
   public abstract readonly options: TEventOption;
 
-  protected constructor(
-    endpoint: Endpoint<TEndpointParams, TEndpointResult>,
-    event: Event<TEventContext, TEventOption>
-  ) {
+  public constructor(endpoint: Endpoint<TEndpointParams, TEndpointResult>, event: Event<TEventContext, TEventOption>) {
     this.event = event;
     this.endpoint = endpoint;
   }

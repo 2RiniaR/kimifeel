@@ -1,4 +1,3 @@
-import "./build";
 import { ClientManager } from "./client";
 import { TargetGuildManager } from "./target-guild";
 

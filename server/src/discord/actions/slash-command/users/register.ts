@@ -9,8 +9,8 @@ import { NoBotActionError } from "../../errors";
 
 export class SlashCommandRegisterUserAction extends ActionWith<SlashCommandEvent, RegisterUserEndpoint> {
   readonly options: SlashCommandEventOptions = {
-    commandName: "request",
-    subCommandName: "cancel",
+    commandName: "user",
+    subCommandName: "register",
     allowBot: false
   };
 

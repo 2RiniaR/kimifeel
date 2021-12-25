@@ -16,8 +16,9 @@ export type SlashCommandEventOptions = {
 
 function checkCommandName(interaction: CommandInteraction, options: SlashCommandEventOptions) {
   const mainValid = interaction.commandName === options.commandName;
-  const subGroupValid = interaction.options.getSubcommandGroup() === options.subCommandGroupName;
-  const subValid = interaction.options.getSubcommand() === options.subCommandName;
+  const subGroupValid = (interaction.options.getSubcommandGroup(false) ?? undefined) === options.subCommandGroupName;
+  const subValid = (interaction.options.getSubcommand(false) ?? undefined) === options.subCommandName;
+
   return mainValid && subGroupValid && subValid;
 }
 

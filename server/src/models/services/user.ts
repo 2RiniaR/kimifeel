@@ -1,11 +1,9 @@
-import { findProfileByIndex } from "firestore/queries/profile-queries";
-import { findRequestByIndex, searchRequests } from "firestore/queries/request-queries";
-import { createUserIfNotExist } from "firestore/queries/user-queries";
 import { IdentityUser, ImaginaryUser, Profile, Request, SearchRequestsProps } from "../structures";
 import { ContextModel } from "../context-model";
 import { buildProfile } from "../builders/profile";
 import { buildClientUser } from "../builders/client-user";
 import { buildRequest } from "../builders/request";
+import { createUser, findProfileByIndex, findRequestByIndex, searchRequests } from "../../prisma";
 
 export class UserService extends ContextModel {
   private readonly user: IdentityUser;
@@ -29,11 +27,12 @@ export class UserService extends ContextModel {
 
   public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {
     const results = await searchRequests({
-      status: props.status,
-      userId: this.user.id,
       order: props.order,
       start: props.start,
-      count: props.count
+      count: props.count,
+      applicantUserId: props.status === "sent" ? this.user.id : props.applicant?.id,
+      targetUserId: props.status === "received" ? this.user.id : props.target?.id,
+      content: props.content
     });
     return results.map((result) => buildRequest(this.context, result));
   }
@@ -46,8 +45,8 @@ export class ImaginaryUserService {
     this.user = user;
   }
 
-  public async createIfNotExist() {
-    const result = await createUserIfNotExist({ discordId: this.user.discordId });
+  public async create() {
+    const result = await createUser({ discordId: this.user.discordId });
     return buildClientUser(result);
   }
 }

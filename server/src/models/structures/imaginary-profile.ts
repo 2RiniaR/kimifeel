@@ -6,7 +6,7 @@ import { ContentLengthLimitError } from "../errors";
 
 export class ImaginaryProfile extends ContextModel {
   private readonly service = new ImaginaryProfileService(this);
-  public readonly user: IdentityUser;
+  public readonly owner: IdentityUser;
   public readonly author: IdentityUser;
   public readonly content: string;
   public static readonly MinContentLength = 1;
@@ -14,7 +14,7 @@ export class ImaginaryProfile extends ContextModel {
 
   public constructor(ctx: Context, props: CreateProfileProps) {
     super(ctx);
-    this.user = props.user;
+    this.owner = props.owner;
     this.author = props.author;
     this.content = props.content;
     this.validation();
@@ -39,7 +39,7 @@ export class ImaginaryProfile extends ContextModel {
 }
 
 export type CreateProfileProps = {
-  user: IdentityUser;
+  owner: IdentityUser;
   author: IdentityUser;
   content: string;
 };

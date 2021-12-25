@@ -1,0 +1,76 @@
+import { GuildMember, Message } from "discord.js";
+import { SessionIn } from "../../session";
+import { DiscordFetchFailedActionError, NoBotActionError } from "../../errors";
+import { ActionWith } from "../../base";
+import { ErrorEmbed, RequestSentEmbed } from "discord/views";
+import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
+import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "endpoints";
+import { ReactionAcceptRequestAction } from "../../reaction/requests/accept";
+import { ReactionCancelRequestAction } from "../../reaction/requests/cancel";
+import { ReactionDenyRequestAction } from "../../reaction/requests/deny";
+
+export class SlashCommandSendRequestAction extends ActionWith<SlashCommandEvent, CreateRequestEndpoint> {
+  readonly options: SlashCommandEventOptions = {
+    commandName: "request",
+    subCommandName: "send",
+    allowBot: false
+  };
+
+  async onEvent(context: SlashCommandEventContext) {
+    await new Session(context, this.endpoint).run();
+  }
+}
+
+class Session extends SessionIn<SlashCommandSendRequestAction> {
+  private target!: GuildMember;
+  private content!: string;
+
+  protected async fetch(): Promise<CreateRequestEndpointParams> {
+    await Promise.resolve();
+
+    const target = this.context.interaction.options.getMember("target", true);
+    this.content = this.context.interaction.options.getString("content", true);
+
+    if (!(target instanceof GuildMember)) {
+      throw new DiscordFetchFailedActionError();
+    }
+
+    this.target = target;
+    if (this.target.user.bot) {
+      throw new NoBotActionError();
+    }
+
+    return {
+      clientDiscordId: this.context.member.id,
+      targetDiscordId: this.target.id,
+      content: this.content
+    };
+  }
+
+  protected async onSucceed(result: CreateRequestEndpointResult) {
+    const embed = new RequestSentEmbed({
+      index: result.index,
+      requesterUserName: this.context.member.displayName,
+      requesterUserAvatarURL: this.context.member.displayAvatarURL(),
+      requesterUserId: this.context.member.id,
+      content: this.content,
+      targetUserName: this.target.displayName,
+      targetUserId: this.target.id
+    });
+
+    const message = await this.context.interaction.reply({ embeds: [embed], fetchReply: true });
+    if (!(message instanceof Message)) return;
+
+    const emojiCharacters = [
+      ...ReactionAcceptRequestAction.emojis,
+      ...ReactionCancelRequestAction.emojis,
+      ...ReactionDenyRequestAction.emojis
+    ];
+    await emojiCharacters.mapAsync((emoji) => message.react(emoji));
+  }
+
+  protected async onFailed(error: unknown) {
+    const embed = new ErrorEmbed(error);
+    await this.context.interaction.reply({ embeds: [embed], ephemeral: true });
+  }
+}

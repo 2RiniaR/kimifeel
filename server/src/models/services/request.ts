@@ -1,7 +1,8 @@
-import { IdentityRequest, ImaginaryRequest } from "../structures";
+import { IdentityRequest, ImaginaryRequest, Request } from "../structures";
 import { buildRequest } from "../builders/request";
 import { ContextModel } from "../context-model";
-import { createRequest, deleteRequest } from "firestore/queries/request-queries";
+import { createRequest, deleteRequest } from "../../prisma";
+import { NotFoundError } from "../errors";
 
 export class RequestService extends ContextModel {
   private readonly request: IdentityRequest;
@@ -11,8 +12,12 @@ export class RequestService extends ContextModel {
     this.request = request;
   }
 
-  public async delete() {
-    await deleteRequest(this.request.target.id, this.request.id);
+  public async delete(): Promise<Request> {
+    const result = await deleteRequest(this.request.target.id, this.request.index);
+    if (!result) {
+      throw new NotFoundError();
+    }
+    return buildRequest(this.context, result);
   }
 }
 
@@ -26,8 +31,8 @@ export class ImaginaryRequestService extends ContextModel {
 
   public async create() {
     const result = await createRequest({
-      userId: this.request.profile.user.id,
-      requesterUserId: this.request.profile.author.id,
+      targetUserId: this.request.profile.owner.id,
+      applicantUserId: this.request.profile.author.id,
       content: this.request.profile.content
     });
     return buildRequest(this.context, result);

@@ -1,7 +1,8 @@
 import { ContextModel } from "../context-model";
-import { IdentityProfile, ImaginaryProfile } from "../structures";
+import { IdentityProfile, ImaginaryProfile, Profile } from "../structures";
 import { buildProfile } from "../builders/profile";
-import { createProfile, deleteProfile } from "firestore/queries/profile-queries";
+import { createProfile, deleteProfile } from "../../prisma";
+import { NotFoundError } from "../errors";
 
 export class ProfileService extends ContextModel {
   private readonly profile: IdentityProfile;
@@ -11,8 +12,12 @@ export class ProfileService extends ContextModel {
     this.profile = profile;
   }
 
-  public async delete() {
-    await deleteProfile(this.context.clientUser.id, this.profile.id);
+  public async delete(): Promise<Profile> {
+    const result = await deleteProfile(this.context.clientUser.id, this.profile.index);
+    if (!result) {
+      throw new NotFoundError();
+    }
+    return buildProfile(this.context, result);
   }
 }
 
@@ -26,7 +31,7 @@ export class ImaginaryProfileService extends ContextModel {
 
   public async create() {
     const result = await createProfile({
-      userId: this.profile.user.id,
+      ownerUserId: this.profile.owner.id,
       authorUserId: this.profile.author.id,
       content: this.profile.content
     });

@@ -1,97 +1,136 @@
 import {
+  DeleteProfileEndpoint,
+  FindProfilesEndpoint,
+  RandomProfilesEndpoint,
+  SearchProfilesEndpoint,
   AcceptRequestEndpoint,
   CancelRequestEndpoint,
   CreateRequestEndpoint,
-  DeleteProfileEndpoint,
   DenyRequestEndpoint,
-  GetProfilesEndpoint,
-  GetRequestsEndpoint
+  FindRequestEndpoint,
+  SearchRequestsEndpoint,
+  RegisterUserEndpoint,
+  UnregisterUserEndpoint
 } from "./endpoints";
+
 import {
+  DeleteProfileController,
+  FindProfilesController,
+  RandomProfilesController,
+  SearchProfilesController,
   AcceptRequestController,
   CancelRequestController,
   CreateRequestController,
-  DeleteProfileController,
   DenyRequestController,
-  GetProfilesController,
-  GetRequestsController
+  FindRequestController,
+  SearchRequestsController,
+  RegisterUserController,
+  UnregisterUserController
 } from "./controllers";
+
 import { MessageCommandEvent, ReactionAddEvent, SlashCommandEvent } from "./discord/events";
+
 import {
+  MessageCommandDeleteProfileAction,
+  MessageCommandRandomProfilesAction,
+  MessageCommandSearchProfilesAction,
+  MessageCommandShowProfileAction,
   MessageCommandAcceptRequestAction,
   MessageCommandCancelRequestAction,
-  MessageCommandDeleteProfileAction,
   MessageCommandDenyRequestAction,
+  MessageCommandSearchRequestsAction,
   MessageCommandSendRequestAction,
-  MessageCommandShowProfilesAction,
-  MessageCommandShowRequestsAction,
+  MessageCommandShowRequestAction,
+  MessageCommandRegisterUserAction,
   ReactionAcceptRequestAction,
   ReactionCancelRequestAction,
   ReactionDenyRequestAction,
+  SlashCommandDeleteProfileAction,
+  SlashCommandRandomProfilesAction,
+  SlashCommandSearchProfilesAction,
+  SlashCommandShowProfileAction,
   SlashCommandAcceptRequestAction,
   SlashCommandCancelRequestAction,
-  SlashCommandDeleteProfileAction,
   SlashCommandDenyRequestAction,
+  SlashCommandSearchRequestsAction,
   SlashCommandSendRequestAction,
-  SlashCommandShowProfilesAction
+  SlashCommandShowRequestAction,
+  SlashCommandRegisterUserAction
 } from "./discord/actions";
-import { SlashCommandShowRequestsAction } from "./discord/actions/slash-command/show-requests";
 
-export function buildApplication(): unknown[] {
-  const endpoints = {
-    acceptRequest: new AcceptRequestEndpoint(),
-    cancelRequest: new CancelRequestEndpoint(),
-    denyRequest: new DenyRequestEndpoint(),
-    createRequest: new CreateRequestEndpoint(),
-    deleteProfile: new DeleteProfileEndpoint(),
-    getProfiles: new GetProfilesEndpoint(),
-    getRequests: new GetRequestsEndpoint()
-  } as const;
+const endpoints = {
+  deleteProfile: new DeleteProfileEndpoint(),
+  findProfile: new FindProfilesEndpoint(),
+  randomProfiles: new RandomProfilesEndpoint(),
+  searchProfiles: new SearchProfilesEndpoint(),
+  acceptRequest: new AcceptRequestEndpoint(),
+  cancelRequest: new CancelRequestEndpoint(),
+  createRequest: new CreateRequestEndpoint(),
+  denyRequest: new DenyRequestEndpoint(),
+  findRequest: new FindRequestEndpoint(),
+  searchRequests: new SearchRequestsEndpoint(),
+  registerUser: new RegisterUserEndpoint(),
+  unregisterUser: new UnregisterUserEndpoint()
+} as const;
 
-  const controllers = {
-    acceptRequest: new AcceptRequestController(),
-    cancelRequest: new CancelRequestController(),
-    denyRequest: new DenyRequestController(),
-    createRequest: new CreateRequestController(),
-    deleteProfile: new DeleteProfileController(),
-    getProfiles: new GetProfilesController(),
-    getRequests: new GetRequestsController()
-  } as const;
+const controllers = {
+  deleteProfile: new DeleteProfileController(),
+  findProfile: new FindProfilesController(),
+  randomProfiles: new RandomProfilesController(),
+  searchProfiles: new SearchProfilesController(),
+  acceptRequest: new AcceptRequestController(),
+  cancelRequest: new CancelRequestController(),
+  createRequest: new CreateRequestController(),
+  denyRequest: new DenyRequestController(),
+  findRequest: new FindRequestController(),
+  searchRequests: new SearchRequestsController(),
+  registerUser: new RegisterUserController(),
+  unregisterUser: new UnregisterUserController()
+} as const;
 
-  endpoints.acceptRequest.listen(controllers.acceptRequest);
-  endpoints.cancelRequest.listen(controllers.cancelRequest);
-  endpoints.denyRequest.listen(controllers.denyRequest);
-  endpoints.createRequest.listen(controllers.createRequest);
-  endpoints.deleteProfile.listen(controllers.deleteProfile);
-  endpoints.getProfiles.listen(controllers.getProfiles);
-  endpoints.getRequests.listen(controllers.getRequests);
+endpoints.deleteProfile.listen(controllers.deleteProfile);
+endpoints.findProfile.listen(controllers.findProfile);
+endpoints.randomProfiles.listen(controllers.randomProfiles);
+endpoints.searchProfiles.listen(controllers.searchProfiles);
+endpoints.acceptRequest.listen(controllers.acceptRequest);
+endpoints.cancelRequest.listen(controllers.cancelRequest);
+endpoints.createRequest.listen(controllers.createRequest);
+endpoints.denyRequest.listen(controllers.denyRequest);
+endpoints.findRequest.listen(controllers.findRequest);
+endpoints.searchRequests.listen(controllers.searchRequests);
+endpoints.registerUser.listen(controllers.registerUser);
+endpoints.unregisterUser.listen(controllers.unregisterUser);
 
-  const events = {
-    reactionAdd: new ReactionAddEvent(),
-    slashCommand: new SlashCommandEvent(),
-    messageCommand: new MessageCommandEvent()
-  } as const;
+const events = {
+  reactionAdd: new ReactionAddEvent(),
+  slashCommand: new SlashCommandEvent(),
+  messageCommand: new MessageCommandEvent()
+} as const;
 
-  new MessageCommandAcceptRequestAction(endpoints.acceptRequest, events.messageCommand);
-  new MessageCommandCancelRequestAction(endpoints.cancelRequest, events.messageCommand);
-  new MessageCommandDeleteProfileAction(endpoints.deleteProfile, events.messageCommand);
-  new MessageCommandDenyRequestAction(endpoints.denyRequest, events.messageCommand);
-  new MessageCommandSendRequestAction(endpoints.createRequest, events.messageCommand);
-  new MessageCommandShowProfilesAction(endpoints.getProfiles, events.messageCommand);
-  new MessageCommandShowRequestsAction(endpoints.getRequests, events.messageCommand);
+new MessageCommandDeleteProfileAction(endpoints.deleteProfile, events.messageCommand).activate();
+new MessageCommandRandomProfilesAction(endpoints.randomProfiles, events.messageCommand).activate();
+new MessageCommandSearchProfilesAction(endpoints.searchProfiles, events.messageCommand).activate();
+new MessageCommandShowProfileAction(endpoints.findProfile, events.messageCommand).activate();
+new MessageCommandAcceptRequestAction(endpoints.acceptRequest, events.messageCommand).activate();
+new MessageCommandCancelRequestAction(endpoints.cancelRequest, events.messageCommand).activate();
+new MessageCommandDenyRequestAction(endpoints.denyRequest, events.messageCommand).activate();
+new MessageCommandSearchRequestsAction(endpoints.searchRequests, events.messageCommand).activate();
+new MessageCommandSendRequestAction(endpoints.createRequest, events.messageCommand).activate();
+new MessageCommandShowRequestAction(endpoints.findRequest, events.messageCommand).activate();
+new MessageCommandRegisterUserAction(endpoints.registerUser, events.messageCommand).activate();
+new ReactionAcceptRequestAction(endpoints.acceptRequest, events.reactionAdd).activate();
+new ReactionCancelRequestAction(endpoints.cancelRequest, events.reactionAdd).activate();
+new ReactionDenyRequestAction(endpoints.denyRequest, events.reactionAdd).activate();
+new SlashCommandDeleteProfileAction(endpoints.deleteProfile, events.slashCommand).activate();
+new SlashCommandRandomProfilesAction(endpoints.randomProfiles, events.slashCommand).activate();
+new SlashCommandSearchProfilesAction(endpoints.searchProfiles, events.slashCommand).activate();
+new SlashCommandShowProfileAction(endpoints.findProfile, events.slashCommand).activate();
+new SlashCommandAcceptRequestAction(endpoints.acceptRequest, events.slashCommand).activate();
+new SlashCommandCancelRequestAction(endpoints.cancelRequest, events.slashCommand).activate();
+new SlashCommandDenyRequestAction(endpoints.denyRequest, events.slashCommand).activate();
+new SlashCommandSearchRequestsAction(endpoints.searchRequests, events.slashCommand).activate();
+new SlashCommandSendRequestAction(endpoints.createRequest, events.slashCommand).activate();
+new SlashCommandShowRequestAction(endpoints.findRequest, events.slashCommand).activate();
+new SlashCommandRegisterUserAction(endpoints.registerUser, events.slashCommand).activate();
 
-  new ReactionAcceptRequestAction(endpoints.acceptRequest, events.reactionAdd);
-  new ReactionCancelRequestAction(endpoints.cancelRequest, events.reactionAdd);
-  new ReactionDenyRequestAction(endpoints.denyRequest, events.reactionAdd);
-
-  new SlashCommandAcceptRequestAction(endpoints.acceptRequest, events.slashCommand);
-  new SlashCommandCancelRequestAction(endpoints.cancelRequest, events.slashCommand);
-  new SlashCommandDeleteProfileAction(endpoints.deleteProfile, events.slashCommand);
-  new SlashCommandDenyRequestAction(endpoints.denyRequest, events.slashCommand);
-  new SlashCommandSendRequestAction(endpoints.createRequest, events.slashCommand);
-  new SlashCommandShowProfilesAction(endpoints.getProfiles, events.slashCommand);
-  new SlashCommandShowRequestsAction(endpoints.getRequests, events.slashCommand);
-
-  Object.values(events).forEach((event) => event.activate());
-  return [endpoints, events];
-}
+Object.values(events).forEach((event) => event.activate());

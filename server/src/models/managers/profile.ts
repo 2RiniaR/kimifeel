@@ -1,11 +1,11 @@
-import { findProfileById, searchProfiles, SearchProps } from "firestore/queries/profile-queries";
 import { ContextModel } from "../context-model";
 import { IdentityProfile, IdentityUser, Profile } from "../structures";
 import { buildProfile } from "../builders/profile";
+import { findProfileByIndex, randomProfiles, searchProfiles } from "../../prisma";
 
 export class ProfileManager extends ContextModel {
   public async fetch(profile: IdentityProfile): Promise<Profile> {
-    const result = await findProfileById(profile.target.id, profile.id);
+    const result = await findProfileByIndex(profile.owner.id, profile.index);
     if (!result) {
       throw Error("Tried to fetch data, but it wasn't found.");
     }
@@ -13,45 +13,40 @@ export class ProfileManager extends ContextModel {
   }
 
   public async search(options: SearchOptions): Promise<Profile[]> {
-    let props: SearchProps;
-    const condition = {
-      content: options.content,
+    const results = await searchProfiles({
+      order: options.order,
+      start: options.start,
+      count: options.count,
       authorUserId: options.author?.id,
-      ownerUserId: options.owner?.id
-    };
+      ownerUserId: options.owner?.id,
+      content: options.content
+    });
+    return results.map((result) => buildProfile(this.context, result));
+  }
 
-    if (options.order === "random") {
-      props = {
-        order: options.order,
-        count: options.count,
-        ...condition
-      };
-    } else {
-      props = {
-        order: options.order,
-        start: options.start,
-        count: options.count,
-        ...condition
-      };
-    }
-
-    const results = await searchProfiles(props);
+  public async random(options: RandomOptions): Promise<Profile[]> {
+    const results = await randomProfiles({
+      count: options.count,
+      authorUserId: options.author?.id,
+      ownerUserId: options.owner?.id,
+      content: options.content
+    });
     return results.map((result) => buildProfile(this.context, result));
   }
 }
 
 export type SearchOptions = {
+  order: "latest" | "oldest";
   content?: string;
   author?: IdentityUser;
   owner?: IdentityUser;
-} & (
-  | {
-      order: "random";
-      count: number;
-    }
-  | {
-      order: "latest" | "oldest";
-      start: number;
-      count: number;
-    }
-);
+  start: number;
+  count: number;
+};
+
+export type RandomOptions = {
+  count: number;
+  content?: string;
+  author?: IdentityUser;
+  owner?: IdentityUser;
+};

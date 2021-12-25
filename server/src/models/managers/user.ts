@@ -1,7 +1,7 @@
 import { IdentityUser, User } from "../structures";
-import { findUserByDiscordId, findUserById } from "firestore/queries/user-queries";
 import { ContextModel } from "../context-model";
 import { buildUser } from "../builders/user";
+import { findUserByDiscordId, findUserById } from "../../prisma";
 
 export class UserManager extends ContextModel {
   public async findByDiscordId(discordId: string): Promise<User | undefined> {

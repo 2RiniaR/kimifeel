@@ -7,21 +7,13 @@ export abstract class Controller<TEndpointParams extends EndpointParamsBase, TEn
 {
   private service = new ClientUserManager();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public requireUsersDiscordId(_: Omit<TEndpointParams, "client">): string[] {
-    return [];
-  }
-
   public abstract action(ctx: TEndpointParams, client: ClientUser): Promise<TEndpointResult>;
 
-  private async checkRequireUsers(params: TEndpointParams) {
-    const users = this.requireUsersDiscordId(params);
-    await Promise.all(users.map((id) => this.service.registerIfNotExist(id)));
-  }
-
   public async runEndpoint(params: TEndpointParams): Promise<TEndpointResult> {
-    await this.checkRequireUsers(params);
-    const client = await this.service.registerIfNotExist(params.clientDiscordId);
+    const client = await this.service.findByDiscordId(params.clientDiscordId);
+    if (!client) {
+      throw new Error("User was not registered.");
+    }
     return await this.action(params, client);
   }
 }

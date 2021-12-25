@@ -1,0 +1,51 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Profile {
+  id           String   @unique @default(uuid())
+  ownerUserId  String
+  index        Int      @default(autoincrement())
+  createdAt    DateTime @default(now())
+  content      String
+  authorUserId String
+
+  ownerUser    User     @relation(name: "OwnedProfilesOnUser", fields: [ownerUserId], references: [id])
+  authorUser   User     @relation(name: "WroteProfilesOnUser", fields: [authorUserId], references: [id])
+
+  @@index([ownerUserId, index])
+  @@unique([ownerUserId, index])
+}
+
+model Request {
+  id              String   @unique @default(uuid())
+  targetUserId    String
+  index           Int      @default(autoincrement())
+  createdAt       DateTime @default(now())
+  content         String
+  applicantUserId String
+
+  targetUser      User     @relation(name: "ReceivedRequestsOnUser", fields: [targetUserId], references: [id])
+  applicantUser   User     @relation(name: "SentRequestsOnUser", fields: [applicantUserId], references: [id])
+
+  @@index([targetUserId, index])
+  @@unique([targetUserId, index])
+}
+
+model User {
+  id               String    @id @default(uuid())
+  discordId        String    @unique
+
+  sentRequests     Request[] @relation(name: "SentRequestsOnUser")
+  receivedRequests Request[] @relation(name: "ReceivedRequestsOnUser")
+  ownedProfiles    Profile[] @relation(name: "OwnedProfilesOnUser")
+  wroteProfiles    Profile[] @relation(name: "WroteProfilesOnUser")
+
+  @@index([discordId])
+}
+

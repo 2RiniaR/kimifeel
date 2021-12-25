@@ -11,8 +11,8 @@ export class ImaginaryRequest extends ContextModel {
   constructor(ctx: Context, props: CreateRequestProps) {
     super(ctx);
     this.profile = new ImaginaryProfile(ctx, {
-      author: props.requester,
-      user: props.user,
+      author: props.applicant,
+      owner: props.target,
       content: props.content
     });
   }
@@ -23,7 +23,7 @@ export class ImaginaryRequest extends ContextModel {
 }
 
 export type CreateRequestProps = {
-  user: IdentityUser;
-  requester: IdentityUser;
+  target: IdentityUser;
+  applicant: IdentityUser;
   content: string;
 };

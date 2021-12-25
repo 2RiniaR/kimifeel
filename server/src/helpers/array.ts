@@ -7,6 +7,10 @@ declare global {
     mapAsync<U>(converter: (src: T) => Promise<U>): Promise<Array<U>>;
     forEachAsync(task: (src: T) => Promise<void>): Promise<void[]>;
   }
+
+  interface ArrayConstructor {
+    range(count: number): Array<number>;
+  }
 }
 
 Array.prototype.removeNone = function <T>(this: Array<T | undefined | null>): Array<T> {
@@ -24,4 +28,8 @@ Array.prototype.mapAsync = function <T, U>(this: Array<T>, converter: (src: T) =
 
 Array.prototype.forEachAsync = function <T>(this: Array<T>, task: (src: T) => Promise<void>): Promise<void[]> {
   return Promise.all(this.map(task));
+};
+
+Array.range = function (count: number): Array<number> {
+  return [...Array(count).keys()];
 };

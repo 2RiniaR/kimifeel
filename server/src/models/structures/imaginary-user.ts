@@ -8,8 +8,8 @@ export class ImaginaryUser {
     this.discordId = props.discordId;
   }
 
-  public async createIfNotExist() {
-    return await this.service.createIfNotExist();
+  public async create() {
+    return await this.service.create();
   }
 }
 

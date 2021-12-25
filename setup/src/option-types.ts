@@ -1,0 +1,10 @@
+export const SubCommand = 1;
+export const SubCommandGroup = 2;
+export const String = 3;
+export const Integer = 4;
+export const Boolean = 5;
+export const User = 6;
+export const Channel = 7;
+export const Role = 8;
+export const Mentionable = 9;
+export const Number = 10;

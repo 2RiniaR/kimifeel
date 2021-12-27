@@ -5,7 +5,7 @@ import { ProfileNotFoundEndpointError } from "endpoints/errors";
 
 export class DeleteProfileController extends ControllerFor<DeleteProfileEndpoint> {
   async action(ctx: DeleteProfileEndpointParams, client: ClientUser): Promise<DeleteProfileEndpointResult> {
-    const profile = await client.asUser().getProfileByIndex(ctx.index);
+    const profile = await client.profiles.findByIndex(ctx.index);
     if (!profile) {
       throw new ProfileNotFoundEndpointError();
     }

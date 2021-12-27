@@ -6,12 +6,7 @@ import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoin
 
 export class CancelRequestController extends ControllerFor<CancelRequestEndpoint> {
   async action(ctx: CancelRequestEndpointParams, client: ClientUser): Promise<CancelRequestEndpointResult> {
-    const target = await client.users.findByDiscordId(ctx.targetDiscordId);
-    if (!target) {
-      throw Error("The require user was not registered.");
-    }
-
-    const request = await target.getRequestByIndex(ctx.index);
+    const request = await client.requests.findByIndex(ctx.index);
     if (!request) {
       throw new RequestNotFoundEndpointError();
     }
@@ -22,7 +17,7 @@ export class CancelRequestController extends ControllerFor<CancelRequestEndpoint
         index: request.index,
         content: request.profile.content,
         requesterUserId: request.profile.author.discordId,
-        targetUserId: request.target.discordId
+        targetUserId: request.profile.owner.discordId
       };
     } catch (error) {
       if (error instanceof ForbiddenError) throw new NoPermissionEndpointError();

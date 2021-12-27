@@ -29,15 +29,13 @@ class Session extends SessionIn<ReactionCancelRequestAction> {
     }
     const requestEmbed = this.context.message.embeds[0];
     const index = RequestSentEmbed.getIndex(requestEmbed);
-    const targetDiscordId = RequestSentEmbed.getUserId(requestEmbed);
-    if (!index || !targetDiscordId) {
+    if (!index) {
       throw new DiscordFetchFailedActionError();
     }
 
     return {
       clientDiscordId: this.context.member.id,
-      index,
-      targetDiscordId
+      index
     };
   }
 

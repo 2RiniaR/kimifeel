@@ -1,4 +1,3 @@
-import { NoBotActionError } from "../../errors";
 import { ActionWith } from "../../base";
 import { SessionIn } from "../../session";
 import { FindRequestEndpoint, FindRequestEndpointParams, FindRequestEndpointResult } from "endpoints";
@@ -21,17 +20,11 @@ class Session extends SessionIn<SlashCommandShowRequestAction> {
   async fetch(): Promise<FindRequestEndpointParams> {
     await Promise.resolve();
 
-    const target = this.context.interaction.options.getUser("target", false);
     const index = this.context.interaction.options.getInteger("number", true);
-
-    if (target && target.bot) {
-      throw new NoBotActionError();
-    }
 
     return {
       clientDiscordId: this.context.member.id,
-      index: index,
-      targetDiscordId: target?.id ?? this.context.member.id
+      index: index
     };
   }
 

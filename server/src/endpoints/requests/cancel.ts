@@ -2,7 +2,6 @@ import { Endpoint, EndpointParamsBase } from "../base";
 import { RequestMarkdownProps } from "discord/views";
 
 export type CancelRequestEndpointParams = EndpointParamsBase & {
-  targetDiscordId: string;
   index: number;
 };
 

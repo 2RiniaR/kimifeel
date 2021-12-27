@@ -1,28 +1,15 @@
-import { IdentityUser, ImaginaryUser, Profile, Request, SearchRequestsProps } from "../structures";
+import { User, ImaginaryUser, Request, SearchRequestsProps } from "../structures";
 import { ContextModel } from "../context-model";
-import { buildProfile } from "../builders/profile";
 import { buildClientUser } from "../builders/client-user";
 import { buildRequest } from "../builders/request";
-import { createUser, findProfileByIndex, findRequestByIndex, searchRequests } from "../../prisma";
+import { createUser, searchRequests } from "../../prisma";
 
 export class UserService extends ContextModel {
-  private readonly user: IdentityUser;
+  private readonly user: User;
 
-  public constructor(user: IdentityUser) {
+  public constructor(user: User) {
     super(user.context);
     this.user = user;
-  }
-
-  public async findProfileByIndex(index: number): Promise<Profile | undefined> {
-    const result = await findProfileByIndex(this.user.id, index);
-    if (!result) return;
-    return buildProfile(this.context, result);
-  }
-
-  public async findRequestByIndex(index: number): Promise<Request | undefined> {
-    const result = await findRequestByIndex(this.user.id, index);
-    if (!result) return;
-    return buildRequest(this.context, result);
   }
 
   public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {

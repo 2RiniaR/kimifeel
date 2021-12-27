@@ -14,13 +14,7 @@ const format = {
       type: "integer"
     }
   ],
-  options: {
-    owner: {
-      name: "対象ユーザーのID",
-      description: "",
-      type: "userId"
-    }
-  }
+  options: {}
 } as const;
 
 export class MessageCommandShowProfileAction extends ActionWith<MessageCommandEvent, FindProfilesEndpoint> {
@@ -34,12 +28,10 @@ export class MessageCommandShowProfileAction extends ActionWith<MessageCommandEv
 class Session extends MessageCommandSession<MessageCommandShowProfileAction, typeof format> {
   async fetch(): Promise<FindProfileEndpointParams> {
     await Promise.resolve();
-    if (!this.command.options.owner) throw Error();
     if (!this.command.arguments[0]) throw Error();
 
     return {
       clientDiscordId: this.context.member.id,
-      ownerDiscordId: this.command.options.owner,
       index: this.command.arguments[0]
     };
   }

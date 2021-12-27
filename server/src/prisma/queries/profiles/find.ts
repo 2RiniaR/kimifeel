@@ -1,13 +1,10 @@
 import { prisma } from "../../client";
 import { ProfileQueryResult } from "../results";
 
-export async function findProfileByIndex(ownerUserId: string, index: number): Promise<ProfileQueryResult | undefined> {
+export async function findProfileByIndex(index: number): Promise<ProfileQueryResult | undefined> {
   const result = await prisma.profile.findUnique({
     where: {
-      ownerUserId_index: {
-        ownerUserId,
-        index
-      }
+      index: index
     },
     include: {
       authorUser: true,

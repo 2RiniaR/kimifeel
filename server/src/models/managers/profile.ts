@@ -5,7 +5,11 @@ import { findProfileByIndex, randomProfiles, searchProfiles } from "../../prisma
 
 export class ProfileManager extends ContextModel {
   public async fetch(profile: IdentityProfile): Promise<Profile> {
-    const result = await findProfileByIndex(profile.owner.id, profile.index);
+    return this.findByIndex(profile.index);
+  }
+
+  public async findByIndex(index: number): Promise<Profile> {
+    const result = await findProfileByIndex(index);
     if (!result) {
       throw Error("Tried to fetch data, but it wasn't found.");
     }

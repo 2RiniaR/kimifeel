@@ -1,14 +1,11 @@
 import { prisma } from "../../client";
 import { ProfileQueryResult } from "../results";
 
-export async function deleteProfile(ownerUserId: string, index: number): Promise<ProfileQueryResult | undefined> {
+export async function deleteProfileByIndex(index: number): Promise<ProfileQueryResult | undefined> {
   try {
     return prisma.profile.delete({
       where: {
-        ownerUserId_index: {
-          ownerUserId,
-          index
-        }
+        index: index
       },
       include: {
         authorUser: true,

@@ -7,6 +7,6 @@ export type RequestListEmbedProps = {
 
 export class RequestListEmbed extends SystemMessageEmbed {
   public constructor(props: RequestListEmbedProps) {
-    super("info", "プロフィール一覧", props.requests.map((element) => getRequestMarkdown(element)).join("\n"));
+    super("request", "リクエスト", props.requests.map((element) => getRequestMarkdown(element)).join("\n"));
   }
 }

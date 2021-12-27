@@ -1,5 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { getUserReference, removeUserReference } from "../utils/user-reference";
+import { SystemMessageEmbed } from "./system-message-embed";
 
 export type RequestEmbedProps = {
   index: number;
@@ -11,15 +12,13 @@ export type RequestEmbedProps = {
   targetUserId: string;
 };
 
-export class RequestSentEmbed extends MessageEmbed {
+export class RequestSentEmbed extends SystemMessageEmbed {
   public static readonly UserIdFieldName = "To";
   public static readonly IndexFieldName = "Request No.";
 
   public constructor(props: RequestEmbedProps) {
-    super();
+    super("request", "リクエストが作成されました！", RequestSentEmbed.buildDescription(props));
     this.setAuthor(props.requesterUserName, props.requesterUserAvatarURL)
-      .setDescription(RequestSentEmbed.buildDescription(props))
-      .setColor("AQUA")
       .addField(RequestSentEmbed.UserIdFieldName, getUserReference(props.targetUserId), true)
       .addField(RequestSentEmbed.IndexFieldName, props.index.toString(), true);
   }

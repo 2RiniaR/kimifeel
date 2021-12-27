@@ -1,19 +1,19 @@
 import { ContextModel } from "../context-model";
-import { IdentityProfile, ImaginaryProfile, Profile } from "../structures";
+import { Profile, ImaginaryProfile } from "../structures";
 import { buildProfile } from "../builders/profile";
-import { createProfile, deleteProfile } from "../../prisma";
+import { createProfile, deleteProfileByIndex } from "../../prisma";
 import { NotFoundError } from "../errors";
 
 export class ProfileService extends ContextModel {
-  private readonly profile: IdentityProfile;
+  private readonly profile: Profile;
 
-  public constructor(profile: IdentityProfile) {
+  public constructor(profile: Profile) {
     super(profile.context);
     this.profile = profile;
   }
 
   public async delete(): Promise<Profile> {
-    const result = await deleteProfile(this.context.clientUser.id, this.profile.index);
+    const result = await deleteProfileByIndex(this.profile.index);
     if (!result) {
       throw new NotFoundError();
     }

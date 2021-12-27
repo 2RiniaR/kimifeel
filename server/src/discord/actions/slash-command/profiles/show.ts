@@ -1,4 +1,3 @@
-import { NoBotActionError } from "../../errors";
 import { ActionWith } from "../../base";
 import { SessionIn } from "../../session";
 import { FindProfilesEndpoint, FindProfileEndpointParams, FindProfilesEndpointResult } from "endpoints";
@@ -21,16 +20,10 @@ class Session extends SessionIn<SlashCommandShowProfileAction> {
   async fetch(): Promise<FindProfileEndpointParams> {
     await Promise.resolve();
 
-    const owner = this.context.interaction.options.getUser("owner", false);
     const number = this.context.interaction.options.getInteger("number", true);
-
-    if (owner && owner.bot) {
-      throw new NoBotActionError();
-    }
 
     return {
       clientDiscordId: this.context.member.id,
-      ownerDiscordId: owner?.id ?? this.context.member.id,
       index: number
     };
   }

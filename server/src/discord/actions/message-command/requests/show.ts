@@ -14,13 +14,7 @@ const format = {
       type: "integer"
     }
   ],
-  options: {
-    target: {
-      name: "リクエスト送信先ユーザーのID",
-      description: "",
-      type: "userId"
-    }
-  }
+  options: {}
 } as const;
 
 export class MessageCommandShowRequestAction extends ActionWith<MessageCommandEvent, FindRequestEndpoint> {
@@ -37,7 +31,6 @@ class Session extends MessageCommandSession<MessageCommandShowRequestAction, typ
 
     return {
       clientDiscordId: this.context.member.id,
-      targetDiscordId: this.command.options.target ?? this.context.member.id,
       index: this.command.arguments[0]
     };
   }

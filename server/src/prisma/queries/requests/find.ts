@@ -1,13 +1,10 @@
 import { prisma } from "../../client";
 import { RequestQueryResult } from "../results";
 
-export async function findRequestByIndex(targetUserId: string, index: number): Promise<RequestQueryResult | undefined> {
+export async function findRequestByIndex(index: number): Promise<RequestQueryResult | undefined> {
   const result = await prisma.request.findUnique({
     where: {
-      targetUserId_index: {
-        targetUserId,
-        index
-      }
+      index: index
     },
     include: {
       applicantUser: true,

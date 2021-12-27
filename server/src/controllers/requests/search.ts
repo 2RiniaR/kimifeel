@@ -34,7 +34,7 @@ export class SearchRequestsController extends ControllerFor<SearchRequestsEndpoi
 
     return requests.map((request) => {
       return {
-        targetUserId: request.target.discordId,
+        targetUserId: request.profile.owner.discordId,
         requesterUserId: request.profile.author.discordId,
         content: request.profile.content,
         index: request.index

@@ -17,7 +17,7 @@ export class CreateRequestController extends ControllerFor<CreateRequestEndpoint
         index: request.index,
         content: request.profile.content,
         requesterUserId: request.profile.author.discordId,
-        targetUserId: request.target.discordId
+        targetUserId: request.profile.owner.discordId
       };
     } catch (error) {
       if (error instanceof ContentLengthLimitError) {

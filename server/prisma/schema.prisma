@@ -8,33 +8,31 @@ generator client {
 }
 
 model Profile {
-  id           String   @unique @default(uuid())
-  ownerUserId  String
-  index        Int      @default(autoincrement())
+  id           String   @id @default(uuid())
+  index        Int      @unique @default(autoincrement())
   createdAt    DateTime @default(now())
   content      String
+  ownerUserId  String
   authorUserId String
 
   ownerUser    User     @relation(name: "OwnedProfilesOnUser", fields: [ownerUserId], references: [id])
   authorUser   User     @relation(name: "WroteProfilesOnUser", fields: [authorUserId], references: [id])
 
-  @@index([ownerUserId, index])
-  @@unique([ownerUserId, index])
+  @@index([index])
 }
 
 model Request {
-  id              String   @unique @default(uuid())
-  targetUserId    String
-  index           Int      @default(autoincrement())
+  id              String   @id @default(uuid())
+  index           Int      @unique @default(autoincrement())
   createdAt       DateTime @default(now())
   content         String
+  targetUserId    String
   applicantUserId String
 
   targetUser      User     @relation(name: "ReceivedRequestsOnUser", fields: [targetUserId], references: [id])
   applicantUser   User     @relation(name: "SentRequestsOnUser", fields: [applicantUserId], references: [id])
 
-  @@index([targetUserId, index])
-  @@unique([targetUserId, index])
+  @@index([index])
 }
 
 model User {

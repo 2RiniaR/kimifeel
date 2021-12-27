@@ -10,11 +10,6 @@ const format = {
   prefixes: [`${basePhrase} request cancel`],
   arguments: [
     {
-      name: "リクエスト対象のユーザーID",
-      description: "",
-      type: "userId"
-    },
-    {
       name: "リクエストの番号",
       description: "",
       type: "integer"
@@ -37,8 +32,7 @@ class Session extends MessageCommandSession<MessageCommandCancelRequestAction, t
 
     return {
       clientDiscordId: this.context.member.id,
-      index: this.command.arguments[1],
-      targetDiscordId: this.command.arguments[0]
+      index: this.command.arguments[0]
     };
   }
 

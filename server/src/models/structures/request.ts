@@ -20,7 +20,7 @@ export class Request extends IdentityRequest {
   }
 
   public async accept(): Promise<Profile> {
-    if (this.context.clientUser.id !== this.target.id) {
+    if (this.context.clientUser.id !== this.profile.owner.id) {
       throw new ForbiddenError("Can not accept the requests because you are not the reviewer.");
     }
     await this.service.delete();
@@ -28,7 +28,7 @@ export class Request extends IdentityRequest {
   }
 
   public async deny(): Promise<Request> {
-    if (this.context.clientUser.id !== this.target.id) {
+    if (this.context.clientUser.id !== this.profile.owner.id) {
       throw new ForbiddenError("Can not deny the requests because you are not the reviewer.");
     }
     return await this.service.delete();
@@ -44,5 +44,6 @@ export class Request extends IdentityRequest {
 
 export type RequestProps = {
   content: string;
+  target: IdentityUser;
   applicant: IdentityUser;
 };

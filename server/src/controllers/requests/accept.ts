@@ -6,7 +6,7 @@ import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoin
 
 export class AcceptRequestController extends ControllerFor<AcceptRequestEndpoint> {
   async action(ctx: AcceptRequestEndpointParams, client: ClientUser): Promise<AcceptRequestEndpointResult> {
-    const request = await client.asUser().getRequestByIndex(ctx.index);
+    const request = await client.requests.findByIndex(ctx.index);
     if (!request) {
       throw new RequestNotFoundEndpointError();
     }

@@ -22,12 +22,10 @@ class Session extends SessionIn<SlashCommandCancelRequestAction> {
     await Promise.resolve();
 
     const number = this.context.interaction.options.getInteger("number", true);
-    const target = this.context.interaction.options.getUser("target", true);
 
     return {
       clientDiscordId: this.context.member.id,
-      index: number,
-      targetDiscordId: target.id
+      index: number
     };
   }
 

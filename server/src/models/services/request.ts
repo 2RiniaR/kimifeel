@@ -1,19 +1,19 @@
-import { IdentityRequest, ImaginaryRequest, Request } from "../structures";
+import { Request, ImaginaryRequest } from "../structures";
 import { buildRequest } from "../builders/request";
 import { ContextModel } from "../context-model";
-import { createRequest, deleteRequest } from "../../prisma";
+import { createRequest, deleteRequestByIndex } from "../../prisma";
 import { NotFoundError } from "../errors";
 
 export class RequestService extends ContextModel {
-  private readonly request: IdentityRequest;
+  private readonly request: Request;
 
-  public constructor(request: IdentityRequest) {
+  public constructor(request: Request) {
     super(request.context);
     this.request = request;
   }
 
   public async delete(): Promise<Request> {
-    const result = await deleteRequest(this.request.target.id, this.request.index);
+    const result = await deleteRequestByIndex(this.request.index);
     if (!result) {
       throw new NotFoundError();
     }

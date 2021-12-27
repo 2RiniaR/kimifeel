@@ -6,7 +6,7 @@ import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoin
 
 export class DenyRequestController extends ControllerFor<DenyRequestEndpoint> {
   async action(ctx: DenyRequestEndpointParams, client: ClientUser): Promise<DenyRequestEndpointResult> {
-    const request = await client.asUser().getRequestByIndex(ctx.index);
+    const request = await client.requests.findByIndex(ctx.index);
     if (!request) {
       throw new RequestNotFoundEndpointError();
     }
@@ -17,7 +17,7 @@ export class DenyRequestController extends ControllerFor<DenyRequestEndpoint> {
         index: request.index,
         content: request.profile.content,
         requesterUserId: request.profile.author.discordId,
-        targetUserId: request.target.discordId
+        targetUserId: request.profile.owner.discordId
       };
     } catch (error) {
       if (error instanceof ForbiddenError) throw new NoPermissionEndpointError();

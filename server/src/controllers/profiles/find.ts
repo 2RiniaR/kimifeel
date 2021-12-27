@@ -4,12 +4,7 @@ import { FindProfilesEndpoint, FindProfileEndpointParams, FindProfilesEndpointRe
 
 export class FindProfilesController extends ControllerFor<FindProfilesEndpoint> {
   async action(ctx: FindProfileEndpointParams, client: ClientUser): Promise<FindProfilesEndpointResult> {
-    const owner = await client.users.findByDiscordId(ctx.ownerDiscordId);
-    if (!owner) {
-      throw Error();
-    }
-
-    const profile = await owner.getProfileByIndex(ctx.index);
+    const profile = await client.profiles.findByIndex(ctx.index);
     if (!profile) {
       throw Error();
     }

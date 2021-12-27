@@ -1,6 +1,6 @@
 console.log("Kimifeel started?");
 import "./helpers";
-import "./firebase";
+import "./prisma";
 import { clientManager } from "./discord";
 import { settingsManager } from "./settings";
 import "./build";

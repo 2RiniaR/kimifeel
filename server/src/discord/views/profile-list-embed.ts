@@ -7,6 +7,6 @@ export type ProfileListEmbedProps = {
 
 export class ProfileListEmbed extends SystemMessageEmbed {
   public constructor(props: ProfileListEmbedProps) {
-    super("info", "プロフィール一覧", props.profiles.map((element) => getProfileMarkdown(element)).join("\n"));
+    super("profile", "プロフィール", props.profiles.map((element) => getProfileMarkdown(element)).join("\n"));
   }
 }

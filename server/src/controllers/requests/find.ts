@@ -4,12 +4,7 @@ import { FindRequestEndpoint, FindRequestEndpointParams, FindRequestEndpointResu
 
 export class FindRequestController extends ControllerFor<FindRequestEndpoint> {
   async action(ctx: FindRequestEndpointParams, client: ClientUser): Promise<FindRequestEndpointResult> {
-    const target = await client.users.findByDiscordId(ctx.targetDiscordId);
-    if (!target) {
-      throw Error();
-    }
-
-    const request = await target.getRequestByIndex(ctx.index);
+    const request = await client.requests.findByIndex(ctx.index);
     if (!request) {
       throw Error();
     }

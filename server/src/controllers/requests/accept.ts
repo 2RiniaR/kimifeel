@@ -1,12 +1,18 @@
-import { ControllerFor } from "../base";
+import { ControllerFor, RunnerFor } from "../base";
 import { ClientUser } from "models/structures";
 import { ForbiddenError } from "models/errors";
-import { AcceptRequestEndpoint, AcceptRequestEndpointParams, AcceptRequestEndpointResult } from "endpoints";
+import { AcceptRequestEndpoint, AcceptRequestEndpointParams } from "endpoints";
 import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 
+export class AcceptRequestRunner extends RunnerFor<AcceptRequestEndpoint> {
+  generate(params: AcceptRequestEndpointParams, client: ClientUser): ControllerFor<AcceptRequestEndpoint> {
+    return new AcceptRequestController(params, client);
+  }
+}
+
 export class AcceptRequestController extends ControllerFor<AcceptRequestEndpoint> {
-  async action(ctx: AcceptRequestEndpointParams, client: ClientUser): Promise<AcceptRequestEndpointResult> {
-    const request = await client.requests.findByIndex(ctx.index);
+  async run() {
+    const request = await this.client.requests.findByIndex(this.context.index);
     if (!request) {
       throw new RequestNotFoundEndpointError();
     }

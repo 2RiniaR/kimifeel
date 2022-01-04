@@ -1,6 +1,19 @@
 import { prisma } from "../../client";
 import { ProfileQueryResult } from "../results";
 
+export async function findProfile(id: string): Promise<ProfileQueryResult | undefined> {
+  const result = await prisma.profile.findUnique({
+    where: {
+      id: id
+    },
+    include: {
+      authorUser: true,
+      ownerUser: true
+    }
+  });
+  return result ?? undefined;
+}
+
 export async function findProfileByIndex(index: number): Promise<ProfileQueryResult | undefined> {
   const result = await prisma.profile.findUnique({
     where: {

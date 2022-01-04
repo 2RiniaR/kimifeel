@@ -1,7 +1,7 @@
 import { prisma } from "../../client";
 import { UserQueryResult } from "../results";
 
-export async function findUserById(id: string): Promise<UserQueryResult | undefined> {
+export async function findUser(id: string): Promise<UserQueryResult | undefined> {
   const result = await prisma.user.findUnique({
     where: {
       id

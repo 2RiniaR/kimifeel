@@ -5,6 +5,6 @@ export type FindProfileEndpointParams = EndpointParamsBase & {
   index: number;
 };
 
-export type FindProfilesEndpointResult = ProfileMarkdownProps;
+export type FindProfileEndpointResult = ProfileMarkdownProps;
 
-export class FindProfilesEndpoint extends Endpoint<FindProfileEndpointParams, FindProfilesEndpointResult> {}
+export class FindProfileEndpoint extends Endpoint<FindProfileEndpointParams, FindProfileEndpointResult> {}

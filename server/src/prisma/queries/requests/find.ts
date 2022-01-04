@@ -1,6 +1,19 @@
 import { prisma } from "../../client";
 import { RequestQueryResult } from "../results";
 
+export async function findRequest(id: string): Promise<RequestQueryResult | undefined> {
+  const result = await prisma.request.findUnique({
+    where: {
+      id: id
+    },
+    include: {
+      applicantUser: true,
+      targetUser: true
+    }
+  });
+  return result ?? undefined;
+}
+
 export async function findRequestByIndex(index: number): Promise<RequestQueryResult | undefined> {
   const result = await prisma.request.findUnique({
     where: {

@@ -1,8 +1,7 @@
-import { User, ImaginaryUser, Request, SearchRequestsProps } from "../structures";
+import { User, Request, SearchRequestsProps } from "../structures";
 import { ContextModel } from "../context-model";
-import { buildClientUser } from "../builders/client-user";
 import { buildRequest } from "../builders/request";
-import { createUser, searchRequests } from "../../prisma";
+import * as db from "prisma";
 
 export class UserService extends ContextModel {
   private readonly user: User;
@@ -13,7 +12,7 @@ export class UserService extends ContextModel {
   }
 
   public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {
-    const results = await searchRequests({
+    const results = await db.searchRequests({
       order: props.order,
       start: props.start,
       count: props.count,
@@ -22,18 +21,5 @@ export class UserService extends ContextModel {
       content: props.content
     });
     return results.map((result) => buildRequest(this.context, result));
-  }
-}
-
-export class ImaginaryUserService {
-  private readonly user: ImaginaryUser;
-
-  public constructor(user: ImaginaryUser) {
-    this.user = user;
-  }
-
-  public async create() {
-    const result = await createUser({ discordId: this.user.discordId });
-    return buildClientUser(result);
   }
 }

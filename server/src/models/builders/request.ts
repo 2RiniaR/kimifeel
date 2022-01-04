@@ -1,8 +1,8 @@
 import { Context } from "../context";
 import { Request, IdentityUser } from "../structures";
-import { RequestQueryResult } from "../../prisma";
+import * as db from "prisma";
 
-export function buildRequest(context: Context, result: RequestQueryResult): Request {
+export function buildRequest(context: Context, result: db.RequestQueryResult): Request {
   return new Request(context, {
     id: result.id,
     target: new IdentityUser(context, { id: result.targetUser.id, discordId: result.targetUser.discordId }),

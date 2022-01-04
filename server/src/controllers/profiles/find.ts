@@ -1,12 +1,24 @@
-import { ControllerFor } from "../base";
+import { ControllerFor, RunnerFor } from "../base";
 import { ClientUser } from "models/structures";
-import { FindProfilesEndpoint, FindProfileEndpointParams, FindProfilesEndpointResult } from "endpoints";
+import {
+  FindProfileEndpoint,
+  FindProfileEndpointParams,
+  FindProfileEndpointResult,
+  NotFoundError as NotFoundEndPointError
+} from "endpoints";
 
-export class FindProfilesController extends ControllerFor<FindProfilesEndpoint> {
-  async action(ctx: FindProfileEndpointParams, client: ClientUser): Promise<FindProfilesEndpointResult> {
-    const profile = await client.profiles.findByIndex(ctx.index);
+export class FindProfileRunner extends RunnerFor<FindProfileEndpoint> {
+  generate(params: FindProfileEndpointParams, client: ClientUser): ControllerFor<FindProfileEndpoint> {
+    return new FindProfileController(params, client);
+  }
+}
+
+export class FindProfileController extends ControllerFor<FindProfileEndpoint> {
+  async run(): Promise<FindProfileEndpointResult> {
+    const profile = await this.client.profiles.findByIndex(this.context.index);
+
     if (!profile) {
-      throw Error();
+      throw new NotFoundEndPointError();
     }
 
     return {

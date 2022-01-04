@@ -5,6 +5,8 @@ import { ForbiddenError } from "../errors";
 import { ImaginaryRequest } from "./imaginary-request";
 import { UserService } from "../services";
 
+export class SelfSubmitRequestError extends Error {}
+
 export class User extends IdentityUser {
   private readonly service = new UserService(this);
 
@@ -13,12 +15,15 @@ export class User extends IdentityUser {
   }
 
   public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {
+    if (this.context.clientUser.id !== this.id) {
+      throw new ForbiddenError();
+    }
     return await this.service.searchRequests(props);
   }
 
   public async submitRequest(content: string): Promise<Request> {
     if (this.context.clientUser.id === this.id) {
-      throw new ForbiddenError();
+      throw new SelfSubmitRequestError();
     }
 
     const request = new ImaginaryRequest(this.context, {

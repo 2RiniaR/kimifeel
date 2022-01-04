@@ -1,30 +1,36 @@
-import { ControllerFor } from "../base";
+import { ControllerFor, RunnerFor } from "../base";
 import { ClientUser, User } from "models/structures";
 import { RandomProfilesEndpoint, RandomProfilesEndpointParams, RandomProfilesEndpointResult } from "endpoints";
+
+export class RandomProfilesRunner extends RunnerFor<RandomProfilesEndpoint> {
+  generate(params: RandomProfilesEndpointParams, client: ClientUser): ControllerFor<RandomProfilesEndpoint> {
+    return new RandomProfilesController(params, client);
+  }
+}
 
 export class RandomProfilesController extends ControllerFor<RandomProfilesEndpoint> {
   public static readonly count: number = 5;
 
-  async action(ctx: RandomProfilesEndpointParams, client: ClientUser): Promise<RandomProfilesEndpointResult> {
+  async run(): Promise<RandomProfilesEndpointResult> {
     let owner: User | undefined = undefined;
-    if (ctx.ownerDiscordId) {
-      owner = await client.users.findByDiscordId(ctx.ownerDiscordId);
+    if (this.context.ownerDiscordId) {
+      owner = await this.client.users.findByDiscordId(this.context.ownerDiscordId);
       if (!owner) {
         throw new Error();
       }
     }
 
     let author: User | undefined = undefined;
-    if (ctx.authorDiscordId) {
-      author = await client.users.findByDiscordId(ctx.authorDiscordId);
+    if (this.context.authorDiscordId) {
+      author = await this.client.users.findByDiscordId(this.context.authorDiscordId);
       if (!author) {
         throw new Error();
       }
     }
 
-    const profiles = await client.profiles.random({
+    const profiles = await this.client.profiles.random({
       count: RandomProfilesController.count,
-      content: ctx.content,
+      content: this.context.content,
       author: author,
       owner: owner
     });

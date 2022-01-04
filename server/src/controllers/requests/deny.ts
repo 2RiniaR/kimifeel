@@ -1,12 +1,18 @@
-import { ControllerFor } from "../base";
+import { ControllerFor, RunnerFor } from "../base";
 import { ClientUser } from "models/structures";
 import { ForbiddenError } from "models/errors";
-import { DenyRequestEndpoint, DenyRequestEndpointParams, DenyRequestEndpointResult } from "endpoints";
+import { DenyRequestEndpoint, DenyRequestEndpointParams } from "endpoints";
 import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 
+export class DenyRequestRunner extends RunnerFor<DenyRequestEndpoint> {
+  generate(params: DenyRequestEndpointParams, client: ClientUser): ControllerFor<DenyRequestEndpoint> {
+    return new DenyRequestController(params, client);
+  }
+}
+
 export class DenyRequestController extends ControllerFor<DenyRequestEndpoint> {
-  async action(ctx: DenyRequestEndpointParams, client: ClientUser): Promise<DenyRequestEndpointResult> {
-    const request = await client.requests.findByIndex(ctx.index);
+  async run() {
+    const request = await this.client.requests.findByIndex(this.context.index);
     if (!request) {
       throw new RequestNotFoundEndpointError();
     }

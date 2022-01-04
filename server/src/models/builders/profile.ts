@@ -1,8 +1,8 @@
 import { Context } from "../context";
 import { Profile, IdentityUser } from "../structures";
-import { ProfileQueryResult } from "../../prisma";
+import * as db from "prisma";
 
-export function buildProfile(context: Context, result: ProfileQueryResult): Profile {
+export function buildProfile(context: Context, result: db.ProfileQueryResult): Profile {
   return new Profile(context, {
     id: result.id,
     owner: new IdentityUser(context, { id: result.ownerUser.id, discordId: result.ownerUser.discordId }),

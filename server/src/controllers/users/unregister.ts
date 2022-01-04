@@ -1,10 +1,16 @@
-import { ControllerFor } from "../base";
+import { ControllerFor, RunnerFor } from "../base";
 import { ClientUser } from "models/structures";
-import { UnregisterUserEndpoint, UnregisterUserEndpointParams, UnregisterUserEndpointResult } from "endpoints";
+import { UnregisterUserEndpoint, UnregisterUserEndpointParams } from "endpoints";
+
+export class UnregisterUserRunner extends RunnerFor<UnregisterUserEndpoint> {
+  generate(params: UnregisterUserEndpointParams, client: ClientUser): ControllerFor<UnregisterUserEndpoint> {
+    return new UnregisterUserController(params, client);
+  }
+}
 
 export class UnregisterUserController extends ControllerFor<UnregisterUserEndpoint> {
-  async action(ctx: UnregisterUserEndpointParams, client: ClientUser): Promise<UnregisterUserEndpointResult> {
-    await client.unregister();
-    return { discordId: ctx.clientDiscordId };
+  async run() {
+    await this.client.unregister();
+    return { discordId: this.context.clientDiscordId };
   }
 }

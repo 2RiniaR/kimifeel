@@ -1,33 +1,39 @@
-import { ControllerFor } from "../base";
+import { ControllerFor, RunnerFor } from "../base";
 import { ClientUser, User } from "models/structures";
-import { SearchRequestsEndpoint, SearchRequestsEndpointParams, SearchRequestsEndpointResult } from "endpoints";
+import { SearchRequestsEndpoint, SearchRequestsEndpointParams } from "endpoints";
+
+export class SearchRequestsRunner extends RunnerFor<SearchRequestsEndpoint> {
+  generate(params: SearchRequestsEndpointParams, client: ClientUser): ControllerFor<SearchRequestsEndpoint> {
+    return new SearchRequestsController(params, client);
+  }
+}
 
 export class SearchRequestsController extends ControllerFor<SearchRequestsEndpoint> {
   public static readonly count: number = 5;
 
-  async action(ctx: SearchRequestsEndpointParams, client: ClientUser): Promise<SearchRequestsEndpointResult> {
+  async run() {
     let applicant: User | undefined = undefined;
-    if (ctx.applicantDiscordId) {
-      applicant = await client.users.findByDiscordId(ctx.applicantDiscordId);
+    if (this.context.applicantDiscordId) {
+      applicant = await this.client.users.findByDiscordId(this.context.applicantDiscordId);
       if (!applicant) {
         throw new Error();
       }
     }
 
     let target: User | undefined = undefined;
-    if (ctx.targetDiscordId) {
-      target = await client.users.findByDiscordId(ctx.targetDiscordId);
+    if (this.context.targetDiscordId) {
+      target = await this.client.users.findByDiscordId(this.context.targetDiscordId);
       if (!target) {
         throw new Error();
       }
     }
 
-    const requests = await client.asUser().searchRequests({
-      order: ctx.order,
-      start: (ctx.page - 1) * SearchRequestsController.count,
+    const requests = await this.client.asUser().searchRequests({
+      order: this.context.order,
+      start: (this.context.page - 1) * SearchRequestsController.count,
       count: SearchRequestsController.count,
-      content: ctx.content,
-      status: ctx.status,
+      content: this.context.content,
+      status: this.context.status,
       target: target,
       applicant: applicant
     });

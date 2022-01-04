@@ -1,18 +1,24 @@
-import { ControllerFor } from "../base";
+import { ControllerFor, RunnerFor } from "../base";
 import { ContentLengthLimitError } from "models/errors";
 import { ClientUser } from "models/structures";
-import { CreateRequestEndpoint, CreateRequestEndpointParams, CreateRequestEndpointResult } from "endpoints";
+import { CreateRequestEndpoint, CreateRequestEndpointParams } from "endpoints";
 import { ProfileContentLengthLimitEndpointError } from "endpoints/errors";
 
+export class CreateRequestRunner extends RunnerFor<CreateRequestEndpoint> {
+  generate(params: CreateRequestEndpointParams, client: ClientUser): ControllerFor<CreateRequestEndpoint> {
+    return new CreateRequestController(params, client);
+  }
+}
+
 export class CreateRequestController extends ControllerFor<CreateRequestEndpoint> {
-  async action(ctx: CreateRequestEndpointParams, client: ClientUser): Promise<CreateRequestEndpointResult> {
-    const target = await client.users.findByDiscordId(ctx.targetDiscordId);
+  async run() {
+    const target = await this.client.users.findByDiscordId(this.context.targetDiscordId);
     if (!target) {
       throw Error();
     }
 
     try {
-      const request = await target.submitRequest(ctx.content);
+      const request = await target.submitRequest(this.context.content);
       return {
         index: request.index,
         content: request.profile.content,

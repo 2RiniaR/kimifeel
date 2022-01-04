@@ -1,4 +1,5 @@
 export * from "./base";
+export * from "./errors";
 
 export * from "./profiles/delete";
 export * from "./profiles/find";

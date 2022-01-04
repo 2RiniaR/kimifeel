@@ -1,10 +1,16 @@
-import { ControllerFor } from "../base";
+import { ControllerFor, RunnerFor } from "../base";
 import { ClientUser } from "models/structures";
-import { FindRequestEndpoint, FindRequestEndpointParams, FindRequestEndpointResult } from "endpoints";
+import { FindRequestEndpoint, FindRequestEndpointParams } from "endpoints";
+
+export class FindRequestRunner extends RunnerFor<FindRequestEndpoint> {
+  generate(params: FindRequestEndpointParams, client: ClientUser): ControllerFor<FindRequestEndpoint> {
+    return new FindRequestController(params, client);
+  }
+}
 
 export class FindRequestController extends ControllerFor<FindRequestEndpoint> {
-  async action(ctx: FindRequestEndpointParams, client: ClientUser): Promise<FindRequestEndpointResult> {
-    const request = await client.requests.findByIndex(ctx.index);
+  async run() {
+    const request = await this.client.requests.findByIndex(this.context.index);
     if (!request) {
       throw Error();
     }

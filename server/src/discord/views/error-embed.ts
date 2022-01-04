@@ -6,7 +6,7 @@ export class ErrorEmbed extends SystemMessageEmbed {
     if (error instanceof ActionError) {
       super(error.messageType ?? "error", error.title, error.message);
     } else if (error instanceof Error) {
-      super("error", "不明なエラー", error.message);
+      super("error", "不明なエラー", "管理者に報告してください。");
     } else {
       super("error", "不明なエラー", "詳細な情報はありません。");
     }

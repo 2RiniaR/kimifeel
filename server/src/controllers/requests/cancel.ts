@@ -1,12 +1,18 @@
-import { ControllerFor } from "../base";
+import { ControllerFor, RunnerFor } from "../base";
 import { ClientUser } from "models/structures";
 import { ForbiddenError } from "models/errors";
-import { CancelRequestEndpoint, CancelRequestEndpointParams, CancelRequestEndpointResult } from "endpoints";
+import { CancelRequestEndpoint, CancelRequestEndpointParams } from "endpoints";
 import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
 
+export class CancelRequestRunner extends RunnerFor<CancelRequestEndpoint> {
+  generate(params: CancelRequestEndpointParams, client: ClientUser): ControllerFor<CancelRequestEndpoint> {
+    return new CancelRequestController(params, client);
+  }
+}
+
 export class CancelRequestController extends ControllerFor<CancelRequestEndpoint> {
-  async action(ctx: CancelRequestEndpointParams, client: ClientUser): Promise<CancelRequestEndpointResult> {
-    const request = await client.requests.findByIndex(ctx.index);
+  async run() {
+    const request = await this.client.requests.findByIndex(this.context.index);
     if (!request) {
       throw new RequestNotFoundEndpointError();
     }

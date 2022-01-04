@@ -11,8 +11,8 @@ export function getRandomInteger(min: number, max: number) {
 // min is inclusive, max is exclusive
 export function getRandomIntegerArray(min: number, max: number, count: number): number[] {
   const range = max - min;
-  if (range < count) {
-    throw new RangeError("Range was smaller than count.");
+  if (range <= count) {
+    return Array.range(range).map((i) => i + min);
   }
   const selects = Array.range(count).map((i) => getRandomInteger(0, range - i));
   return selects.reduce<number[]>((results, select, i) => {

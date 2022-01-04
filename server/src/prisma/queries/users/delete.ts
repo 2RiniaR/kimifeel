@@ -1,5 +1,6 @@
 import { prisma } from "../../client";
 import { UserQueryResult } from "../results";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 
 export async function deleteUser(id: string): Promise<UserQueryResult | undefined> {
   try {
@@ -9,6 +10,15 @@ export async function deleteUser(id: string): Promise<UserQueryResult | undefine
       }
     });
   } catch (error) {
-    return;
+    if (!(error instanceof PrismaClientKnownRequestError)) {
+      throw error;
+    }
+
+    switch (error.code) {
+      case "P2016":
+        return undefined;
+    }
+
+    throw error;
   }
 }

@@ -1,10 +1,10 @@
 import { ActionWith } from "../../base";
 import { SessionIn } from "../../session";
-import { FindProfilesEndpoint, FindProfileEndpointParams, FindProfilesEndpointResult } from "endpoints";
+import { FindProfileEndpoint, FindProfileEndpointParams, FindProfileEndpointResult } from "endpoints";
 import { ErrorEmbed, ProfileListEmbed } from "discord/views";
 import { SlashCommandEvent, SlashCommandEventContext, SlashCommandEventOptions } from "discord/events";
 
-export class SlashCommandShowProfileAction extends ActionWith<SlashCommandEvent, FindProfilesEndpoint> {
+export class SlashCommandShowProfileAction extends ActionWith<SlashCommandEvent, FindProfileEndpoint> {
   readonly options: SlashCommandEventOptions = {
     commandName: "profile",
     subCommandName: "show",
@@ -28,7 +28,7 @@ class Session extends SessionIn<SlashCommandShowProfileAction> {
     };
   }
 
-  async onSucceed(result: FindProfilesEndpointResult) {
+  async onSucceed(result: FindProfileEndpointResult) {
     const listEmbed = new ProfileListEmbed({ profiles: [result] });
     await this.context.interaction.reply({ embeds: [listEmbed] });
   }

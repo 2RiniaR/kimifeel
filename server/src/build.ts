@@ -1,6 +1,6 @@
 import {
   DeleteProfileEndpoint,
-  FindProfilesEndpoint,
+  FindProfileEndpoint,
   RandomProfilesEndpoint,
   SearchProfilesEndpoint,
   AcceptRequestEndpoint,
@@ -14,18 +14,18 @@ import {
 } from "./endpoints";
 
 import {
-  DeleteProfileController,
-  FindProfilesController,
-  RandomProfilesController,
-  SearchProfilesController,
-  AcceptRequestController,
-  CancelRequestController,
-  CreateRequestController,
-  DenyRequestController,
-  FindRequestController,
-  SearchRequestsController,
-  RegisterUserController,
-  UnregisterUserController
+  DeleteProfileRunner,
+  FindProfileRunner,
+  RandomProfilesRunner,
+  SearchProfilesRunner,
+  AcceptRequestRunner,
+  CancelRequestRunner,
+  CreateRequestRunner,
+  DenyRequestRunner,
+  FindRequestRunner,
+  SearchRequestsRunner,
+  RegisterUserRunner,
+  UnregisterUserRunner
 } from "./controllers";
 
 import { MessageCommandEvent, ReactionAddEvent, SlashCommandEvent } from "./discord/events";
@@ -60,7 +60,7 @@ import {
 
 const endpoints = {
   deleteProfile: new DeleteProfileEndpoint(),
-  findProfile: new FindProfilesEndpoint(),
+  findProfile: new FindProfileEndpoint(),
   randomProfiles: new RandomProfilesEndpoint(),
   searchProfiles: new SearchProfilesEndpoint(),
   acceptRequest: new AcceptRequestEndpoint(),
@@ -74,18 +74,18 @@ const endpoints = {
 } as const;
 
 const controllers = {
-  deleteProfile: new DeleteProfileController(),
-  findProfile: new FindProfilesController(),
-  randomProfiles: new RandomProfilesController(),
-  searchProfiles: new SearchProfilesController(),
-  acceptRequest: new AcceptRequestController(),
-  cancelRequest: new CancelRequestController(),
-  createRequest: new CreateRequestController(),
-  denyRequest: new DenyRequestController(),
-  findRequest: new FindRequestController(),
-  searchRequests: new SearchRequestsController(),
-  registerUser: new RegisterUserController(),
-  unregisterUser: new UnregisterUserController()
+  deleteProfile: new DeleteProfileRunner(),
+  findProfile: new FindProfileRunner(),
+  randomProfiles: new RandomProfilesRunner(),
+  searchProfiles: new SearchProfilesRunner(),
+  acceptRequest: new AcceptRequestRunner(),
+  cancelRequest: new CancelRequestRunner(),
+  createRequest: new CreateRequestRunner(),
+  denyRequest: new DenyRequestRunner(),
+  findRequest: new FindRequestRunner(),
+  searchRequests: new SearchRequestsRunner(),
+  registerUser: new RegisterUserRunner(),
+  unregisterUser: new UnregisterUserRunner()
 } as const;
 
 endpoints.deleteProfile.listen(controllers.deleteProfile);

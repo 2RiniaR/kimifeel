@@ -1,5 +1,5 @@
 import { ActionWith } from "../../base";
-import { FindProfilesEndpoint, FindProfileEndpointParams, FindProfilesEndpointResult } from "endpoints";
+import { FindProfileEndpoint, FindProfileEndpointParams, FindProfileEndpointResult } from "endpoints";
 import { ErrorEmbed, ProfileListEmbed } from "discord/views";
 import { MessageCommandEvent, MessageCommandEventContext } from "discord/events";
 import { basePhrase } from "../phrases";
@@ -17,7 +17,7 @@ const format = {
   options: {}
 } as const;
 
-export class MessageCommandShowProfileAction extends ActionWith<MessageCommandEvent, FindProfilesEndpoint> {
+export class MessageCommandShowProfileAction extends ActionWith<MessageCommandEvent, FindProfileEndpoint> {
   readonly options = { prefixes: format.prefixes, allowBot: false };
 
   async onEvent(context: MessageCommandEventContext) {
@@ -36,7 +36,7 @@ class Session extends MessageCommandSession<MessageCommandShowProfileAction, typ
     };
   }
 
-  async onSucceed(result: FindProfilesEndpointResult) {
+  async onSucceed(result: FindProfileEndpointResult) {
     const listEmbed = new ProfileListEmbed({ profiles: [result] });
     await this.context.message.reply({ embeds: [listEmbed] });
   }

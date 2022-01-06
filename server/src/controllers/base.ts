@@ -1,44 +1,46 @@
-import { AnyEndpoint, EndpointListener, EndpointParamsBase, EndpointResultBase, ParamsOf, ResultOf } from "endpoints";
-import { ClientUserManager } from "models/managers";
-import { ClientUser } from "../models/structures";
+import { ClientUser, Profile, Request, User } from "../models/structures";
+import { ClientUserManager } from "../models/managers";
+import * as EndpointError from "../endpoints/errors";
+import { ProfileResult, RequestResult } from "../endpoints/structures";
 
-export abstract class Runner<TEndpointParams extends EndpointParamsBase, TEndpointResult extends EndpointResultBase>
-  implements EndpointListener<TEndpointParams, TEndpointResult>
-{
-  public abstract generate(params: TEndpointParams, client: ClientUser): Controller<TEndpointParams, TEndpointResult>;
-
-  public async runEndpoint(params: TEndpointParams): Promise<TEndpointResult> {
+export abstract class Controller {
+  async getClientUser(discordId: string): Promise<ClientUser> {
     const service = new ClientUserManager();
-    const client = await service.findByDiscordId(params.clientDiscordId);
+    const client = await service.findByDiscordId(discordId);
     if (!client) {
-      throw new Error("User was not registered.");
+      throw new EndpointError.NotFoundError("User was not registered.");
     }
-    const controller = this.generate(params, client);
-    return await controller.run();
-  }
-}
-
-export abstract class RunnerFor<TEndpoint extends AnyEndpoint> extends Runner<
-  ParamsOf<TEndpoint>,
-  ResultOf<TEndpoint>
-> {}
-
-export abstract class Controller<
-  TEndpointParams extends EndpointParamsBase,
-  TEndpointResult extends EndpointResultBase
-> {
-  public readonly context: TEndpointParams;
-  public readonly client: ClientUser;
-
-  public constructor(context: TEndpointParams, client: ClientUser) {
-    this.context = context;
-    this.client = client;
+    return client;
   }
 
-  public abstract run(): Promise<TEndpointResult>;
-}
+  async getUser(client: ClientUser, discordId: string): Promise<User> {
+    const user = await client.users.findByDiscordId(discordId);
+    if (!user) {
+      throw new EndpointError.NotFoundError();
+    }
+    return user;
+  }
 
-export abstract class ControllerFor<TEndpoint extends AnyEndpoint> extends Controller<
-  ParamsOf<TEndpoint>,
-  ResultOf<TEndpoint>
-> {}
+  getUserIfHasValue(client: ClientUser, discordId: string | undefined): Promise<User> | undefined {
+    if (!discordId) return undefined;
+    return this.getUser(client, discordId);
+  }
+
+  convertRequestToResult(request: Request): RequestResult {
+    return {
+      index: request.index,
+      content: request.profile.content,
+      requesterUserId: request.profile.author.discordId,
+      targetUserId: request.profile.owner.discordId
+    };
+  }
+
+  convertProfileToResult(profile: Profile): ProfileResult {
+    return {
+      index: profile.index,
+      content: profile.content,
+      authorUserId: profile.author.discordId,
+      ownerUserId: profile.owner.discordId
+    };
+  }
+}

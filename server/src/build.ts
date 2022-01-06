@@ -55,7 +55,7 @@ import {
   SlashCommandSearchRequestsAction,
   SlashCommandSendRequestAction,
   SlashCommandShowRequestAction,
-  SlashCommandRegisterUserAction
+  RegisterUserAction
 } from "./discord/actions";
 
 const endpoints = {
@@ -131,6 +131,6 @@ new SlashCommandDenyRequestAction(endpoints.denyRequest, events.slashCommand).ac
 new SlashCommandSearchRequestsAction(endpoints.searchRequests, events.slashCommand).activate();
 new SlashCommandSendRequestAction(endpoints.createRequest, events.slashCommand).activate();
 new SlashCommandShowRequestAction(endpoints.findRequest, events.slashCommand).activate();
-new SlashCommandRegisterUserAction(endpoints.registerUser, events.slashCommand).activate();
+new RegisterUserAction(endpoints.registerUser, events.slashCommand).activate();
 
 Object.values(events).forEach((event) => event.activate());

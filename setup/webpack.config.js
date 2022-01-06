@@ -4,7 +4,7 @@ const nodeExternals = require("webpack-node-externals");
 module.exports = {
   mode: "development",
   entry: {
-    "setup": path.resolve(__dirname, "src/index.ts")
+    "setup": path.resolve(__dirname, "src/message.ts")
   },
   target: "node",
   externals: [nodeExternals()],

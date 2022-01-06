@@ -1,10 +1,10 @@
 import { SessionIn } from "../../session";
 import { ReactionAddEvent, ReactionAddEventContext, ReactionAddEventOptions } from "discord/events";
 import { DiscordFetchFailedActionError } from "../../errors";
-import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
+import { NoPermissionError, RequestNotFoundEndpointError } from "endpoints/errors";
 import { RequestSentEmbed, ErrorEmbed, RequestCanceledEmbed } from "discord/views";
 import { ActionWith } from "../../base";
-import { CancelRequestEndpoint, CancelRequestEndpointParams, CancelRequestEndpointResult } from "endpoints";
+import { CancelRequestEndpoint, EndpointParams, EndpointResult } from "endpoints";
 
 export class ReactionCancelRequestAction extends ActionWith<ReactionAddEvent, CancelRequestEndpoint> {
   static emojis = ["⛔"];
@@ -21,7 +21,7 @@ export class ReactionCancelRequestAction extends ActionWith<ReactionAddEvent, Ca
 }
 
 class Session extends SessionIn<ReactionCancelRequestAction> {
-  async fetch(): Promise<CancelRequestEndpointParams> {
+  async fetch(): Promise<EndpointParams> {
     await Promise.resolve();
 
     if (this.context.message.embeds.length === 0) {
@@ -39,13 +39,13 @@ class Session extends SessionIn<ReactionCancelRequestAction> {
     };
   }
 
-  async onSucceed(result: CancelRequestEndpointResult) {
+  async onSucceed(result: EndpointResult) {
     const embed = new RequestCanceledEmbed({ request: result });
     await this.context.message.reply({ embeds: [embed] });
   }
 
   async onFailed(error: unknown) {
-    if (error instanceof NoPermissionEndpointError) return;
+    if (error instanceof NoPermissionError) return;
     if (error instanceof RequestNotFoundEndpointError) return;
     const embed = new ErrorEmbed(error);
     await this.context.message.reply({ embeds: [embed] });

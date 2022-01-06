@@ -1,10 +1,10 @@
 import { SessionIn } from "../../session";
 import { ReactionAddEvent, ReactionAddEventContext, ReactionAddEventOptions } from "discord/events";
 import { DiscordFetchFailedActionError } from "../../errors";
-import { NoPermissionEndpointError, RequestNotFoundEndpointError } from "endpoints/errors";
+import { NoPermissionError, RequestNotFoundEndpointError } from "endpoints/errors";
 import { RequestSentEmbed, ErrorEmbed, RequestAcceptedEmbed } from "discord/views";
 import { ActionWith } from "../../base";
-import { AcceptRequestEndpoint, AcceptRequestEndpointParams, AcceptRequestEndpointResult } from "endpoints";
+import { AcceptRequestEndpoint, EndpointParams, EndpointResult } from "endpoints";
 
 export class ReactionAcceptRequestAction extends ActionWith<ReactionAddEvent, AcceptRequestEndpoint> {
   static emojis = ["✅"];
@@ -21,7 +21,7 @@ export class ReactionAcceptRequestAction extends ActionWith<ReactionAddEvent, Ac
 }
 
 class Session extends SessionIn<ReactionAcceptRequestAction> {
-  async fetch(): Promise<AcceptRequestEndpointParams> {
+  async fetch(): Promise<EndpointParams> {
     await Promise.resolve();
 
     if (this.context.message.embeds.length === 0) {
@@ -39,13 +39,13 @@ class Session extends SessionIn<ReactionAcceptRequestAction> {
     };
   }
 
-  async onSucceed(result: AcceptRequestEndpointResult) {
+  async onSucceed(result: EndpointResult) {
     const embed = new RequestAcceptedEmbed({ profile: result });
     await this.context.message.reply({ embeds: [embed] });
   }
 
   async onFailed(error: unknown) {
-    if (error instanceof NoPermissionEndpointError) return;
+    if (error instanceof NoPermissionError) return;
     if (error instanceof RequestNotFoundEndpointError) return;
     const embed = new ErrorEmbed(error);
     await this.context.message.reply({ embeds: [embed] });

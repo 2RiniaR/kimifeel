@@ -11,6 +11,7 @@ import {
   ShowRequestAction
 } from "./request";
 import { RegisterUserAction } from "./user";
+import { HelpAction } from "./help";
 
 export class MessageRouter {
   private readonly event: MessageEventRunner;
@@ -22,6 +23,11 @@ export class MessageRouter {
   }
 
   public registerActions() {
+    this.event.registerCreateCommandEvent(new HelpAction(), {
+      prefixes: [`${basePhrase} help`],
+      allowBot: false
+    });
+
     this.event.registerCreateCommandEvent(new DeleteProfileAction(this.endpoints.profile), {
       prefixes: [`${basePhrase} profile delete`],
       allowBot: false

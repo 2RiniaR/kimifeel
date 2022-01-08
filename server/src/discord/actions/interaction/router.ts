@@ -10,6 +10,7 @@ import {
   ShowRequestAction
 } from "./request";
 import { RegisterUserAction } from "./user";
+import { HelpAction } from "./help";
 
 export class InteractionRouter {
   private readonly event: InteractionEventRunner;
@@ -21,6 +22,11 @@ export class InteractionRouter {
   }
 
   public registerActions() {
+    this.event.registerCreateCommandEvent(new HelpAction(), {
+      commandName: "help",
+      allowBot: false
+    });
+
     this.event.registerCreateCommandEvent(new DeleteProfileAction(this.endpoints.profile), {
       commandName: "profile",
       subCommandName: "delete",

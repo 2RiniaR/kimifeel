@@ -1,85 +1,59 @@
-import { GuildMember, Message, MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js";
-import { clientManager, targetGuildManager } from "../index";
+import { MessageReaction, PartialUser, User } from "discord.js";
+import { ClientManager } from "../client";
 
-export type AddedEventContext = {
-  reaction: MessageReaction;
-  member: GuildMember;
-  message: Message;
-};
-
-export type AddedEventOptions = {
+export type AddEventOptions = {
   emojis: string[];
   allowBot: boolean;
   myMessageOnly: boolean;
 };
 
-export interface AddedEventListener {
-  onAddedEvent(context: AddedEventContext): PromiseLike<void>;
-}
+export type AddEventHandler = (reaction: MessageReaction, user: User) => PromiseLike<void>;
 
-type AddedEventRegistration = {
-  listener: AddedEventListener;
-  options: AddedEventOptions;
+type AddEventRegistration = {
+  handler: AddEventHandler;
+  options: AddEventOptions;
 };
 
-export interface ReactionEventProvider {
-  onReactionAdded(handler: (reaction: MessageReaction, user: User) => PromiseLike<void>): void;
-}
-
 export class ReactionEventRunner {
+  private readonly client: ClientManager;
   private readonly registrations = {
-    onAdded: [] as AddedEventRegistration[]
+    onAdd: [] as AddEventRegistration[]
   };
 
-  constructor(provider: ReactionEventProvider) {
-    provider.onReactionAdded((reaction, user) => this.onReactionAdded(reaction, user));
+  constructor(client: ClientManager) {
+    this.client = client;
+    client.onReactionAdd((reaction, user) => this.onReactionAdded(reaction, user));
   }
 
-  public registerAddEvent(listener: AddedEventListener, options: AddedEventOptions) {
-    this.registrations.onAdded.push({ listener, options });
+  public registerAddEvent(handler: AddEventHandler, options: AddEventOptions) {
+    this.registrations.onAdd.push({ handler, options });
   }
 
   private async onReactionAdded(reaction: MessageReaction, user: User) {
-    const registrationss = this.registrations.onAdded.filter(
+    let registrations = this.registrations.onAdd;
+
+    registrations = registrations.filter(
       (registrations) =>
         this.checkMessageAuthor(reaction, registrations.options) &&
         this.checkReactionEmoji(reaction, registrations.options) &&
         this.checkBot(user, registrations.options)
     );
 
-    const member = await targetGuildManager.getMember(user.id);
-    if (!member) return;
-    const message = await this.fetchMessage(reaction);
-
-    const context = { reaction, member, message };
-    await registrationss.mapAsync(async (registrations) => await registrations.listener.onAddedEvent(context));
+    await registrations.mapAsync(async (registrations) => await registrations.handler(reaction, user));
   }
 
-  checkMessageAuthor(reaction: MessageReaction | PartialMessageReaction, options: AddedEventOptions) {
+  checkMessageAuthor(reaction: MessageReaction, options: AddEventOptions) {
     return (
       !options.myMessageOnly ||
-      (reaction.message.author &&
-        clientManager.client.user &&
-        reaction.message.author.id === clientManager.client.user.id)
+      (reaction.message.author && this.client.user && reaction.message.author.id === this.client.user.id)
     );
   }
 
-  checkReactionEmoji(reaction: MessageReaction | PartialMessageReaction, options: AddedEventOptions) {
+  checkReactionEmoji(reaction: MessageReaction, options: AddEventOptions) {
     return options.emojis.includes(reaction.emoji.toString());
   }
 
-  checkBot(user: User | PartialUser, options: AddedEventOptions) {
+  checkBot(user: User | PartialUser, options: AddEventOptions) {
     return options.allowBot || !user.bot;
-  }
-
-  async fetchReaction(reaction: MessageReaction | PartialMessageReaction): Promise<MessageReaction> {
-    if (reaction instanceof MessageReaction) return reaction;
-    return await reaction.fetch();
-  }
-
-  async fetchMessage(reaction: MessageReaction): Promise<Message> {
-    const message = reaction.message;
-    if (message instanceof Message) return message;
-    return await message.fetch();
   }
 }

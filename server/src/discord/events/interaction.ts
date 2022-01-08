@@ -1,75 +1,57 @@
-import { CommandInteraction, GuildMember, Interaction, User } from "discord.js";
-import { targetGuildManager } from "../index";
+import { CommandInteraction, Interaction } from "discord.js";
+import { ClientManager } from "../client";
 
-export type CreateMessageCommandEventContext = {
-  interaction: CommandInteraction;
-  member: GuildMember;
-};
-
-export type CreateMessageCommandEventOptions = {
+export type CreateCommandEventOptions = {
   commandName: string;
   subCommandGroupName?: string;
   subCommandName?: string;
   allowBot: boolean;
 };
 
-export interface CreateMessageCommandEventListener {
-  onMessageCommandCreated(context: CreateMessageCommandEventContext): PromiseLike<void>;
-}
+export type CreateCommandEventHandler = (command: CommandInteraction) => PromiseLike<void>;
 
-type CreateMessageCommandEventRegistration = {
-  listener: CreateMessageCommandEventListener;
-  options: CreateMessageCommandEventOptions;
+type CreateCommandEventRegistration = {
+  handler: CreateCommandEventHandler;
+  options: CreateCommandEventOptions;
 };
-
-export interface InteractionEventProvider {
-  onInteractionCreated(handler: (interaction: Interaction, user: User) => PromiseLike<void>): void;
-}
 
 export class InteractionEventRunner {
   private readonly registrations = {
-    onMessageCommandCreated: [] as CreateMessageCommandEventRegistration[]
+    onCommandCreated: [] as CreateCommandEventRegistration[]
   };
 
-  constructor(provider: InteractionEventProvider) {
-    provider.onInteractionCreated((interaction) => this.onInteractionCreated(interaction));
+  constructor(client: ClientManager) {
+    client.onInteractionCreated((interaction) => this.onInteractionCreated(interaction));
   }
 
-  public registerCreateMessageCommandEvent(
-    listener: CreateMessageCommandEventListener,
-    options: CreateMessageCommandEventOptions
-  ) {
-    this.registrations.onMessageCommandCreated.push({ listener, options });
+  public registerCreateEvent(handler: CreateCommandEventHandler, options: CreateCommandEventOptions) {
+    this.registrations.onCommandCreated.push({ handler, options });
   }
 
   private async onInteractionCreated(interaction: Interaction) {
-    if (!interaction.isCommand()) {
-      return;
+    if (interaction.isCommand()) {
+      await this.onCommandCreated(interaction);
     }
-
-    const registrations = this.registrations.onMessageCommandCreated.filter(
-      (registration) =>
-        this.checkCommandName(interaction, registration.options) && this.checkBot(interaction, registration.options)
-    );
-
-    const member = await targetGuildManager.getMember(interaction.user.id);
-    if (!member) {
-      return;
-    }
-
-    const context = { interaction, member };
-    await registrations.mapAsync(async (registration) => await registration.listener.onMessageCommandCreated(context));
   }
 
-  private checkCommandName(interaction: CommandInteraction, options: CreateMessageCommandEventOptions) {
+  private async onCommandCreated(command: CommandInteraction) {
+    let registrations = this.registrations.onCommandCreated;
+
+    registrations = registrations.filter((registration) => this.checkBot(command, registration.options));
+    registrations = registrations.filter((registration) => this.checkCommandName(command, registration.options));
+
+    await registrations.mapAsync(async (registration) => await registration.handler(command));
+  }
+
+  private checkBot(interaction: Interaction, options: CreateCommandEventOptions) {
+    return options.allowBot || !interaction.user.bot;
+  }
+
+  private checkCommandName(interaction: CommandInteraction, options: CreateCommandEventOptions) {
     const mainValid = interaction.commandName === options.commandName;
     const subGroupValid = (interaction.options.getSubcommandGroup(false) ?? undefined) === options.subCommandGroupName;
     const subValid = (interaction.options.getSubcommand(false) ?? undefined) === options.subCommandName;
 
     return mainValid && subGroupValid && subValid;
-  }
-
-  private checkBot(interaction: CommandInteraction, options: CreateMessageCommandEventOptions) {
-    return options.allowBot || !interaction.user.bot;
   }
 }

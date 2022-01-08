@@ -10,9 +10,7 @@ export type ProfileProps = {
 
 export function toProfileUnit({ index, content, authorUserId, ownerUserId }: ProfileProps, showDetail = true): string {
   if (showDetail) {
-    return `**${toMention(ownerUserId)} No.${index}** - *by ${toMention(
-      authorUserId
-    )}*\`\`\`\n${content}\n\`\`\``;
+    return `**${toMention(ownerUserId)} No.${index}** - *by ${toMention(authorUserId)}*\`\`\`\n${content}\n\`\`\``;
   } else {
     return `**${toMention(ownerUserId)} No.${index}** - *by ${toMention(authorUserId)}*`;
   }

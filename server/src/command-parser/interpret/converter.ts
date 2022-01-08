@@ -22,7 +22,6 @@ export type ConvertType<TReturn extends SupportTypes> = {
 
 export type ConvertParameter<TReturn extends SupportTypes> = {
   readonly name: string;
-  readonly description: string;
   readonly value: string;
   readonly convertType: ConvertType<TReturn>;
 };
@@ -93,7 +92,6 @@ export function convertArguments<
     if (!fmt) throw Error();
     const param = {
       name: `${(index + 1).toString()} 番目の引数`,
-      description: fmt.description,
       value: values.arguments[index],
       convertType: types[fmt.type]
     };
@@ -119,7 +117,6 @@ export function convertOptions<
 
     results[key] = convertParameter({
       name: `オプション ${key}`,
-      description: options[key].description,
       value,
       convertType: types[options[key].type]
     }) as TypeToReturn<TConvertTypeSet[TFormat["options"][typeof key]["type"]]>;

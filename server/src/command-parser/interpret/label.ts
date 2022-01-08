@@ -60,7 +60,6 @@ export type InterpretFormat<
   TConvertTypeSet extends ConvertTypeSetBase,
   TFormat extends CommandFormatOn<TConvertTypeSet>
 > = {
-  readonly prefixes: readonly string[];
   readonly argumentsCount: TFormat["arguments"];
   readonly optionsName: TFormat["options"];
 };
@@ -69,7 +68,6 @@ export type InterpretResult<
   TConvertTypeSet extends ConvertTypeSetBase,
   TFormat extends CommandFormatOn<TConvertTypeSet>
 > = {
-  readonly prefix: string;
   readonly arguments: InterpretArguments<TConvertTypeSet, TFormat>;
   readonly options: InterpretOptions<TConvertTypeSet, TFormat>;
 };
@@ -82,7 +80,6 @@ export function labelCommand<
   format: InterpretFormat<TConvertTypeSet, TFormat>
 ): InterpretResult<TConvertTypeSet, TFormat> {
   return {
-    prefix: fragments.prefix,
     arguments: checkArgumentCount(fragments.arguments, format.argumentsCount),
     options: checkOptionName(fragments.options, format.optionsName)
   };

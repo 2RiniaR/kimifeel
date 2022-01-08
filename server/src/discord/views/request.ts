@@ -45,21 +45,17 @@ export class RequestListEmbed extends CustomMessageEmbed {
   }
 }
 
-export type RequestSentEmbedProps = RequestProps & {
-  requesterUserName: string;
-  requesterUserAvatarURL: string;
-  targetUserName: string;
-};
-
 export class RequestSentEmbed extends CustomMessageEmbed {
   public static readonly UserIdFieldName = "To";
   public static readonly IndexFieldName = "Request No.";
 
-  public constructor(props: RequestSentEmbedProps) {
+  public constructor(props: RequestProps) {
     super("request", "リクエストが作成されました！", RequestSentEmbed.buildDescription(props));
-    this.setAuthor(props.requesterUserName, props.requesterUserAvatarURL)
-      .addField(RequestSentEmbed.UserIdFieldName, toMention(props.targetUserId), true)
-      .addField(RequestSentEmbed.IndexFieldName, props.index.toString(), true);
+    this.addField(RequestSentEmbed.UserIdFieldName, toMention(props.targetUserId), true).addField(
+      RequestSentEmbed.IndexFieldName,
+      props.index.toString(),
+      true
+    );
   }
 
   public static getUserId(embed: MessageEmbed): string | undefined {
@@ -74,7 +70,7 @@ export class RequestSentEmbed extends CustomMessageEmbed {
     return parseInt(indexField.value);
   }
 
-  private static buildDescription(props: RequestSentEmbedProps): string {
+  private static buildDescription(props: RequestProps): string {
     const content = `\`\`\`\n${props.content}\n\`\`\``;
     const messageForTarget = `${toMention(
       props.targetUserId

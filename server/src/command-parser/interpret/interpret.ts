@@ -23,7 +23,6 @@ export type CommandFormat<
   TArguments extends CommandFormatArguments<TConvertTypeSet>,
   TOptions extends CommandFormatOptions<TConvertTypeSet>
 > = {
-  readonly prefixes: readonly string[];
   readonly arguments: TArguments;
   readonly options: TOptions;
 };
@@ -42,14 +41,13 @@ export function interpretCommand<
   TFormat extends CommandFormatOn<TConvertTypeSet>
 >(fragment: CommandFragments, format: TFormat, types: TConvertTypeSet): CommandResultOf<TConvertTypeSet, TFormat> {
   const interpretFormat = {
-    prefixes: format.prefixes,
     argumentsCount: format.arguments,
     optionsName: format.options
   } as const;
 
   const interpretation = labelCommand<TConvertTypeSet, TFormat>(fragment, interpretFormat);
   return {
-    prefix: interpretation.prefix,
+    prefix: fragment.prefix,
     arguments: convertArguments(interpretation, format, types),
     options: convertOptions(interpretation, format, types)
   };

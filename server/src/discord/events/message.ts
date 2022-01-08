@@ -1,76 +1,44 @@
-import { GuildMember, Message } from "discord.js";
-import { targetGuildManager } from "discord";
+import { Message } from "discord.js";
 import { CommandFragments, fragmentCommand } from "command-parser";
-
-export type CreateCommandEventContext = {
-  readonly message: Message;
-  readonly member: GuildMember;
-  readonly command: CommandFragments;
-};
+import { ClientManager } from "../client";
 
 export type CreateCommandEventOptions = {
   readonly prefixes: readonly string[];
   readonly allowBot: boolean;
 };
 
-export interface CreateCommandEventListener {
-  onCommandCreated(context: CreateCommandEventContext): PromiseLike<void>;
-}
+export type CreateCommandEventHandler = (message: Message, command: CommandFragments) => PromiseLike<void>;
 
 type CreateCommandEventRegistration = {
-  listener: CreateCommandEventListener;
+  handler: CreateCommandEventHandler;
   options: CreateCommandEventOptions;
 };
-
-export interface MessageEventProvider {
-  onMessageCreated(handler: (message: Message) => PromiseLike<void>): void;
-}
 
 export class MessageEventRunner {
   private readonly registrations = {
     onCommandCreated: [] as CreateCommandEventRegistration[]
   };
 
-  constructor(provider: MessageEventProvider) {
-    provider.onMessageCreated((message) => this.onMessageCreated(message));
+  constructor(client: ClientManager) {
+    client.onMessageCreated((message) => this.onMessageCreated(message));
   }
 
-  public registerCreateCommandEvent(listener: CreateCommandEventListener, options: CreateCommandEventOptions) {
-    this.registrations.onCommandCreated.push({ listener, options });
+  public registerCreateCommandEvent(handler: CreateCommandEventHandler, options: CreateCommandEventOptions) {
+    this.registrations.onCommandCreated.push({ handler, options });
   }
 
   private async onMessageCreated(message: Message) {
-    const sessions = this.registrations.onCommandCreated
-      .map((registration) => {
-        const botCheckPassed = !message.author.bot || registration.options.allowBot;
-        if (!botCheckPassed) {
-          return;
-        }
+    let registrations = this.registrations.onCommandCreated;
 
-        const command = fragmentCommand(message.content, registration.options.prefixes);
-        if (!command) {
-          return;
-        }
+    registrations = registrations.filter((registration) => this.checkBot(message, registration.options));
 
-        return {
-          registration,
-          command
-        };
-      })
-      .removeNone();
-
-    if (sessions.length === 0) {
-      return;
-    }
-
-    const member = await targetGuildManager.getMember(message.author.id);
-    if (!member) {
-      return;
-    }
-
-    await sessions.forEachAsync(async ({ registration, command }) => {
-      const context = { member, message, command };
-      await registration.listener.onCommandCreated(context);
+    await registrations.forEachAsync(async (registration) => {
+      const command = fragmentCommand(message.content, registration.options.prefixes);
+      if (command) await registration.handler(message, command);
     });
+  }
+
+  private checkBot(message: Message, options: CreateCommandEventOptions) {
+    return !message.author.bot || options.allowBot;
   }
 }

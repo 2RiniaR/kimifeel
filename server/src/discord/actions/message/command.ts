@@ -1,5 +1,7 @@
 const snowflakeRegex = /^(\d+)$/;
 
+export const basePhrase = "!kimi";
+
 export const parameterTypes = {
   integer: {
     name: "整数",

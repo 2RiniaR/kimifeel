@@ -2,7 +2,6 @@ import { ConvertTypeSetBase } from "./interpret";
 
 export type Parameter<TConvertTypeSet extends ConvertTypeSetBase = ConvertTypeSetBase> = {
   readonly name: string;
-  readonly description: string;
   readonly type: keyof TConvertTypeSet;
 };
 

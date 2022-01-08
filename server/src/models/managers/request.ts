@@ -2,7 +2,7 @@ import { IdentityRequest, Request } from "../structures";
 import { buildRequest } from "../builders/request";
 import { ContextModel } from "../context-model";
 import { NotFoundError } from "../errors";
-import * as db from "prisma";
+import * as db from "../../prisma";
 
 export class RequestManager extends ContextModel {
   public async fetch(request: IdentityRequest): Promise<Request> {

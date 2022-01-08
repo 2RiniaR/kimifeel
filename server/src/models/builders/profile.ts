@@ -1,6 +1,6 @@
 import { Context } from "../context";
 import { Profile, IdentityUser } from "../structures";
-import * as db from "prisma";
+import * as db from "../../prisma";
 
 export function buildProfile(context: Context, result: db.ProfileQueryResult): Profile {
   return new Profile(context, {

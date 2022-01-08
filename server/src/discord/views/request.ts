@@ -2,6 +2,7 @@ import { CustomMessageEmbed } from "./base";
 import { ProfileProps, toProfileUnit } from "./profile";
 import { MessageEmbed } from "discord.js";
 import { removeMention, toMention } from "./user";
+import { RequestIdentifier } from "endpoints/structures";
 
 export type RequestProps = {
   index: number;
@@ -19,6 +20,11 @@ export function toRequestUnit(
   } else {
     return `**${toMention(targetUserId)} No.${index}** - *by ${toMention(requesterUserId)}*`;
   }
+}
+
+function getIdentityCall(identifier: RequestIdentifier) {
+  if ("id" in identifier) return `リクエスト ID: \`${identifier.id}\``;
+  else return `プロフィール 番号: \`${identifier.index}\``;
 }
 
 export class RequestAcceptedEmbed extends CustomMessageEmbed {
@@ -77,5 +83,22 @@ export class RequestSentEmbed extends CustomMessageEmbed {
     )}\n承認→✅のリアクションを付ける\n拒否→❌のリアクションを付ける`;
     const messageForRequester = `${toMention(props.requesterUserId)}\nキャンセル→⛔のリアクションを付ける`;
     return `${content}\n${messageForTarget}\n\n${messageForRequester}`;
+  }
+}
+
+export class SendRequestOwnEmbed extends CustomMessageEmbed {
+  public constructor() {
+    super("invalid", "自分自身にリクエストを送信することはできません。");
+  }
+}
+
+export class RequestNotFoundEmbed extends CustomMessageEmbed {
+  public constructor(identifier: RequestIdentifier) {
+    const identity = getIdentityCall(identifier);
+    super(
+      "failed",
+      "リクエストが見つかりませんでした。",
+      `${identity} は存在しない、もしくは削除された可能性があります。`
+    );
   }
 }

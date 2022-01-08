@@ -3,13 +3,13 @@ import * as Endpoint from "../endpoints/request";
 import * as EndpointError from "../endpoints/errors";
 import { Controller } from "./base";
 import { ForbiddenError } from "../models/errors";
-import { ClientUser, ContentLengthLimitError, Request } from "../models/structures";
+import { ClientUser, ContentLengthLimitError, Request, SubmitRequestOwnError } from "../models/structures";
 
 class RequestControllerService {
   async getRequestByIndex(client: ClientUser, index: number): Promise<Request> {
     const request = await client.requests.findByIndex(index);
     if (!request) {
-      throw new EndpointError.NotFoundError();
+      throw new EndpointError.RequestNotFoundError({ index });
     }
     return request;
   }
@@ -21,16 +21,15 @@ export class RequestController extends Controller implements RequestEndpointResp
   async accept(clientDiscordId: string, params: Endpoint.AcceptParams): Promise<Endpoint.AcceptResult> {
     const client = await this.getClientUser(clientDiscordId);
     const request = await this.service.getRequestByIndex(client, params.index);
-    let profile;
 
+    let profile;
     try {
       profile = await request.accept();
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new EndpointError.NoPermissionError();
-      } else {
-        throw error;
+        throw new EndpointError.RequestNotFoundError({ index: params.index });
       }
+      throw error;
     }
 
     return this.convertProfileToResult(profile);
@@ -44,10 +43,9 @@ export class RequestController extends Controller implements RequestEndpointResp
       await request.cancel();
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new EndpointError.NoPermissionError();
-      } else {
-        throw error;
+        throw new EndpointError.RequestNotFoundError({ index: params.index });
       }
+      throw error;
     }
 
     return this.convertRequestToResult(request);
@@ -56,16 +54,17 @@ export class RequestController extends Controller implements RequestEndpointResp
   async create(clientDiscordId: string, params: Endpoint.CreateParams): Promise<Endpoint.CreateResult> {
     const client = await this.getClientUser(clientDiscordId);
     const target = await this.getUser(client, params.targetDiscordId);
-    let request;
 
+    let request;
     try {
       request = await target.submitRequest(params.content);
     } catch (error) {
       if (error instanceof ContentLengthLimitError) {
         throw new EndpointError.ContentLengthLimitError(error.min, error.max, error.actual);
-      } else {
-        throw error;
+      } else if (error instanceof SubmitRequestOwnError) {
+        throw new EndpointError.SendRequestOwnError({ discordId: params.targetDiscordId });
       }
+      throw error;
     }
 
     return this.convertRequestToResult(request);
@@ -79,10 +78,9 @@ export class RequestController extends Controller implements RequestEndpointResp
       await request.deny();
     } catch (error) {
       if (error instanceof ForbiddenError) {
-        throw new EndpointError.NoPermissionError();
-      } else {
-        throw error;
+        throw new EndpointError.RequestNotFoundError({ index: params.index });
       }
+      throw error;
     }
 
     return this.convertRequestToResult(request);

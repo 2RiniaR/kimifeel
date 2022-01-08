@@ -1,9 +1,18 @@
 import { MessageEmbed } from "discord.js";
 
-export type CustomMessageType = keyof CustomMessageEmbed["generators"];
+export type CustomMessageType =
+  | "succeed"
+  | "deleted"
+  | "profile"
+  | "request"
+  | "info"
+  | "invalid"
+  | "failed"
+  | "warning"
+  | "error";
 
 export class CustomMessageEmbed extends MessageEmbed {
-  public readonly generators: { [type in string]: (title: string) => MessageEmbed } = {
+  public readonly generators: { [type in CustomMessageType]: (title: string) => MessageEmbed } = {
     succeed: (title) => this.setTitle(`✅ ${title}`).setColor("GREEN"),
     deleted: (title) => this.setTitle(`🗑 ${title}`).setColor("GREY"),
     profile: (title) => this.setTitle(`📓 ${title}`).setColor("AQUA"),

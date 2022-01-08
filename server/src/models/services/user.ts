@@ -1,7 +1,7 @@
 import { User, Request, SearchRequestsProps } from "../structures";
 import { ContextModel } from "../context-model";
 import { buildRequest } from "../builders/request";
-import * as db from "prisma";
+import * as db from "../../prisma";
 
 export class UserService extends ContextModel {
   private readonly user: User;

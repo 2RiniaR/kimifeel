@@ -1,8 +1,15 @@
 import { InteractionEventRunner } from "discord/events";
 import { Endpoints } from "../endpoints";
-import { ProfileAction } from "./profile";
-import { RequestAction } from "./request";
-import { UserAction } from "./user";
+import { DeleteProfileAction, RandomProfileAction, SearchProfileAction, ShowProfileAction } from "./profile";
+import {
+  AcceptRequestAction,
+  CancelRequestAction,
+  DenyRequestAction,
+  SearchRequestAction,
+  SendRequestAction,
+  ShowRequestAction
+} from "./request";
+import { RegisterUserAction } from "./user";
 
 export class InteractionRouter {
   private readonly event: InteractionEventRunner;
@@ -14,73 +21,67 @@ export class InteractionRouter {
   }
 
   public registerActions() {
-    const actions = {
-      profile: new ProfileAction(this.endpoints.profile),
-      request: new RequestAction(this.endpoints.request),
-      user: new UserAction(this.endpoints.user)
-    } as const;
-
-    this.event.registerCreateEvent((command) => actions.profile.delete(command), {
+    this.event.registerCreateCommandEvent(new DeleteProfileAction(this.endpoints.profile), {
       commandName: "profile",
       subCommandName: "delete",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.profile.random(command), {
+    this.event.registerCreateCommandEvent(new RandomProfileAction(this.endpoints.profile), {
       commandName: "profile",
       subCommandName: "random",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.profile.search(command), {
+    this.event.registerCreateCommandEvent(new SearchProfileAction(this.endpoints.profile), {
       commandName: "profile",
       subCommandName: "search",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.profile.show(command), {
+    this.event.registerCreateCommandEvent(new ShowProfileAction(this.endpoints.profile), {
       commandName: "profile",
       subCommandName: "show",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.request.accept(command), {
+    this.event.registerCreateCommandEvent(new AcceptRequestAction(this.endpoints.request), {
       commandName: "request",
       subCommandName: "accept",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.request.cancel(command), {
+    this.event.registerCreateCommandEvent(new CancelRequestAction(this.endpoints.request), {
       commandName: "request",
       subCommandName: "cancel",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.request.deny(command), {
+    this.event.registerCreateCommandEvent(new DenyRequestAction(this.endpoints.request), {
       commandName: "request",
       subCommandName: "deny",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.request.search(command), {
+    this.event.registerCreateCommandEvent(new SearchRequestAction(this.endpoints.request), {
       commandName: "request",
       subCommandName: "search",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.request.send(command), {
+    this.event.registerCreateCommandEvent(new SendRequestAction(this.endpoints.request), {
       commandName: "request",
       subCommandName: "send",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.request.show(command), {
+    this.event.registerCreateCommandEvent(new ShowRequestAction(this.endpoints.request), {
       commandName: "request",
       subCommandName: "show",
       allowBot: false
     });
 
-    this.event.registerCreateEvent((command) => actions.user.register(command), {
+    this.event.registerCreateCommandEvent(new RegisterUserAction(this.endpoints.user), {
       commandName: "user",
       subCommandName: "register",
       allowBot: false

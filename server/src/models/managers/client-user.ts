@@ -1,6 +1,6 @@
 import { ImaginaryUser, ClientUser } from "../structures";
 import { buildClientUser } from "../builders/client-user";
-import * as db from "prisma";
+import * as db from "../../prisma";
 
 export class ClientUserManager {
   public async register(discordId: string): Promise<ClientUser> {

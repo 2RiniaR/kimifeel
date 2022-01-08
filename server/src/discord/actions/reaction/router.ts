@@ -1,5 +1,5 @@
 import { Endpoints } from "../endpoints";
-import { RequestAction } from "./request";
+import { AcceptRequestAction, CancelRequestAction, DenyRequestAction } from "./request";
 import { ReactionEventRunner } from "discord/events/reaction";
 
 export class ReactionRouter {
@@ -12,23 +12,19 @@ export class ReactionRouter {
   }
 
   public registerActions() {
-    const actions = {
-      request: new RequestAction(this.endpoints.request)
-    } as const;
-
-    this.event.registerAddEvent((reaction, user) => actions.request.accept(reaction, user), {
+    this.event.registerAddEvent(new AcceptRequestAction(this.endpoints.request), {
       emojis: ["✅"],
       allowBot: false,
       myMessageOnly: true
     });
 
-    this.event.registerAddEvent((reaction, user) => actions.request.cancel(reaction, user), {
+    this.event.registerAddEvent(new CancelRequestAction(this.endpoints.request), {
       emojis: ["⛔"],
       allowBot: false,
       myMessageOnly: true
     });
 
-    this.event.registerAddEvent((reaction, user) => actions.request.deny(reaction, user), {
+    this.event.registerAddEvent(new DenyRequestAction(this.endpoints.request), {
       emojis: ["❌"],
       allowBot: false,
       myMessageOnly: true

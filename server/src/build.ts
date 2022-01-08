@@ -32,8 +32,9 @@ const actions = {
   interaction: new InteractionRouter(events.interaction, endpoints),
   message: new MessageRouter(events.message, endpoints)
 };
-
-Object.values(actions).forEach((action) => action.registerActions());
+actions.reaction.registerActions();
+actions.interaction.registerActions();
+actions.message.registerActions();
 
 settings.load();
 void client.initialize();

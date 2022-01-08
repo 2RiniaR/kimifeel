@@ -9,7 +9,7 @@ class ProfileControllerService {
   async getProfileByIndex(client: ClientUser, index: number): Promise<Profile> {
     const profile = await client.profiles.findByIndex(index);
     if (!profile) {
-      throw new EndpointError.NotFoundError();
+      throw new EndpointError.ProfileNotFoundError({ index });
     }
     return profile;
   }
@@ -26,10 +26,9 @@ export class ProfileController extends Controller implements ProfileEndpointResp
       await profile.delete();
     } catch (error) {
       if (error instanceof NotFoundError) {
-        throw new EndpointError.NotFoundError();
-      } else {
-        throw error;
+        throw new EndpointError.ProfileNotFoundError({ index: params.index });
       }
+      throw error;
     }
 
     return this.convertProfileToResult(profile);

@@ -2,7 +2,7 @@ import { ContextModel } from "../context-model";
 import { Profile } from "../structures";
 import { buildProfile } from "../builders/profile";
 import { NotFoundError } from "../errors";
-import * as db from "prisma";
+import * as db from "../../prisma";
 
 export class ProfileService extends ContextModel {
   private readonly profile: Profile;

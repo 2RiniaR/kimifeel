@@ -1,107 +1,86 @@
-import { MessageReaction, User } from "discord.js";
-import {
-  ErrorEmbed,
-  RequestAcceptedEmbed,
-  RequestCanceledEmbed,
-  RequestDeniedEmbed,
-  RequestSentEmbed
-} from "discord/views";
-import { NoPermissionError, NotFoundError } from "endpoints/errors";
+import { Message, MessageReaction, User } from "discord.js";
+import { RequestAcceptedEmbed, RequestCanceledEmbed, RequestDeniedEmbed, RequestSentEmbed } from "discord/views";
 import { RequestEndpoint } from "endpoints/request";
-import { DiscordFetchFailedActionError } from "../errors";
-import { fetchMessage } from "discord/fetch";
+import { AddEventAction } from "./base";
+import { FetchFailedError } from "../errors";
 
-export class RequestAction {
+export class AcceptRequestAction extends AddEventAction {
   private readonly endpoint: RequestEndpoint;
 
   constructor(endpoint: RequestEndpoint) {
+    super();
     this.endpoint = endpoint;
   }
 
-  async accept(reaction: MessageReaction, user: User) {
-    const message = await fetchMessage(reaction.message);
-
+  async run(reaction: MessageReaction, user: User, message: Message) {
     if (message.embeds.length === 0) {
-      throw new DiscordFetchFailedActionError();
+      throw new FetchFailedError();
     }
     const requestEmbed = message.embeds[0];
     const index = RequestSentEmbed.getIndex(requestEmbed);
     if (!index) {
-      throw new DiscordFetchFailedActionError();
+      throw new FetchFailedError();
     }
 
-    let profile;
-    try {
-      profile = await this.endpoint.accept(user.id, {
-        index
-      });
-    } catch (error) {
-      if (error instanceof NoPermissionError) return;
-      if (error instanceof NotFoundError) return;
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const profile = await this.endpoint.accept(user.id, {
+      index
+    });
 
     const embed = new RequestAcceptedEmbed(profile);
     await message.reply({ embeds: [embed] });
   }
+}
 
-  async cancel(reaction: MessageReaction, user: User) {
-    const message = await fetchMessage(reaction.message);
+export class CancelRequestAction extends AddEventAction {
+  private readonly endpoint: RequestEndpoint;
 
-    if (message.embeds.length === 0) {
-      throw new DiscordFetchFailedActionError();
-    }
-    const requestEmbed = message.embeds[0];
-    const index = RequestSentEmbed.getIndex(requestEmbed);
-    if (!index) {
-      throw new DiscordFetchFailedActionError();
-    }
-
-    let request;
-    try {
-      request = await this.endpoint.cancel(user.id, {
-        index
-      });
-    } catch (error) {
-      if (error instanceof NoPermissionError) return;
-      if (error instanceof NotFoundError) return;
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
-
-    const embed = new RequestCanceledEmbed(request);
-    await message.reply({ embeds: [embed] });
+  constructor(endpoint: RequestEndpoint) {
+    super();
+    this.endpoint = endpoint;
   }
 
-  async deny(reaction: MessageReaction, user: User) {
-    const message = await fetchMessage(reaction.message);
-
+  async run(reaction: MessageReaction, user: User, message: Message) {
     if (message.embeds.length === 0) {
-      throw new DiscordFetchFailedActionError();
+      throw new FetchFailedError();
     }
     const requestEmbed = message.embeds[0];
     const index = RequestSentEmbed.getIndex(requestEmbed);
     if (!index) {
-      throw new DiscordFetchFailedActionError();
+      throw new FetchFailedError();
     }
 
-    let request;
-    try {
-      request = await this.endpoint.deny(user.id, {
-        index
-      });
-    } catch (error) {
-      if (error instanceof NoPermissionError) return;
-      if (error instanceof NotFoundError) return;
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
+    const result = await this.endpoint.cancel(user.id, {
+      index
+    });
+
+    const embed = new RequestCanceledEmbed(result);
+    await message.reply({ embeds: [embed] });
+  }
+}
+
+export class DenyRequestAction extends AddEventAction {
+  private readonly endpoint: RequestEndpoint;
+
+  constructor(endpoint: RequestEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(reaction: MessageReaction, user: User, message: Message) {
+    if (message.embeds.length === 0) {
+      throw new FetchFailedError();
+    }
+    const requestEmbed = message.embeds[0];
+    const index = RequestSentEmbed.getIndex(requestEmbed);
+    if (!index) {
+      throw new FetchFailedError();
     }
 
-    const embed = new RequestDeniedEmbed(request);
+    const result = await this.endpoint.deny(user.id, {
+      index
+    });
+
+    const embed = new RequestDeniedEmbed(result);
     await message.reply({ embeds: [embed] });
   }
 }

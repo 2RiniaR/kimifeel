@@ -8,7 +8,7 @@ export abstract class Controller {
     const service = new ClientUserManager();
     const client = await service.findByDiscordId(discordId);
     if (!client) {
-      throw new EndpointError.NotFoundError("User was not registered.");
+      throw new EndpointError.ClientUserNotExistError({ discordId });
     }
     return client;
   }
@@ -16,7 +16,7 @@ export abstract class Controller {
   async getUser(client: ClientUser, discordId: string): Promise<User> {
     const user = await client.users.findByDiscordId(discordId);
     if (!user) {
-      throw new EndpointError.NotFoundError();
+      throw new EndpointError.UserNotFoundError({ discordId });
     }
     return user;
   }

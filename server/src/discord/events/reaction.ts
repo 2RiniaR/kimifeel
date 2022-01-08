@@ -7,10 +7,12 @@ export type AddEventOptions = {
   myMessageOnly: boolean;
 };
 
-export type AddEventHandler = (reaction: MessageReaction, user: User) => PromiseLike<void>;
+export interface AddEventListener {
+  onReactionAdded(reaction: MessageReaction, user: User): PromiseLike<void>;
+}
 
 type AddEventRegistration = {
-  handler: AddEventHandler;
+  listener: AddEventListener;
   options: AddEventOptions;
 };
 
@@ -25,8 +27,8 @@ export class ReactionEventRunner {
     client.onReactionAdd((reaction, user) => this.onReactionAdded(reaction, user));
   }
 
-  public registerAddEvent(handler: AddEventHandler, options: AddEventOptions) {
-    this.registrations.onAdd.push({ handler, options });
+  public registerAddEvent(listener: AddEventListener, options: AddEventOptions) {
+    this.registrations.onAdd.push({ listener, options });
   }
 
   private async onReactionAdded(reaction: MessageReaction, user: User) {
@@ -39,7 +41,7 @@ export class ReactionEventRunner {
         this.checkBot(user, registrations.options)
     );
 
-    await registrations.mapAsync(async (registrations) => await registrations.handler(reaction, user));
+    await registrations.mapAsync(async (registrations) => await registrations.listener.onReactionAdded(reaction, user));
   }
 
   checkMessageAuthor(reaction: MessageReaction, options: AddEventOptions) {

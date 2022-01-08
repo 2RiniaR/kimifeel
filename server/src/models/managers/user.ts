@@ -2,7 +2,7 @@ import { IdentityUser, User } from "../structures";
 import { ContextModel } from "../context-model";
 import { buildUser } from "../builders/user";
 import { NotFoundError } from "../errors";
-import * as db from "prisma";
+import * as db from "../../prisma";
 
 export class UserManager extends ContextModel {
   public async fetch(user: IdentityUser): Promise<User> {

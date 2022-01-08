@@ -1,6 +1,6 @@
 import { Context } from "../context";
 import { Request, IdentityUser } from "../structures";
-import * as db from "prisma";
+import * as db from "../../prisma";
 
 export function buildRequest(context: Context, result: db.RequestQueryResult): Request {
   return new Request(context, {

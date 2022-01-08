@@ -1,27 +1,22 @@
-import { ErrorEmbed, UserRegisteredEmbed } from "discord/views";
+import { UserRegisteredEmbed } from "discord/views";
 import { UserEndpoint } from "endpoints/user";
-import { NoPermissionError, NotFoundError } from "endpoints/errors";
 import { CommandInteraction } from "discord.js";
+import { CreateCommandEventAction } from "./base";
 
-export class UserAction {
+export class RegisterUserAction extends CreateCommandEventAction {
   private readonly endpoint: UserEndpoint;
 
   constructor(endpoint: UserEndpoint) {
+    super();
     this.endpoint = endpoint;
   }
 
-  async register(command: CommandInteraction) {
-    try {
-      await this.endpoint.register(command.user.id);
-    } catch (error) {
-      if (error instanceof NoPermissionError) return;
-      if (error instanceof NotFoundError) return;
-      const embed = new ErrorEmbed(error);
-      await command.reply({ embeds: [embed] });
-      return;
-    }
+  async run(command: CommandInteraction) {
+    const discordId = command.user.id;
 
-    const embed = new UserRegisteredEmbed({ discordId: command.user.id });
-    await command.reply({ embeds: [embed] });
+    await this.endpoint.register(discordId);
+
+    const embed = new UserRegisteredEmbed({ discordId });
+    await command.reply({ embeds: [embed], ephemeral: true });
   }
 }

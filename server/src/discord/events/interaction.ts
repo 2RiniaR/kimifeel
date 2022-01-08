@@ -8,10 +8,12 @@ export type CreateCommandEventOptions = {
   allowBot: boolean;
 };
 
-export type CreateCommandEventHandler = (command: CommandInteraction) => PromiseLike<void>;
+export interface CreateCommandEventListener {
+  onCommandCreated(command: CommandInteraction): PromiseLike<void>;
+}
 
 type CreateCommandEventRegistration = {
-  handler: CreateCommandEventHandler;
+  listener: CreateCommandEventListener;
   options: CreateCommandEventOptions;
 };
 
@@ -24,8 +26,8 @@ export class InteractionEventRunner {
     client.onInteractionCreated((interaction) => this.onInteractionCreated(interaction));
   }
 
-  public registerCreateEvent(handler: CreateCommandEventHandler, options: CreateCommandEventOptions) {
-    this.registrations.onCommandCreated.push({ handler, options });
+  public registerCreateCommandEvent(listener: CreateCommandEventListener, options: CreateCommandEventOptions) {
+    this.registrations.onCommandCreated.push({ listener, options });
   }
 
   private async onInteractionCreated(interaction: Interaction) {
@@ -40,7 +42,7 @@ export class InteractionEventRunner {
     registrations = registrations.filter((registration) => this.checkBot(command, registration.options));
     registrations = registrations.filter((registration) => this.checkCommandName(command, registration.options));
 
-    await registrations.mapAsync(async (registration) => await registration.handler(command));
+    await registrations.mapAsync(async (registration) => await registration.listener.onCommandCreated(command));
   }
 
   private checkBot(interaction: Interaction, options: CreateCommandEventOptions) {

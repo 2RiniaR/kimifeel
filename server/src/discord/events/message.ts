@@ -7,10 +7,12 @@ export type CreateCommandEventOptions = {
   readonly allowBot: boolean;
 };
 
-export type CreateCommandEventHandler = (message: Message, command: CommandFragments) => PromiseLike<void>;
+export interface CreateCommandEventListener {
+  onCommandCreated(message: Message, command: CommandFragments): PromiseLike<void>;
+}
 
 type CreateCommandEventRegistration = {
-  handler: CreateCommandEventHandler;
+  listener: CreateCommandEventListener;
   options: CreateCommandEventOptions;
 };
 
@@ -23,8 +25,8 @@ export class MessageEventRunner {
     client.onMessageCreated((message) => this.onMessageCreated(message));
   }
 
-  public registerCreateCommandEvent(handler: CreateCommandEventHandler, options: CreateCommandEventOptions) {
-    this.registrations.onCommandCreated.push({ handler, options });
+  public registerCreateCommandEvent(listener: CreateCommandEventListener, options: CreateCommandEventOptions) {
+    this.registrations.onCommandCreated.push({ listener, options });
   }
 
   private async onMessageCreated(message: Message) {
@@ -34,7 +36,7 @@ export class MessageEventRunner {
 
     await registrations.forEachAsync(async (registration) => {
       const command = fragmentCommand(message.content, registration.options.prefixes);
-      if (command) await registration.handler(message, command);
+      if (command) await registration.listener.onCommandCreated(message, command);
     });
   }
 

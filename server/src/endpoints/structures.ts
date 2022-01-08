@@ -1,3 +1,7 @@
+export type ProfileIdentifier = { id: string } | { index: number };
+export type RequestIdentifier = { id: string } | { index: number };
+export type UserIdentifier = { id: string } | { discordId: string };
+
 export type RequestResult = {
   index: number;
   content: string;

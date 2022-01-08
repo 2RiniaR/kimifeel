@@ -2,96 +2,98 @@ import { Message } from "discord.js";
 import { CommandFragments, interpretCommand } from "command-parser";
 import { RequestEndpoint } from "endpoints/request";
 import { parameterTypes } from "./command";
-import { NoPermissionError, NotFoundError } from "endpoints/errors";
 import {
-  ErrorEmbed,
   RequestAcceptedEmbed,
   RequestCanceledEmbed,
   RequestDeniedEmbed,
   RequestListEmbed,
   RequestSentEmbed
 } from "../../views";
+import { CreateCommandEventAction } from "./base";
+import { ParameterFormatInvalidError } from "../errors";
 
-export class RequestAction {
+export class AcceptRequestAction extends CreateCommandEventAction {
   private readonly endpoint: RequestEndpoint;
 
   constructor(endpoint: RequestEndpoint) {
+    super();
     this.endpoint = endpoint;
   }
 
-  async accept(message: Message, command: CommandFragments) {
+  async run(message: Message, command: CommandFragments) {
     const format = {
       arguments: [{ name: "リクエストの番号", type: "integer" }],
       options: {}
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    let request;
-    try {
-      request = await this.endpoint.accept(message.author.id, {
-        index: interpret.arguments[0]
-      });
-    } catch (error) {
-      if (error instanceof NoPermissionError) return;
-      if (error instanceof NotFoundError) return;
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const request = await this.endpoint.accept(message.author.id, {
+      index: interpret.arguments[0]
+    });
 
     const embed = new RequestAcceptedEmbed(request);
     await message.reply({ embeds: [embed] });
   }
+}
 
-  async cancel(message: Message, command: CommandFragments) {
+export class CancelRequestAction extends CreateCommandEventAction {
+  private readonly endpoint: RequestEndpoint;
+
+  constructor(endpoint: RequestEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(message: Message, command: CommandFragments) {
     const format = {
       arguments: [{ name: "リクエストの番号", type: "integer" }],
       options: {}
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    let profile;
-    try {
-      profile = await this.endpoint.cancel(message.author.id, {
-        index: interpret.arguments[0]
-      });
-    } catch (error) {
-      if (error instanceof NoPermissionError) return;
-      if (error instanceof NotFoundError) return;
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const profile = await this.endpoint.cancel(message.author.id, {
+      index: interpret.arguments[0]
+    });
 
     const embed = new RequestCanceledEmbed(profile);
     await message.reply({ embeds: [embed] });
   }
+}
 
-  async deny(message: Message, command: CommandFragments) {
+export class DenyRequestAction extends CreateCommandEventAction {
+  private readonly endpoint: RequestEndpoint;
+
+  constructor(endpoint: RequestEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(message: Message, command: CommandFragments) {
     const format = {
       arguments: [{ name: "リクエストの番号", type: "integer" }],
       options: {}
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    let request;
-    try {
-      request = await this.endpoint.deny(message.author.id, {
-        index: interpret.arguments[0]
-      });
-    } catch (error) {
-      if (error instanceof NoPermissionError) return;
-      if (error instanceof NotFoundError) return;
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const request = await this.endpoint.deny(message.author.id, {
+      index: interpret.arguments[0]
+    });
 
     const embed = new RequestDeniedEmbed(request);
     await message.reply({ embeds: [embed] });
   }
+}
 
-  async search(message: Message, command: CommandFragments) {
+export class SearchRequestAction extends CreateCommandEventAction {
+  private readonly endpoint: RequestEndpoint;
+
+  constructor(endpoint: RequestEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(message: Message, command: CommandFragments) {
+    const defaultPage = 1;
     const format = {
       arguments: [],
       options: {
@@ -105,41 +107,41 @@ export class RequestAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const defaultPage = 1;
-
     const genreTypes = ["received", "sent"] as const;
     const genre = interpret.options.genre;
     if (!genre || !(genre in genreTypes)) {
-      throw Error();
+      throw new ParameterFormatInvalidError("genre", "received または sent");
     }
 
     const orderTypes = ["latest", "oldest"] as const;
     const order = interpret.options.order;
     if (!order || !(order in orderTypes)) {
-      throw Error();
+      throw new ParameterFormatInvalidError("order", "latest または oldest");
     }
 
-    let requests;
-    try {
-      requests = await this.endpoint.search(message.author.id, {
-        status: genre as "received" | "sent",
-        order: order as "oldest" | "latest",
-        page: interpret.options.page ?? defaultPage,
-        targetDiscordId: interpret.options.target,
-        applicantDiscordId: interpret.options.applicant,
-        content: interpret.options.content
-      });
-    } catch (error) {
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const requests = await this.endpoint.search(message.author.id, {
+      status: genre as "received" | "sent",
+      order: order as "oldest" | "latest",
+      page: interpret.options.page ?? defaultPage,
+      targetDiscordId: interpret.options.target,
+      applicantDiscordId: interpret.options.applicant,
+      content: interpret.options.content
+    });
 
     const listEmbed = new RequestListEmbed(requests);
     await message.reply({ embeds: [listEmbed] });
   }
+}
 
-  async send(message: Message, command: CommandFragments) {
+export class SendRequestAction extends CreateCommandEventAction {
+  private readonly endpoint: RequestEndpoint;
+
+  constructor(endpoint: RequestEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(message: Message, command: CommandFragments) {
     const format = {
       arguments: [
         { name: "送信先ユーザーのID", type: "userId" },
@@ -149,17 +151,10 @@ export class RequestAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    let request;
-    try {
-      request = await this.endpoint.create(message.author.id, {
-        targetDiscordId: interpret.arguments[0],
-        content: interpret.arguments[1]
-      });
-    } catch (error) {
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const request = await this.endpoint.create(message.author.id, {
+      targetDiscordId: interpret.arguments[0],
+      content: interpret.arguments[1]
+    });
 
     const embed = new RequestSentEmbed({
       index: request.index,
@@ -173,24 +168,26 @@ export class RequestAction {
     const emojiCharacters = ["✅", "⛔", "❌"];
     await emojiCharacters.mapAsync((emoji) => card.react(emoji));
   }
+}
 
-  async show(message: Message, command: CommandFragments) {
+export class ShowRequestAction extends CreateCommandEventAction {
+  private readonly endpoint: RequestEndpoint;
+
+  constructor(endpoint: RequestEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(message: Message, command: CommandFragments) {
     const format = {
       arguments: [{ name: "番号", type: "integer" }],
       options: {}
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    let request;
-    try {
-      request = await this.endpoint.find(message.author.id, {
-        index: interpret.arguments[0]
-      });
-    } catch (error) {
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const request = await this.endpoint.find(message.author.id, {
+      index: interpret.arguments[0]
+    });
 
     const listEmbed = new RequestListEmbed([request]);
     await message.reply({ embeds: [listEmbed] });

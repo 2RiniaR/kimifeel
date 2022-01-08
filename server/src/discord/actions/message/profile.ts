@@ -2,36 +2,43 @@ import { Message } from "discord.js";
 import { CommandFragments, interpretCommand } from "command-parser";
 import { ProfileEndpoint } from "endpoints/profile";
 import { parameterTypes } from "./command";
-import { ErrorEmbed, ProfileDeletedEmbed, ProfileListEmbed } from "../../views";
+import { ProfileDeletedEmbed, ProfileListEmbed } from "../../views";
+import { CreateCommandEventAction } from "./base";
+import { ParameterFormatInvalidError } from "../errors";
 
-export class ProfileAction {
+export class DeleteProfileAction extends CreateCommandEventAction {
   private readonly endpoint: ProfileEndpoint;
 
   constructor(endpoint: ProfileEndpoint) {
+    super();
     this.endpoint = endpoint;
   }
 
-  async delete(message: Message, command: CommandFragments) {
+  async run(message: Message, command: CommandFragments) {
     const format = {
       arguments: [{ name: "プロフィールの番号", type: "integer" }],
       options: {}
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    let profile;
-    try {
-      profile = await this.endpoint.delete(message.author.id, { index: interpret.arguments[0] });
-    } catch (error) {
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const profile = await this.endpoint.delete(message.author.id, {
+      index: interpret.arguments[0]
+    });
 
     const embed = new ProfileDeletedEmbed(profile);
     await message.reply({ embeds: [embed] });
   }
+}
 
-  async random(message: Message, command: CommandFragments) {
+export class RandomProfileAction extends CreateCommandEventAction {
+  private readonly endpoint: ProfileEndpoint;
+
+  constructor(endpoint: ProfileEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(message: Message, command: CommandFragments) {
     const format = {
       arguments: [],
       options: {
@@ -42,24 +49,27 @@ export class ProfileAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    let profiles;
-    try {
-      profiles = await this.endpoint.random(message.author.id, {
-        ownerDiscordId: interpret.options.owner,
-        authorDiscordId: interpret.options.author,
-        content: interpret.options.content
-      });
-    } catch (error) {
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const profiles = await this.endpoint.random(message.author.id, {
+      ownerDiscordId: interpret.options.owner,
+      authorDiscordId: interpret.options.author,
+      content: interpret.options.content
+    });
 
     const listEmbed = new ProfileListEmbed(profiles);
     await message.reply({ embeds: [listEmbed] });
   }
+}
 
-  async search(message: Message, command: CommandFragments) {
+export class SearchProfileAction extends CreateCommandEventAction {
+  private readonly endpoint: ProfileEndpoint;
+
+  constructor(endpoint: ProfileEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(message: Message, command: CommandFragments) {
+    const defaultPage = 1;
     const format = {
       arguments: [],
       options: {
@@ -72,49 +82,43 @@ export class ProfileAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const defaultPage = 1;
     const orderTypes = ["latest", "oldest"] as const;
     const order = interpret.options.order;
     if (order && !(order in orderTypes)) {
-      throw Error();
+      throw new ParameterFormatInvalidError("order", "latest または oldest");
     }
 
-    let profiles;
-    try {
-      profiles = await this.endpoint.search(message.author.id, {
-        order: (order as "oldest" | "latest") ?? "latest",
-        ownerDiscordId: interpret.options.owner,
-        authorDiscordId: interpret.options.author,
-        content: interpret.options.content,
-        page: interpret.options.page ?? defaultPage
-      });
-    } catch (error) {
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const profiles = await this.endpoint.search(message.author.id, {
+      order: (order as "oldest" | "latest") ?? "latest",
+      ownerDiscordId: interpret.options.owner,
+      authorDiscordId: interpret.options.author,
+      content: interpret.options.content,
+      page: interpret.options.page ?? defaultPage
+    });
 
     const listEmbed = new ProfileListEmbed(profiles);
     await message.reply({ embeds: [listEmbed] });
   }
+}
 
-  async show(message: Message, command: CommandFragments) {
+export class ShowProfileAction extends CreateCommandEventAction {
+  private readonly endpoint: ProfileEndpoint;
+
+  constructor(endpoint: ProfileEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(message: Message, command: CommandFragments) {
     const format = {
       arguments: [{ name: "プロフィールの番号", type: "integer" }],
       options: {}
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    let profile;
-    try {
-      profile = await this.endpoint.find(message.author.id, {
-        index: interpret.arguments[0]
-      });
-    } catch (error) {
-      const embed = new ErrorEmbed(error);
-      await message.reply({ embeds: [embed] });
-      return;
-    }
+    const profile = await this.endpoint.find(message.author.id, {
+      index: interpret.arguments[0]
+    });
 
     const listEmbed = new ProfileListEmbed([profile]);
     await message.reply({ embeds: [listEmbed] });

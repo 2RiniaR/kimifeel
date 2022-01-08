@@ -1,12 +1,24 @@
 import { IdentityUser } from "./identity-user";
 import { Context } from "../context";
 import { ContextModel } from "../context-model";
-import { ImaginaryProfileService } from "../services/profile-service";
-import { ContentLengthLimitError } from "../errors";
+import { ImaginaryProfileService } from "../services";
+
+export class ContentLengthLimitError extends Error {
+  public readonly min: number;
+  public readonly max: number;
+  public readonly actual: number;
+
+  public constructor(min: number, max: number, actual: number) {
+    super();
+    this.min = min;
+    this.max = max;
+    this.actual = actual;
+  }
+}
 
 export class ImaginaryProfile extends ContextModel {
   private readonly service = new ImaginaryProfileService(this);
-  public readonly user: IdentityUser;
+  public readonly owner: IdentityUser;
   public readonly author: IdentityUser;
   public readonly content: string;
   public static readonly MinContentLength = 1;
@@ -14,7 +26,7 @@ export class ImaginaryProfile extends ContextModel {
 
   public constructor(ctx: Context, props: CreateProfileProps) {
     super(ctx);
-    this.user = props.user;
+    this.owner = props.owner;
     this.author = props.author;
     this.content = props.content;
     this.validation();
@@ -39,7 +51,7 @@ export class ImaginaryProfile extends ContextModel {
 }
 
 export type CreateProfileProps = {
-  user: IdentityUser;
+  owner: IdentityUser;
   author: IdentityUser;
   content: string;
 };

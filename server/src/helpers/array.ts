@@ -4,8 +4,12 @@ declare global {
   interface Array<T> {
     removeNone(): Array<T extends null ? never : T extends undefined ? never : T>;
     throwNone(): Array<T extends null ? never : T extends undefined ? never : T>;
-    toStringElements<T, U extends T>(): Array<U>;
     mapAsync<U>(converter: (src: T) => Promise<U>): Promise<Array<U>>;
+    forEachAsync(task: (src: T) => Promise<void>): Promise<void[]>;
+  }
+
+  interface ArrayConstructor {
+    range(count: number): Array<number>;
   }
 }
 
@@ -18,10 +22,14 @@ Array.prototype.throwNone = function <T>(this: Array<T | undefined | null>): Arr
   return this as T[];
 };
 
-Array.prototype.toStringElements = function <T, U extends T>(this: Array<T>): Array<U> {
-  return this.map((element) => element as U);
-};
-
 Array.prototype.mapAsync = function <T, U>(this: Array<T>, converter: (src: T) => Promise<U>): Promise<Array<U>> {
   return Promise.all(this.map(converter));
+};
+
+Array.prototype.forEachAsync = function <T>(this: Array<T>, task: (src: T) => Promise<void>): Promise<void[]> {
+  return Promise.all(this.map(task));
+};
+
+Array.range = function (count: number): Array<number> {
+  return [...Array(count).keys()];
 };

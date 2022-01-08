@@ -1,4 +1,10 @@
-import { ImaginaryUserService } from "../services/user-service";
+import { ImaginaryUserService } from "../services";
+import * as db from "../../prisma";
+
+const snowflakeRegex = /^(\d+)$/;
+
+export class DiscordIdFormatError extends Error {}
+export class UserAlreadyRegisteredError extends Error {}
 
 export class ImaginaryUser {
   private readonly service = new ImaginaryUserService(this);
@@ -6,10 +12,25 @@ export class ImaginaryUser {
 
   public constructor(props: CreateUserProps) {
     this.discordId = props.discordId;
+    this.checkDiscordIdFormat();
   }
 
-  public async createIfNotExist() {
-    return await this.service.createIfNotExist();
+  private checkDiscordIdFormat() {
+    const match = this.discordId.match(snowflakeRegex);
+    if (!match) {
+      throw new DiscordIdFormatError();
+    }
+  }
+
+  public async create() {
+    try {
+      return await this.service.create();
+    } catch (error) {
+      if (error instanceof db.DiscordIdDuplicatedError) {
+        throw new UserAlreadyRegisteredError();
+      }
+      throw error;
+    }
   }
 }
 

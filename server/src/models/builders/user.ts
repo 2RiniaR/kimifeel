@@ -1,10 +1,10 @@
 import { Context } from "../context";
-import { UserQueryResult } from "../queries/user";
 import { User } from "../structures";
+import * as db from "../../prisma";
 
-export function buildUser(context: Context, result: UserQueryResult): User {
+export function buildUser(context: Context, result: db.UserQueryResult): User {
   return new User(context, {
-    id: result.userId,
+    id: result.id,
     discordId: result.discordId
   });
 }

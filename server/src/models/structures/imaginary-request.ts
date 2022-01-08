@@ -1,7 +1,7 @@
 import { Context } from "../context";
 import { IdentityUser } from "./identity-user";
 import { ContextModel } from "../context-model";
-import { ImaginaryRequestService } from "../services/request-service";
+import { ImaginaryRequestService } from "../services";
 import { ImaginaryProfile } from "./imaginary-profile";
 
 export class ImaginaryRequest extends ContextModel {
@@ -11,8 +11,8 @@ export class ImaginaryRequest extends ContextModel {
   constructor(ctx: Context, props: CreateRequestProps) {
     super(ctx);
     this.profile = new ImaginaryProfile(ctx, {
-      author: props.requester,
-      user: props.user,
+      author: props.applicant,
+      owner: props.target,
       content: props.content
     });
   }
@@ -23,7 +23,7 @@ export class ImaginaryRequest extends ContextModel {
 }
 
 export type CreateRequestProps = {
-  user: IdentityUser;
-  requester: IdentityUser;
+  target: IdentityUser;
+  applicant: IdentityUser;
   content: string;
 };

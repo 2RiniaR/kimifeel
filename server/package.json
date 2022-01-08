@@ -1,5 +1,5 @@
 {
-  "name": "limitimes",
+  "name": "kimifeel",
   "version": "1.0.0",
   "private": "true",
   "scripts": {
@@ -18,8 +18,8 @@
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-prettier": "^4.0.0",
-    "firebase-admin": "10.0.0",
     "prettier": "^2.4.1",
+    "prisma": "^3.7.0",
     "ts-loader": "^9.2.6",
     "ts-node": "^10.4.0",
     "tsconfig-paths": "^3.11.0",
@@ -29,6 +29,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
+    "@prisma/client": "^3.7.0",
     "discord.js": "^13.2.0",
     "dotenv": "^10.0.0"
   }

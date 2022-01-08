@@ -1,28 +1,13 @@
 import * as dotenv from "dotenv";
+import { DiscordTokenProvider } from "./discord/client";
 
-export type ApplicationSettings = {
-  discordToken: string;
-  targetGuildId: string;
-};
-
-class SettingsManager {
+export class SettingsManager implements DiscordTokenProvider {
   private _isLoaded = false;
-  private _values: ApplicationSettings = {
-    discordToken: "",
-    targetGuildId: ""
-  };
-
-  get values(): ApplicationSettings {
-    if (!this._isLoaded) this.load();
-    return this._values;
-  }
+  discordToken = "";
 
   public load() {
     dotenv.config();
-    this._values = {
-      discordToken: SettingsManager.getEnvironmentVariable("DISCORD_TOKEN"),
-      targetGuildId: SettingsManager.getEnvironmentVariable("TARGET_GUILD_ID")
-    };
+    this.discordToken = SettingsManager.getEnvironmentVariable("DISCORD_TOKEN");
   }
 
   private static getEnvironmentVariable(name: string): string {
@@ -31,5 +16,3 @@ class SettingsManager {
     return value;
   }
 }
-
-export const settingsManager = new SettingsManager();

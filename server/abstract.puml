@@ -1,0 +1,16 @@
+@startuml Kimifeel
+
+hide empty members
+
+class Endpoints
+
+package Discord #DDDDFF {
+    Actions --> Endpoints
+    Actions -l> Events
+}
+
+Controllers --> Endpoints
+Controllers --> Models
+Models --> Firestore
+
+@enduml

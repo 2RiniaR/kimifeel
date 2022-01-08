@@ -1,0 +1,49 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Profile {
+  id           String   @id @default(uuid())
+  index        Int      @unique @default(autoincrement())
+  createdAt    DateTime @default(now())
+  content      String
+  ownerUserId  String
+  authorUserId String
+
+  ownerUser    User     @relation(name: "OwnedProfilesOnUser", fields: [ownerUserId], references: [id])
+  authorUser   User     @relation(name: "WroteProfilesOnUser", fields: [authorUserId], references: [id])
+
+  @@index([index])
+}
+
+model Request {
+  id              String   @id @default(uuid())
+  index           Int      @unique @default(autoincrement())
+  createdAt       DateTime @default(now())
+  content         String
+  targetUserId    String
+  applicantUserId String
+
+  targetUser      User     @relation(name: "ReceivedRequestsOnUser", fields: [targetUserId], references: [id])
+  applicantUser   User     @relation(name: "SentRequestsOnUser", fields: [applicantUserId], references: [id])
+
+  @@index([index])
+}
+
+model User {
+  id               String    @id @default(uuid())
+  discordId        String    @unique
+
+  sentRequests     Request[] @relation(name: "SentRequestsOnUser")
+  receivedRequests Request[] @relation(name: "ReceivedRequestsOnUser")
+  ownedProfiles    Profile[] @relation(name: "OwnedProfilesOnUser")
+  wroteProfiles    Profile[] @relation(name: "WroteProfilesOnUser")
+
+  @@index([discordId])
+}
+

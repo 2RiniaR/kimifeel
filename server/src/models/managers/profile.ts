@@ -20,6 +20,9 @@ export class ProfileManager extends ContextModel {
   }
 
   public async search(options: SearchOptions): Promise<Profile[]> {
+    if (options.start < 0) throw new RangeError("start must be larger than 0.");
+    if (options.count < 0) throw new RangeError("count must be larger than 0.");
+
     const results = await db.searchProfiles({
       order: options.order,
       start: options.start,
@@ -32,6 +35,8 @@ export class ProfileManager extends ContextModel {
   }
 
   public async random(options: RandomOptions): Promise<Profile[]> {
+    if (options.count < 0) throw new RangeError("count must be larger than 0.");
+
     const results = await db.randomProfiles({
       count: options.count,
       authorUserId: options.author?.id,

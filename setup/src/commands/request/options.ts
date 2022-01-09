@@ -5,7 +5,7 @@ export const numberOption: CommandOption = {
   type: Integer,
   name: "number",
   description: "リクエスト番号",
-  min_value: 0
+  min_value: 1
 };
 
 export const genreOption: CommandOption = {

@@ -2,7 +2,7 @@ import { ProfileEndpointResponder } from "../endpoints/profile";
 import * as Endpoint from "../endpoints/profile";
 import * as EndpointError from "../endpoints/errors";
 import { Controller } from "./base";
-import { NotFoundError } from "../models/errors";
+import { ForbiddenError } from "../models/errors";
 import { ClientUser, Profile } from "../models/structures";
 
 class ProfileControllerService {
@@ -25,7 +25,7 @@ export class ProfileController extends Controller implements ProfileEndpointResp
     try {
       await profile.delete();
     } catch (error) {
-      if (error instanceof NotFoundError) {
+      if (error instanceof ForbiddenError) {
         throw new EndpointError.ProfileNotFoundError({ index: params.index });
       }
       throw error;

@@ -11,9 +11,9 @@ export type ProfileProps = {
 
 export function toProfileUnit({ index, content, authorUserId, ownerUserId }: ProfileProps, showDetail = true): string {
   if (showDetail) {
-    return `**${toMention(ownerUserId)} No.${index}** - *by ${toMention(authorUserId)}*\`\`\`\n${content}\n\`\`\``;
+    return `**No.${index}** ${toMention(ownerUserId)}\`\`\`\n${content}\n\`\`\` ―――― *by ${toMention(authorUserId)}*`;
   } else {
-    return `**${toMention(ownerUserId)} No.${index}** - *by ${toMention(authorUserId)}*`;
+    return `**No.${index}** ${toMention(ownerUserId)} ―――― *by ${toMention(authorUserId)}*`;
   }
 }
 
@@ -30,7 +30,7 @@ export class ProfileDeletedEmbed extends CustomMessageEmbed {
 
 export class ProfileListEmbed extends CustomMessageEmbed {
   public constructor(profiles: ProfileProps[]) {
-    super("profile", "プロフィール", profiles.map((element) => toProfileUnit(element)).join("\n"));
+    super("profile", "プロフィール", profiles.map((element) => toProfileUnit(element)).join("\n\n"));
   }
 }
 

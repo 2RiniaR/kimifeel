@@ -2,7 +2,6 @@ import { Message, MessageReaction, User } from "discord.js";
 import { RequestAcceptedEmbed, RequestCanceledEmbed, RequestDeniedEmbed, RequestSentEmbed } from "discord/views";
 import { RequestEndpoint } from "endpoints/request";
 import { AddEventAction } from "./base";
-import { FetchFailedError } from "../errors";
 
 export class AcceptRequestAction extends AddEventAction {
   private readonly endpoint: RequestEndpoint;
@@ -14,12 +13,13 @@ export class AcceptRequestAction extends AddEventAction {
 
   async run(reaction: MessageReaction, user: User, message: Message) {
     if (message.embeds.length === 0) {
-      throw new FetchFailedError();
+      return;
     }
+
     const requestEmbed = message.embeds[0];
     const index = RequestSentEmbed.getIndex(requestEmbed);
     if (!index) {
-      throw new FetchFailedError();
+      return;
     }
 
     const profile = await this.endpoint.accept(user.id, {
@@ -41,12 +41,13 @@ export class CancelRequestAction extends AddEventAction {
 
   async run(reaction: MessageReaction, user: User, message: Message) {
     if (message.embeds.length === 0) {
-      throw new FetchFailedError();
+      return;
     }
+
     const requestEmbed = message.embeds[0];
     const index = RequestSentEmbed.getIndex(requestEmbed);
     if (!index) {
-      throw new FetchFailedError();
+      return;
     }
 
     const result = await this.endpoint.cancel(user.id, {
@@ -68,12 +69,13 @@ export class DenyRequestAction extends AddEventAction {
 
   async run(reaction: MessageReaction, user: User, message: Message) {
     if (message.embeds.length === 0) {
-      throw new FetchFailedError();
+      return;
     }
+
     const requestEmbed = message.embeds[0];
     const index = RequestSentEmbed.getIndex(requestEmbed);
     if (!index) {
-      throw new FetchFailedError();
+      return;
     }
 
     const result = await this.endpoint.deny(user.id, {

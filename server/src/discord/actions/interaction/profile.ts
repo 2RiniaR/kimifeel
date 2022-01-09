@@ -43,6 +43,8 @@ export class RandomProfileAction extends CreateCommandEventAction {
       content: content ?? undefined
     });
 
+    console.log(profiles);
+
     const listEmbed = new ProfileListEmbed(profiles);
     await command.reply({ embeds: [listEmbed] });
   }

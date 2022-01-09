@@ -5,7 +5,7 @@ export const pageOption: CommandOption = {
   type: Integer,
   name: "page",
   description: "ページ番号",
-  min_value: 0
+  min_value: 1
 };
 
 export const orderOption: CommandOption = {

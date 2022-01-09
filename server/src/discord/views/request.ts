@@ -16,9 +16,11 @@ export function toRequestUnit(
   showDetail = true
 ): string {
   if (showDetail) {
-    return `**${toMention(targetUserId)} No.${index}** - *by ${toMention(requesterUserId)}*\`\`\`\n${content}\n\`\`\``;
+    return `**No.${index}** ${toMention(targetUserId)}\`\`\`\n${content}\n\`\`\` ―――― *by ${toMention(
+      requesterUserId
+    )}*`;
   } else {
-    return `**${toMention(targetUserId)} No.${index}** - *by ${toMention(requesterUserId)}*`;
+    return `**No.${index}** ${toMention(targetUserId)} ―――― *by ${toMention(requesterUserId)}*`;
   }
 }
 
@@ -47,7 +49,7 @@ export class RequestDeniedEmbed extends CustomMessageEmbed {
 
 export class RequestListEmbed extends CustomMessageEmbed {
   public constructor(requests: RequestProps[]) {
-    super("request", "リクエスト", requests.map((element) => toRequestUnit(element)).join("\n"));
+    super("request", "リクエスト", requests.map((element) => toRequestUnit(element)).join("\n\n"));
   }
 }
 

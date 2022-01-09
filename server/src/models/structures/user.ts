@@ -15,6 +15,9 @@ export class User extends IdentityUser {
   }
 
   public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {
+    if (props.start < 0) throw new RangeError("start must be larger than 0.");
+    if (props.count < 0) throw new RangeError("count must be larger than 0.");
+
     if (this.context.clientUser.id !== this.id) {
       throw new ForbiddenError();
     }

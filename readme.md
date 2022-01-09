@@ -1,20 +1,7 @@
 # kimifeel
 
-## ソースコードのディレクトリ構成
+他の人に自分のプロフィールを書いてもらえるサービス。
 
+## ガイド
+[こちら](https://kimifile.notion.site/473ae50d379048a39fe76437bf1c4b1c) を参照してください。
 
-
-### サーバー用スクリプト (server/src)
-
-  - discord
-    - actions
-      APIサーバーで言う「エンドポイント定義」にあたる。
-  - models
-    - services
-      コントローラから直接必要とされるもので、モデルでは実現できないユースケース。
-    - repositories
-    - context
-
-
-
-### セットアップ用スクリプト (setup/src)

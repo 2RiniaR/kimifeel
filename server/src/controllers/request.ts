@@ -2,7 +2,7 @@ import { RequestEndpointResponder } from "../endpoints/request";
 import * as Endpoint from "../endpoints/request";
 import * as EndpointError from "../endpoints/errors";
 import { Controller } from "./base";
-import { ForbiddenError } from "../models/errors";
+import { ForbiddenError, InvalidParameterError } from "../models/errors";
 import { ClientUser, ContentLengthLimitError, Request, SubmitRequestOwnError } from "../models/structures";
 
 class RequestControllerService {
@@ -94,17 +94,26 @@ export class RequestController extends Controller implements RequestEndpointResp
   }
 
   async search(clientDiscordId: string, params: Endpoint.SearchParams): Promise<Endpoint.SearchResult> {
+    const resultPerPage = 5;
     const client = await this.getClientUser(clientDiscordId);
 
-    const requests = await client.asUser().searchRequests({
-      order: params.order,
-      start: (params.page - 1) * 5,
-      count: 5,
-      content: params.content,
-      status: params.status,
-      target: await this.getUserIfHasValue(client, params.targetDiscordId),
-      applicant: await this.getUserIfHasValue(client, params.applicantDiscordId)
-    });
+    let requests;
+    try {
+      requests = await client.asUser().searchRequests({
+        order: params.order,
+        start: (params.page - 1) * resultPerPage,
+        count: resultPerPage,
+        content: params.content,
+        status: params.status,
+        target: await this.getUserIfHasValue(client, params.targetDiscordId),
+        applicant: await this.getUserIfHasValue(client, params.applicantDiscordId)
+      });
+    } catch (error) {
+      if (error instanceof InvalidParameterError && error.key === "start") {
+        throw new EndpointError.ParameterFormatInvalidError<Endpoint.SearchParams>("page", ">= 1");
+      }
+      throw error;
+    }
 
     return requests.map((request) => this.convertRequestToResult(request));
   }

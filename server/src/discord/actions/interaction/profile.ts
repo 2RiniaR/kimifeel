@@ -2,7 +2,8 @@ import { ProfileDeletedEmbed, ProfileListEmbed } from "discord/views";
 import { ProfileEndpoint } from "endpoints/profile";
 import { CommandInteraction } from "discord.js";
 import { CreateCommandEventAction } from "./base";
-import { ParameterFormatInvalidError } from "../errors";
+import { ArgumentFormatInvalidError } from "../errors";
+import { ParameterFormatInvalidError } from "endpoints/errors";
 
 export class DeleteProfileAction extends CreateCommandEventAction {
   private readonly endpoint: ProfileEndpoint;
@@ -67,16 +68,24 @@ export class SearchProfileAction extends CreateCommandEventAction {
     const content = command.options.getString("content", false);
 
     if (order && order !== "latest" && order !== "oldest") {
-      throw new ParameterFormatInvalidError("order", "latest または oldest");
+      throw new ArgumentFormatInvalidError("order", "latest または oldest");
     }
 
-    const profiles = await this.endpoint.search(command.user.id, {
-      order: (order as "latest" | "oldest" | null) ?? "latest",
-      ownerDiscordId: owner?.id,
-      authorDiscordId: author?.id,
-      page: page ?? defaultPage,
-      content: content ?? undefined
-    });
+    let profiles;
+    try {
+      profiles = await this.endpoint.search(command.user.id, {
+        order: (order as "latest" | "oldest" | null) ?? "latest",
+        ownerDiscordId: owner?.id,
+        authorDiscordId: author?.id,
+        page: page ?? defaultPage,
+        content: content ?? undefined
+      });
+    } catch (error) {
+      if (error instanceof ParameterFormatInvalidError && error.key === "page") {
+        throw new ArgumentFormatInvalidError("page", "0以上の整数");
+      }
+      throw error;
+    }
 
     const listEmbed = new ProfileListEmbed(profiles);
     await command.reply({ embeds: [listEmbed] });

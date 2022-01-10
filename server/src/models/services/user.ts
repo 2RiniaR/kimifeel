@@ -12,12 +12,27 @@ export class UserService extends ContextModel {
   }
 
   public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {
+    let applicantUserId: string | undefined;
+    let targetUserId: string | undefined;
+
+    if (props.status === "sent") {
+      const isApplicantContradicted = props.applicant && props.applicant.id !== this.user.id;
+      applicantUserId = isApplicantContradicted ? "" : this.user.id;
+
+      targetUserId = props.target?.id;
+    } else {
+      const isTargetContradicted = props.target && props.target.id !== this.user.id;
+      targetUserId = isTargetContradicted ? "" : this.user.id;
+
+      applicantUserId = props.applicant?.id;
+    }
+
     const results = await db.searchRequests({
       order: props.order,
       start: props.start,
       count: props.count,
-      applicantUserId: props.status === "sent" ? this.user.id : props.applicant?.id,
-      targetUserId: props.status === "received" ? this.user.id : props.target?.id,
+      applicantUserId,
+      targetUserId,
       content: props.content
     });
     return results.map((result) => buildRequest(this.context, result));

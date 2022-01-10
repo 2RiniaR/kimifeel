@@ -1,8 +1,6 @@
 export class ActionError extends Error {}
 
-export class FetchFailedError extends ActionError {}
-
-export class ParameterFormatInvalidError extends ActionError {
+export class ArgumentFormatInvalidError extends ActionError {
   readonly position: string;
   readonly format: string;
 

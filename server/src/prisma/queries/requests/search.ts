@@ -14,13 +14,17 @@ export async function searchRequests({
   order,
   start,
   count,
+  content,
   targetUserId,
   applicantUserId
 }: Props): Promise<RequestQueryResult[]> {
   return await prisma.request.findMany({
     where: {
       targetUserId,
-      applicantUserId
+      applicantUserId,
+      content: {
+        contains: content
+      }
     },
     orderBy: {
       createdAt: order === "latest" ? "desc" : "asc"

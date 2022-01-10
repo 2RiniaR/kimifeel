@@ -11,3 +11,23 @@ export class ParameterFormatInvalidEmbed extends CustomMessageEmbed {
     super("invalid", "パラメータの形式が不正です。", `\`${position}\` には、 \`${format}\` を入力してください。`);
   }
 }
+
+export class CommandUnexpectedArgumentEmbed extends CustomMessageEmbed {
+  constructor(expected: number, actual: number) {
+    super(
+      "invalid",
+      "引数の個数が不正です。",
+      `\`${expected.toString()}\` 個の引数が必要ですが、\`${actual.toString()}\` 個入力されています。`
+    );
+  }
+}
+
+export class CommandUnexpectedOptionEmbed extends CustomMessageEmbed {
+  constructor(options: readonly string[]) {
+    super(
+      "invalid",
+      "不明なオプションが入力されています。",
+      `オプション ${options.map((name) => `\`${name}\``).join(", ")} は要求されていません。`
+    );
+  }
+}

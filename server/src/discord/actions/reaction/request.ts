@@ -2,6 +2,7 @@ import { Message, MessageReaction, User } from "discord.js";
 import { RequestAcceptedEmbed, RequestCanceledEmbed, RequestDeniedEmbed, RequestSentEmbed } from "discord/views";
 import { RequestEndpoint } from "endpoints/request";
 import { AddEventAction } from "./base";
+import { RequestNotFoundError } from "../../../endpoints/errors";
 
 export class AcceptRequestAction extends AddEventAction {
   private readonly endpoint: RequestEndpoint;
@@ -22,9 +23,15 @@ export class AcceptRequestAction extends AddEventAction {
       return;
     }
 
-    const profile = await this.endpoint.accept(user.id, {
-      index
-    });
+    let profile;
+    try {
+      profile = await this.endpoint.accept(user.id, {
+        index
+      });
+    } catch (error) {
+      if (error instanceof RequestNotFoundError) return;
+      throw error;
+    }
 
     const embed = new RequestAcceptedEmbed(profile);
     await message.reply({ embeds: [embed] });
@@ -50,11 +57,17 @@ export class CancelRequestAction extends AddEventAction {
       return;
     }
 
-    const result = await this.endpoint.cancel(user.id, {
-      index
-    });
+    let request;
+    try {
+      request = await this.endpoint.cancel(user.id, {
+        index
+      });
+    } catch (error) {
+      if (error instanceof RequestNotFoundError) return;
+      throw error;
+    }
 
-    const embed = new RequestCanceledEmbed(result);
+    const embed = new RequestCanceledEmbed(request);
     await message.reply({ embeds: [embed] });
   }
 }
@@ -78,11 +91,17 @@ export class DenyRequestAction extends AddEventAction {
       return;
     }
 
-    const result = await this.endpoint.deny(user.id, {
-      index
-    });
+    let request;
+    try {
+      request = await this.endpoint.deny(user.id, {
+        index
+      });
+    } catch (error) {
+      if (error instanceof RequestNotFoundError) return;
+      throw error;
+    }
 
-    const embed = new RequestDeniedEmbed(result);
+    const embed = new RequestDeniedEmbed(request);
     await message.reply({ embeds: [embed] });
   }
 }

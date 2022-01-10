@@ -68,3 +68,14 @@ export class UserAlreadyRegisteredError extends EndpointError {
     this.identifier = identifier;
   }
 }
+
+export class ParameterFormatInvalidError<T> extends EndpointError {
+  readonly key: keyof T;
+  readonly format: string;
+
+  constructor(key: keyof T, format: string) {
+    super();
+    this.key = key;
+    this.format = format;
+  }
+}

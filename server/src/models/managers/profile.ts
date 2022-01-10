@@ -1,7 +1,7 @@
 import { ContextModel } from "../context-model";
 import { IdentityProfile, IdentityUser, Profile } from "../structures";
 import { buildProfile } from "../builders/profile";
-import { NotFoundError } from "../errors";
+import { InvalidParameterError, NotFoundError } from "../errors";
 import * as db from "../../prisma";
 
 export class ProfileManager extends ContextModel {
@@ -20,6 +20,9 @@ export class ProfileManager extends ContextModel {
   }
 
   public async search(options: SearchOptions): Promise<Profile[]> {
+    if (options.start < 0) throw new InvalidParameterError<SearchOptions>("start", "larger than 0");
+    if (options.count < 0) throw new InvalidParameterError<SearchOptions>("count", "larger than 0");
+
     const results = await db.searchProfiles({
       order: options.order,
       start: options.start,
@@ -32,6 +35,8 @@ export class ProfileManager extends ContextModel {
   }
 
   public async random(options: RandomOptions): Promise<Profile[]> {
+    if (options.count < 0) throw new InvalidParameterError<RandomOptions>("count", "larger than 0");
+
     const results = await db.randomProfiles({
       count: options.count,
       authorUserId: options.author?.id,

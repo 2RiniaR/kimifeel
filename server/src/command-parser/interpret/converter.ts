@@ -28,7 +28,7 @@ export type ConvertParameter<TReturn extends SupportTypes> = {
 
 export function convertParameter<TReturn extends SupportTypes>(parameter: ConvertParameter<TReturn>): TReturn {
   const result = parameter.convertType.converter(parameter.value);
-  if (!result) throw new InvalidFormatError(parameter);
+  if (result === undefined) throw new InvalidFormatError(parameter);
   return result;
 }
 

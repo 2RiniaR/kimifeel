@@ -2,7 +2,7 @@ import { ProfileEndpointResponder } from "../endpoints/profile";
 import * as Endpoint from "../endpoints/profile";
 import * as EndpointError from "../endpoints/errors";
 import { Controller } from "./base";
-import { NotFoundError } from "../models/errors";
+import { ForbiddenError, InvalidParameterError } from "../models/errors";
 import { ClientUser, Profile } from "../models/structures";
 
 class ProfileControllerService {
@@ -25,7 +25,7 @@ export class ProfileController extends Controller implements ProfileEndpointResp
     try {
       await profile.delete();
     } catch (error) {
-      if (error instanceof NotFoundError) {
+      if (error instanceof ForbiddenError) {
         throw new EndpointError.ProfileNotFoundError({ index: params.index });
       }
       throw error;
@@ -47,10 +47,11 @@ export class ProfileController extends Controller implements ProfileEndpointResp
   }
 
   async random(clientDiscordId: string, params: Endpoint.RandomParams): Promise<Endpoint.RandomResult> {
+    const resultPerPage = 5;
     const client = await this.getClientUser(clientDiscordId);
 
     const profiles = await client.profiles.random({
-      count: 5,
+      count: resultPerPage,
       content: params.content,
       author: await this.getUserIfHasValue(client, params.authorDiscordId),
       owner: await this.getUserIfHasValue(client, params.ownerDiscordId)
@@ -60,16 +61,26 @@ export class ProfileController extends Controller implements ProfileEndpointResp
   }
 
   async search(clientDiscordId: string, params: Endpoint.SearchParams): Promise<Endpoint.SearchResult> {
+    const resultPerPage = 5;
     const client = await this.getClientUser(clientDiscordId);
 
-    const profiles = await client.profiles.search({
-      order: params.order,
-      start: (params.page - 1) * 5,
-      count: 5,
-      content: params.content,
-      author: await this.getUserIfHasValue(client, params.authorDiscordId),
-      owner: await this.getUserIfHasValue(client, params.ownerDiscordId)
-    });
+    let profiles;
+
+    try {
+      profiles = await client.profiles.search({
+        order: params.order,
+        start: (params.page - 1) * resultPerPage,
+        count: resultPerPage,
+        content: params.content,
+        author: await this.getUserIfHasValue(client, params.authorDiscordId),
+        owner: await this.getUserIfHasValue(client, params.ownerDiscordId)
+      });
+    } catch (error) {
+      if (error instanceof InvalidParameterError && error.key === "start") {
+        throw new EndpointError.ParameterFormatInvalidError<Endpoint.SearchParams>("page", ">= 1");
+      }
+      throw error;
+    }
 
     return profiles.map((profile) => this.convertProfileToResult(profile));
   }

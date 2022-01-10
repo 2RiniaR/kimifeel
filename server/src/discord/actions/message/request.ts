@@ -10,7 +10,8 @@ import {
   RequestSentEmbed
 } from "../../views";
 import { CreateCommandEventAction } from "./base";
-import { ParameterFormatInvalidError } from "../errors";
+import { ArgumentFormatInvalidError } from "../errors";
+import { ParameterFormatInvalidError } from "../../../endpoints/errors";
 
 export class AcceptRequestAction extends CreateCommandEventAction {
   private readonly endpoint: RequestEndpoint;
@@ -107,26 +108,33 @@ export class SearchRequestAction extends CreateCommandEventAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const genreTypes = ["received", "sent"] as const;
     const genre = interpret.options.genre;
-    if (!genre || !(genre in genreTypes)) {
-      throw new ParameterFormatInvalidError("genre", "received または sent");
+    if (genre && genre !== "received" && genre !== "sent") {
+      throw new ArgumentFormatInvalidError("genre", "received または sent");
     }
 
-    const orderTypes = ["latest", "oldest"] as const;
     const order = interpret.options.order;
-    if (!order || !(order in orderTypes)) {
-      throw new ParameterFormatInvalidError("order", "latest または oldest");
+    if (order && order !== "latest" && order !== "oldest") {
+      throw new ArgumentFormatInvalidError("order", "latest または oldest");
     }
 
-    const requests = await this.endpoint.search(message.author.id, {
-      status: genre as "received" | "sent",
-      order: order as "oldest" | "latest",
-      page: interpret.options.page ?? defaultPage,
-      targetDiscordId: interpret.options.target,
-      applicantDiscordId: interpret.options.applicant,
-      content: interpret.options.content
-    });
+    let requests;
+
+    try {
+      requests = await this.endpoint.search(message.author.id, {
+        status: (genre as "received" | "sent" | undefined) ?? "received",
+        order: (order as "oldest" | "latest" | undefined) ?? "latest",
+        page: interpret.options.page ?? defaultPage,
+        targetDiscordId: interpret.options.target,
+        applicantDiscordId: interpret.options.applicant,
+        content: interpret.options.content
+      });
+    } catch (error) {
+      if (error instanceof ParameterFormatInvalidError && error.key === "page") {
+        throw new ArgumentFormatInvalidError("page", "1以上の整数");
+      }
+      throw error;
+    }
 
     const listEmbed = new RequestListEmbed(requests);
     await message.reply({ embeds: [listEmbed] });

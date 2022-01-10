@@ -4,7 +4,8 @@ import { ProfileEndpoint } from "endpoints/profile";
 import { parameterTypes } from "./command";
 import { ProfileDeletedEmbed, ProfileListEmbed } from "../../views";
 import { CreateCommandEventAction } from "./base";
-import { ParameterFormatInvalidError } from "../errors";
+import { ArgumentFormatInvalidError } from "../errors";
+import { ParameterFormatInvalidError } from "../../../endpoints/errors";
 
 export class DeleteProfileAction extends CreateCommandEventAction {
   private readonly endpoint: ProfileEndpoint;
@@ -82,19 +83,27 @@ export class SearchProfileAction extends CreateCommandEventAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const orderTypes = ["latest", "oldest"] as const;
     const order = interpret.options.order;
-    if (order && !(order in orderTypes)) {
-      throw new ParameterFormatInvalidError("order", "latest または oldest");
+    if (order && order !== "latest" && order !== "oldest") {
+      throw new ArgumentFormatInvalidError("order", "latest または oldest");
     }
 
-    const profiles = await this.endpoint.search(message.author.id, {
-      order: (order as "oldest" | "latest") ?? "latest",
-      ownerDiscordId: interpret.options.owner,
-      authorDiscordId: interpret.options.author,
-      content: interpret.options.content,
-      page: interpret.options.page ?? defaultPage
-    });
+    let profiles;
+
+    try {
+      profiles = await this.endpoint.search(message.author.id, {
+        order: (order as "oldest" | "latest") ?? "latest",
+        ownerDiscordId: interpret.options.owner,
+        authorDiscordId: interpret.options.author,
+        content: interpret.options.content,
+        page: interpret.options.page ?? defaultPage
+      });
+    } catch (error) {
+      if (error instanceof ParameterFormatInvalidError && error.key === "page") {
+        throw new ArgumentFormatInvalidError("page", "1以上の整数");
+      }
+      throw error;
+    }
 
     const listEmbed = new ProfileListEmbed(profiles);
     await message.reply({ embeds: [listEmbed] });

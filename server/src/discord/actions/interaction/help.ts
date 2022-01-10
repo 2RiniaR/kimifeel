@@ -5,6 +5,6 @@ import { HelpEmbed } from "../../views/help";
 export class HelpAction extends CreateCommandEventAction {
   async run(command: CommandInteraction) {
     const embed = new HelpEmbed();
-    await command.reply({ embeds: [embed] });
+    await command.reply({ embeds: [embed], ephemeral: true });
   }
 }

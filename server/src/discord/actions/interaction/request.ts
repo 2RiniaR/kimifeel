@@ -8,7 +8,8 @@ import {
 import { RequestEndpoint } from "endpoints/request";
 import { CommandInteraction, Message } from "discord.js";
 import { CreateCommandEventAction } from "./base";
-import { ParameterFormatInvalidError } from "../errors";
+import { ArgumentFormatInvalidError } from "../errors";
+import { ParameterFormatInvalidError } from "../../../endpoints/errors";
 
 export class AcceptRequestAction extends CreateCommandEventAction {
   private readonly endpoint: RequestEndpoint;
@@ -88,24 +89,32 @@ export class SearchRequestAction extends CreateCommandEventAction {
     const target = command.options.getUser("target", false);
 
     if (genre && genre !== "received" && genre !== "sent") {
-      throw new ParameterFormatInvalidError("genre", "received または sent");
+      throw new ArgumentFormatInvalidError("genre", "received または sent");
     }
 
     if (order && order !== "latest" && order !== "oldest") {
-      throw new ParameterFormatInvalidError("order", "latest または oldest");
+      throw new ArgumentFormatInvalidError("order", "latest または oldest");
     }
 
-    const requests = await this.endpoint.search(command.user.id, {
-      status: (genre as "received" | "sent" | null) ?? "received",
-      order: (order as "latest" | "oldest" | null) ?? "latest",
-      page: page ?? defaultPage,
-      content: content ?? undefined,
-      applicantDiscordId: applicant?.id,
-      targetDiscordId: target?.id
-    });
+    let requests;
+    try {
+      requests = await this.endpoint.search(command.user.id, {
+        status: (genre as "received" | "sent" | null) ?? "received",
+        order: (order as "latest" | "oldest" | null) ?? "latest",
+        page: page ?? defaultPage,
+        content: content ?? undefined,
+        applicantDiscordId: applicant?.id,
+        targetDiscordId: target?.id
+      });
+    } catch (error) {
+      if (error instanceof ParameterFormatInvalidError && error.key === "page") {
+        throw new ArgumentFormatInvalidError("page", "0以上の整数");
+      }
+      throw error;
+    }
 
     const listEmbed = new RequestListEmbed(requests);
-    await command.reply({ embeds: [listEmbed] });
+    await command.reply({ embeds: [listEmbed], ephemeral: true });
   }
 }
 
@@ -157,6 +166,6 @@ export class ShowRequestAction extends CreateCommandEventAction {
     });
 
     const listEmbed = new RequestListEmbed([request]);
-    await command.reply({ embeds: [listEmbed] });
+    await command.reply({ embeds: [listEmbed], ephemeral: true });
   }
 }

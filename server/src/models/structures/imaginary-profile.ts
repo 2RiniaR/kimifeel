@@ -22,7 +22,7 @@ export class ImaginaryProfile extends ContextModel {
   public readonly author: IdentityUser;
   public readonly content: string;
   public static readonly MinContentLength = 1;
-  public static readonly MaxContentLength = 100;
+  public static readonly MaxContentLength = 200;
 
   public constructor(ctx: Context, props: CreateProfileProps) {
     super(ctx);

@@ -3,6 +3,7 @@ import { CommandFragments, interpretCommand } from "command-parser";
 import { RequestEndpoint } from "endpoints/request";
 import { parameterTypes } from "./command";
 import {
+  mentionUsers,
   RequestAcceptedEmbed,
   RequestCanceledEmbed,
   RequestDeniedEmbed,
@@ -28,12 +29,17 @@ export class AcceptRequestAction extends CreateCommandEventAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const request = await this.endpoint.accept(message.author.id, {
+    const profile = await this.endpoint.accept(message.author.id, {
       index: interpret.arguments[0]
     });
 
-    const embed = new RequestAcceptedEmbed(request);
-    await message.reply({ embeds: [embed] });
+    const embed = new RequestAcceptedEmbed(profile);
+    const mentionedUsers = [profile.ownerUserId, profile.authorUserId];
+    await message.reply({
+      content: mentionUsers(mentionedUsers),
+      embeds: [embed],
+      allowedMentions: { repliedUser: true, users: mentionedUsers }
+    });
   }
 }
 
@@ -52,11 +58,11 @@ export class CancelRequestAction extends CreateCommandEventAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const profile = await this.endpoint.cancel(message.author.id, {
+    const request = await this.endpoint.cancel(message.author.id, {
       index: interpret.arguments[0]
     });
 
-    const embed = new RequestCanceledEmbed(profile);
+    const embed = new RequestCanceledEmbed(request);
     await message.reply({ embeds: [embed] });
   }
 }
@@ -81,7 +87,12 @@ export class DenyRequestAction extends CreateCommandEventAction {
     });
 
     const embed = new RequestDeniedEmbed(request);
-    await message.reply({ embeds: [embed] });
+    const mentionedUsers = [request.targetUserId, request.requesterUserId];
+    await message.reply({
+      content: mentionUsers(mentionedUsers),
+      embeds: [embed],
+      allowedMentions: { repliedUser: true, users: mentionedUsers }
+    });
   }
 }
 
@@ -171,7 +182,12 @@ export class SendRequestAction extends CreateCommandEventAction {
       targetUserId: request.targetUserId
     });
 
-    const card = await message.reply({ embeds: [embed] });
+    const mentionedUsers = [request.targetUserId, request.requesterUserId];
+    const card = await message.reply({
+      content: mentionUsers(mentionedUsers),
+      embeds: [embed],
+      allowedMentions: { repliedUser: true, users: mentionedUsers }
+    });
 
     const emojiCharacters = ["✅", "⛔", "❌"];
     await emojiCharacters.mapAsync((emoji) => card.react(emoji));

@@ -58,3 +58,7 @@ export class UserNotFoundEmbed extends CustomMessageEmbed {
     );
   }
 }
+
+export function mentionUsers(usersId: readonly string[]) {
+  return usersId.map((id) => toMention(id)).join(", ");
+}

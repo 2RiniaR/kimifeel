@@ -24,7 +24,13 @@ export class ReactionEventRunner {
 
   constructor(client: ClientManager) {
     this.client = client;
-    client.onReactionAdd((reaction, user) => this.onReactionAdded(reaction, user));
+    client.onReactionAdd(async (reaction, user) => {
+      try {
+        await this.onReactionAdded(reaction, user);
+      } catch (error) {
+        console.error(error);
+      }
+    });
   }
 
   public registerAddEvent(listener: AddEventListener, options: AddEventOptions) {

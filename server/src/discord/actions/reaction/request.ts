@@ -1,5 +1,11 @@
 import { Message, MessageReaction, User } from "discord.js";
-import { RequestAcceptedEmbed, RequestCanceledEmbed, RequestDeniedEmbed, RequestSentEmbed } from "discord/views";
+import {
+  mentionUsers,
+  RequestAcceptedEmbed,
+  RequestCanceledEmbed,
+  RequestDeniedEmbed,
+  RequestSentEmbed
+} from "discord/views";
 import { RequestEndpoint } from "endpoints/request";
 import { AddEventAction } from "./base";
 import { RequestNotFoundError } from "../../../endpoints/errors";
@@ -34,7 +40,12 @@ export class AcceptRequestAction extends AddEventAction {
     }
 
     const embed = new RequestAcceptedEmbed(profile);
-    await message.reply({ embeds: [embed] });
+    const mentionedUsers = [profile.ownerUserId, profile.authorUserId];
+    await message.reply({
+      content: mentionUsers(mentionedUsers),
+      embeds: [embed],
+      allowedMentions: { repliedUser: true, users: mentionedUsers }
+    });
   }
 }
 
@@ -102,6 +113,11 @@ export class DenyRequestAction extends AddEventAction {
     }
 
     const embed = new RequestDeniedEmbed(request);
-    await message.reply({ embeds: [embed] });
+    const mentionedUsers = [request.targetUserId, request.requesterUserId];
+    await message.reply({
+      content: mentionUsers(mentionedUsers),
+      embeds: [embed],
+      allowedMentions: { repliedUser: true, users: mentionedUsers }
+    });
   }
 }

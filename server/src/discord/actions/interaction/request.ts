@@ -1,4 +1,5 @@
 import {
+  mentionUsers,
   RequestAcceptedEmbed,
   RequestCanceledEmbed,
   RequestDeniedEmbed,
@@ -22,12 +23,17 @@ export class AcceptRequestAction extends CreateCommandEventAction {
   async run(command: CommandInteraction) {
     const number = command.options.getInteger("number", true);
 
-    const request = await this.endpoint.accept(command.user.id, {
+    const profile = await this.endpoint.accept(command.user.id, {
       index: number
     });
 
-    const embed = new RequestAcceptedEmbed(request);
-    await command.reply({ embeds: [embed] });
+    const embed = new RequestAcceptedEmbed(profile);
+    const mentionedUsers = [profile.ownerUserId, profile.authorUserId];
+    await command.reply({
+      content: mentionUsers(mentionedUsers),
+      embeds: [embed],
+      allowedMentions: { repliedUser: true, users: mentionedUsers }
+    });
   }
 }
 
@@ -42,11 +48,11 @@ export class CancelRequestAction extends CreateCommandEventAction {
   async run(command: CommandInteraction) {
     const number = command.options.getInteger("number", true);
 
-    const profile = await this.endpoint.cancel(command.user.id, {
+    const request = await this.endpoint.cancel(command.user.id, {
       index: number
     });
 
-    const embed = new RequestCanceledEmbed(profile);
+    const embed = new RequestCanceledEmbed(request);
     await command.reply({ embeds: [embed] });
   }
 }
@@ -67,7 +73,12 @@ export class DenyRequestAction extends CreateCommandEventAction {
     });
 
     const embed = new RequestDeniedEmbed(request);
-    await command.reply({ embeds: [embed] });
+    const mentionedUsers = [request.targetUserId, request.requesterUserId];
+    await command.reply({
+      content: mentionUsers(mentionedUsers),
+      embeds: [embed],
+      allowedMentions: { repliedUser: true, users: mentionedUsers }
+    });
   }
 }
 
@@ -142,11 +153,17 @@ export class SendRequestAction extends CreateCommandEventAction {
       targetUserId: target.id
     });
 
-    const message = await command.reply({ embeds: [embed], fetchReply: true });
-    if (!(message instanceof Message)) return;
+    const mentionedUsers = [request.targetUserId, request.requesterUserId];
+    const card = await command.reply({
+      content: mentionUsers(mentionedUsers),
+      embeds: [embed],
+      fetchReply: true,
+      allowedMentions: { repliedUser: true, users: mentionedUsers }
+    });
+    if (!(card instanceof Message)) return;
 
     const emojiCharacters = ["✅", "⛔", "❌"];
-    await emojiCharacters.mapAsync((emoji) => message.react(emoji));
+    await emojiCharacters.mapAsync((emoji) => card.react(emoji));
   }
 }
 

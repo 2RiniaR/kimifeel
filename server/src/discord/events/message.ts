@@ -1,6 +1,7 @@
 import { Message } from "discord.js";
 import { CommandFragments, fragmentCommand } from "command-parser";
 import { ClientManager } from "../client";
+import { FragmentLimitError } from "../../command-parser/fragment";
 
 export type CreateCommandEventOptions = {
   readonly prefixes: readonly string[];
@@ -22,7 +23,13 @@ export class MessageEventRunner {
   };
 
   constructor(client: ClientManager) {
-    client.onMessageCreated((message) => this.onMessageCreated(message));
+    client.onMessageCreated(async (message) => {
+      try {
+        await this.onMessageCreated(message);
+      } catch (error) {
+        console.error(error);
+      }
+    });
   }
 
   public registerCreateCommandEvent(listener: CreateCommandEventListener, options: CreateCommandEventOptions) {
@@ -35,7 +42,13 @@ export class MessageEventRunner {
     registrations = registrations.filter((registration) => this.checkBot(message, registration.options));
 
     await registrations.forEachAsync(async (registration) => {
-      const command = fragmentCommand(message.content, registration.options.prefixes);
+      let command;
+      try {
+        command = fragmentCommand(message.content, registration.options.prefixes);
+      } catch (error) {
+        if (error instanceof FragmentLimitError) return;
+        throw error;
+      }
       if (command) await registration.listener.onCommandCreated(message, command);
     });
   }

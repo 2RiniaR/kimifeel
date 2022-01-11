@@ -23,7 +23,13 @@ export class InteractionEventRunner {
   };
 
   constructor(client: ClientManager) {
-    client.onInteractionCreated((interaction) => this.onInteractionCreated(interaction));
+    client.onInteractionCreated(async (interaction) => {
+      try {
+        await this.onInteractionCreated(interaction);
+      } catch (error) {
+        console.error(error);
+      }
+    });
   }
 
   public registerCreateCommandEvent(listener: CreateCommandEventListener, options: CreateCommandEventOptions) {

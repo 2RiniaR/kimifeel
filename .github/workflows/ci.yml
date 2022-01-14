@@ -140,7 +140,7 @@ jobs:
           path: kimifeel-setup.tar
 
   deploy:
-    needs: [lint, build]
+    needs: [lint-server, lint-setup, build-server, build-setup]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' }}
     steps:

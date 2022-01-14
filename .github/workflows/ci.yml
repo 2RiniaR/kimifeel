@@ -129,10 +129,6 @@ jobs:
         with:
           name: server-image
           path: kimifeel-server.tar
-      - uses: actions/upload-artifact@v2
-        with:
-          name: setup-image
-          path: kimifeel-setup.tar
 
   build-setup:
     needs: [cache-pnpm-setup]
@@ -162,10 +158,6 @@ jobs:
         run: |
           docker build -t kimifeel-setup .
           docker save --output ./kimifeel-setup.tar kimifeel-setup
-      - uses: actions/upload-artifact@v2
-        with:
-          name: server-image
-          path: kimifeel-server.tar
       - uses: actions/upload-artifact@v2
         with:
           name: setup-image

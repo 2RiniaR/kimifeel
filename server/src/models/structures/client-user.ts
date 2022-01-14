@@ -1,8 +1,9 @@
 import { Context } from "../context";
 import { ProfileManager, RequestManager, UserManager } from "../managers";
-import { User, UserProps } from "./user";
-import { UserIdentifier } from "./identity-user";
-import { ClientUserService } from "../services/client-user";
+import { User, UserIdentifier, UserProps } from "./user";
+import { DataAccessFailedError, NotFoundError } from "../errors";
+import { buildClientUser } from "../builders/client-user";
+import * as db from "../../prisma";
 
 export class ClientUser {
   private readonly service = new ClientUserService(this);
@@ -28,5 +29,30 @@ export class ClientUser {
 
   public async unregister(): Promise<ClientUser> {
     return await this.service.unregister();
+  }
+}
+
+class ClientUserService {
+  private readonly user: ClientUser;
+
+  public constructor(user: ClientUser) {
+    this.user = user;
+  }
+
+  public async unregister(): Promise<ClientUser> {
+    let result;
+    try {
+      result = await db.deleteUser(this.user.id);
+    } catch (error) {
+      if (error instanceof db.ConnectionError) {
+        throw new DataAccessFailedError();
+      }
+      throw error;
+    }
+
+    if (!result) {
+      throw new NotFoundError();
+    }
+    return buildClientUser(result);
   }
 }

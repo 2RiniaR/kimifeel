@@ -1,7 +1,4 @@
 export * from "./client-user";
-export * from "./identity-user";
-export * from "./identity-request";
-export * from "./identity-profile";
 export * from "./profile";
 export * from "./user";
 export * from "./request";

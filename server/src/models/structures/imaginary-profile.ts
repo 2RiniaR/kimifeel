@@ -1,20 +1,9 @@
-import { IdentityUser } from "./identity-user";
 import { Context } from "../context";
 import { ContextModel } from "../context-model";
-import { ImaginaryProfileService } from "../services";
-
-export class ContentLengthLimitError extends Error {
-  public readonly min: number;
-  public readonly max: number;
-  public readonly actual: number;
-
-  public constructor(min: number, max: number, actual: number) {
-    super();
-    this.min = min;
-    this.max = max;
-    this.actual = actual;
-  }
-}
+import { ContentLengthLimitError, DataAccessFailedError } from "../errors";
+import * as db from "../../prisma";
+import { buildProfile } from "../builders/profile";
+import { IdentityUser } from "./user";
 
 export class ImaginaryProfile extends ContextModel {
   private readonly service = new ImaginaryProfileService(this);
@@ -55,3 +44,30 @@ export type CreateProfileProps = {
   author: IdentityUser;
   content: string;
 };
+
+class ImaginaryProfileService extends ContextModel {
+  private readonly profile: ImaginaryProfile;
+
+  public constructor(profile: ImaginaryProfile) {
+    super(profile.context);
+    this.profile = profile;
+  }
+
+  public async create() {
+    let result;
+    try {
+      result = await db.createProfile({
+        ownerUserId: this.profile.owner.id,
+        authorUserId: this.profile.author.id,
+        content: this.profile.content
+      });
+    } catch (error) {
+      if (error instanceof db.ConnectionError) {
+        throw new DataAccessFailedError();
+      }
+      throw error;
+    }
+
+    return buildProfile(this.context, result);
+  }
+}

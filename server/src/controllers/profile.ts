@@ -2,12 +2,22 @@ import { ProfileEndpointResponder } from "../endpoints/profile";
 import * as Endpoint from "../endpoints/profile";
 import * as EndpointError from "../endpoints/errors";
 import { Controller } from "./base";
-import { ForbiddenError, InvalidParameterError } from "../models/errors";
+import { DataAccessFailedError, ForbiddenError, InvalidParameterError } from "../models/errors";
 import { ClientUser, Profile } from "../models/structures";
 
 class ProfileControllerService {
   async getProfileByIndex(client: ClientUser, index: number): Promise<Profile> {
-    const profile = await client.profiles.findByIndex(index);
+    let profile;
+
+    try {
+      profile = await client.profiles.findByIndex(index);
+    } catch (error) {
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
+      }
+      throw error;
+    }
+
     if (!profile) {
       throw new EndpointError.ProfileNotFoundError({ index });
     }
@@ -27,6 +37,9 @@ export class ProfileController extends Controller implements ProfileEndpointResp
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new EndpointError.ProfileNotFoundError({ index: params.index });
+      }
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
       }
       throw error;
     }
@@ -50,12 +63,20 @@ export class ProfileController extends Controller implements ProfileEndpointResp
     const resultPerPage = 5;
     const client = await this.getClientUser(clientDiscordId);
 
-    const profiles = await client.profiles.random({
-      count: resultPerPage,
-      content: params.content,
-      author: await this.getUserIfHasValue(client, params.authorDiscordId),
-      owner: await this.getUserIfHasValue(client, params.ownerDiscordId)
-    });
+    let profiles;
+    try {
+      profiles = await client.profiles.random({
+        count: resultPerPage,
+        content: params.content,
+        author: await this.getUserIfHasValue(client, params.authorDiscordId),
+        owner: await this.getUserIfHasValue(client, params.ownerDiscordId)
+      });
+    } catch (error) {
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
+      }
+      throw error;
+    }
 
     return profiles.map((profile) => this.convertProfileToResult(profile));
   }
@@ -78,6 +99,9 @@ export class ProfileController extends Controller implements ProfileEndpointResp
     } catch (error) {
       if (error instanceof InvalidParameterError && error.key === "start") {
         throw new EndpointError.ParameterFormatInvalidError<Endpoint.SearchParams>("page", ">= 1");
+      }
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
       }
       throw error;
     }

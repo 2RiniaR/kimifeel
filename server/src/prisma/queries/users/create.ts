@@ -1,12 +1,11 @@
 import { prisma } from "../../client";
 import { UserQueryResult } from "../results";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import { PrismaClientInitializationError, PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import { ConnectionError, DiscordIdDuplicatedError } from "../../error";
 
 type Props = {
   discordId: string;
 };
-
-export class DiscordIdDuplicatedError extends Error {}
 
 export async function createUser({ discordId }: Props): Promise<UserQueryResult> {
   try {
@@ -16,15 +15,12 @@ export async function createUser({ discordId }: Props): Promise<UserQueryResult>
       }
     });
   } catch (error) {
-    if (!(error instanceof PrismaClientKnownRequestError)) {
-      throw error;
+    if (error instanceof PrismaClientInitializationError) {
+      throw new ConnectionError();
     }
-
-    switch (error.code) {
-      case "P2002":
-        throw new DiscordIdDuplicatedError();
+    if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
+      throw new DiscordIdDuplicatedError();
     }
-
     throw error;
   }
 }

@@ -1,10 +1,8 @@
-import { ImaginaryUserService } from "../services";
+import { DataAccessFailedError, DiscordIdFormatError, UserAlreadyRegisteredError } from "../errors";
 import * as db from "../../prisma";
+import { buildClientUser } from "../builders/client-user";
 
 const snowflakeRegex = /^(\d+)$/;
-
-export class DiscordIdFormatError extends Error {}
-export class UserAlreadyRegisteredError extends Error {}
 
 export class ImaginaryUser {
   private readonly service = new ImaginaryUserService(this);
@@ -23,17 +21,35 @@ export class ImaginaryUser {
   }
 
   public async create() {
-    try {
-      return await this.service.create();
-    } catch (error) {
-      if (error instanceof db.DiscordIdDuplicatedError) {
-        throw new UserAlreadyRegisteredError();
-      }
-      throw error;
-    }
+    return await this.service.create();
   }
 }
 
 export type CreateUserProps = {
   discordId: string;
 };
+
+class ImaginaryUserService {
+  private readonly user: ImaginaryUser;
+
+  public constructor(user: ImaginaryUser) {
+    this.user = user;
+  }
+
+  public async create() {
+    let result;
+    try {
+      result = await db.createUser({ discordId: this.user.discordId });
+    } catch (error) {
+      if (error instanceof db.DiscordIdDuplicatedError) {
+        throw new UserAlreadyRegisteredError();
+      }
+      if (error instanceof db.ConnectionError) {
+        throw new DataAccessFailedError();
+      }
+      throw error;
+    }
+
+    return buildClientUser(result);
+  }
+}

@@ -1,5 +1,7 @@
 import { prisma } from "../../client";
 import { RequestQueryResult } from "../results";
+import { PrismaClientInitializationError } from "@prisma/client/runtime";
+import { ConnectionError } from "../../error";
 
 type Props = {
   applicantUserId: string;
@@ -8,15 +10,22 @@ type Props = {
 };
 
 export async function createRequest({ applicantUserId, targetUserId, content }: Props): Promise<RequestQueryResult> {
-  return prisma.request.create({
-    data: {
-      applicantUserId,
-      targetUserId,
-      content
-    },
-    include: {
-      applicantUser: true,
-      targetUser: true
+  try {
+    return prisma.request.create({
+      data: {
+        applicantUserId,
+        targetUserId,
+        content
+      },
+      include: {
+        applicantUser: true,
+        targetUser: true
+      }
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientInitializationError) {
+      throw new ConnectionError();
     }
-  });
+    throw error;
+  }
 }

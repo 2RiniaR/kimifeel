@@ -1,6 +1,7 @@
 import { prisma } from "../../client";
 import { ProfileQueryResult } from "../results";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import { PrismaClientInitializationError, PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import { ConnectionError } from "../../error";
 
 export async function deleteProfileByIndex(index: number): Promise<ProfileQueryResult | undefined> {
   try {
@@ -14,15 +15,12 @@ export async function deleteProfileByIndex(index: number): Promise<ProfileQueryR
       }
     });
   } catch (error) {
-    if (!(error instanceof PrismaClientKnownRequestError)) {
-      throw error;
+    if (error instanceof PrismaClientInitializationError) {
+      throw new ConnectionError();
     }
-
-    switch (error.code) {
-      case "P2016":
-        return undefined;
+    if (error instanceof PrismaClientKnownRequestError && error.code === "P2016") {
+      return undefined;
     }
-
     throw error;
   }
 }

@@ -2,12 +2,27 @@ import { RequestEndpointResponder } from "../endpoints/request";
 import * as Endpoint from "../endpoints/request";
 import * as EndpointError from "../endpoints/errors";
 import { Controller } from "./base";
-import { ForbiddenError, InvalidParameterError } from "../models/errors";
-import { ClientUser, ContentLengthLimitError, Request, SubmitRequestOwnError } from "../models/structures";
+import {
+  ContentLengthLimitError,
+  DataAccessFailedError,
+  ForbiddenError,
+  InvalidParameterError,
+  SubmitRequestOwnError
+} from "../models/errors";
+import { ClientUser, Request } from "../models/structures";
 
 class RequestControllerService {
   async getRequestByIndex(client: ClientUser, index: number): Promise<Request> {
-    const request = await client.requests.findByIndex(index);
+    let request;
+    try {
+      request = await client.requests.findByIndex(index);
+    } catch (error) {
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
+      }
+      throw error;
+    }
+
     if (!request) {
       throw new EndpointError.RequestNotFoundError({ index });
     }
@@ -29,6 +44,9 @@ export class RequestController extends Controller implements RequestEndpointResp
       if (error instanceof ForbiddenError) {
         throw new EndpointError.RequestNotFoundError({ index: params.index });
       }
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
+      }
       throw error;
     }
 
@@ -44,6 +62,9 @@ export class RequestController extends Controller implements RequestEndpointResp
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new EndpointError.RequestNotFoundError({ index: params.index });
+      }
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
       }
       throw error;
     }
@@ -61,8 +82,12 @@ export class RequestController extends Controller implements RequestEndpointResp
     } catch (error) {
       if (error instanceof ContentLengthLimitError) {
         throw new EndpointError.ContentLengthLimitError(error.min, error.max, error.actual);
-      } else if (error instanceof SubmitRequestOwnError) {
+      }
+      if (error instanceof SubmitRequestOwnError) {
         throw new EndpointError.SendRequestOwnError({ discordId: params.targetDiscordId });
+      }
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
       }
       throw error;
     }
@@ -79,6 +104,9 @@ export class RequestController extends Controller implements RequestEndpointResp
     } catch (error) {
       if (error instanceof ForbiddenError) {
         throw new EndpointError.RequestNotFoundError({ index: params.index });
+      }
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
       }
       throw error;
     }
@@ -111,6 +139,9 @@ export class RequestController extends Controller implements RequestEndpointResp
     } catch (error) {
       if (error instanceof InvalidParameterError && error.key === "start") {
         throw new EndpointError.ParameterFormatInvalidError<Endpoint.SearchParams>("page", ">= 1");
+      }
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
       }
       throw error;
     }

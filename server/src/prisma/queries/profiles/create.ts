@@ -1,5 +1,7 @@
 import { prisma } from "../../client";
 import { ProfileQueryResult } from "../results";
+import { PrismaClientInitializationError } from "@prisma/client/runtime";
+import { ConnectionError } from "../../error";
 
 type Props = {
   ownerUserId: string;
@@ -8,15 +10,22 @@ type Props = {
 };
 
 export async function createProfile({ ownerUserId, authorUserId, content }: Props): Promise<ProfileQueryResult> {
-  return prisma.profile.create({
-    data: {
-      ownerUserId,
-      authorUserId,
-      content
-    },
-    include: {
-      authorUser: true,
-      ownerUser: true
+  try {
+    return prisma.profile.create({
+      data: {
+        ownerUserId,
+        authorUserId,
+        content
+      },
+      include: {
+        authorUser: true,
+        ownerUser: true
+      }
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientInitializationError) {
+      throw new ConnectionError();
     }
-  });
+    throw error;
+  }
 }

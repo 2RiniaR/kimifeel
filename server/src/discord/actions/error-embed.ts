@@ -5,6 +5,7 @@ import {
   ProfileNotFoundError,
   RequestNotFoundError,
   SendRequestOwnError,
+  UnavailableError,
   UserAlreadyRegisteredError,
   UserNotFoundError
 } from "endpoints/errors";
@@ -19,7 +20,8 @@ import {
   UserRegisterRequiredEmbed,
   CommandUnexpectedArgumentEmbed,
   CommandUnexpectedOptionEmbed,
-  ParameterFormatInvalidEmbed
+  ParameterFormatInvalidEmbed,
+  UnavailableEmbed
 } from "discord/views";
 import { UnexpectedArgumentError, UnknownOptionsError } from "../../command-parser/interpret/label";
 import { InvalidFormatError } from "../../command-parser/interpret/converter";
@@ -58,6 +60,9 @@ export function getErrorEmbed(error: unknown): MessageEmbed {
   }
   if (error instanceof ArgumentFormatInvalidError) {
     return new ParameterFormatInvalidEmbed(error.position, error.format);
+  }
+  if (error instanceof UnavailableError) {
+    return new UnavailableEmbed();
   }
 
   return new ErrorEmbed(error);

@@ -12,3 +12,9 @@ export class ErrorEmbed extends CustomMessageEmbed {
     super("error", "不明なエラー", message);
   }
 }
+
+export class UnavailableEmbed extends CustomMessageEmbed {
+  constructor() {
+    super("error", "現在サービスは利用できません");
+  }
+}

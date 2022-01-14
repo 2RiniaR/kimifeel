@@ -10,6 +10,7 @@ export * from "./requests/find";
 export * from "./requests/search";
 
 export * from "./users/create";
+export * from "./users/delete";
 export * from "./users/find";
 
 export * from "./results";

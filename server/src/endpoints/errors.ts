@@ -79,3 +79,9 @@ export class ParameterFormatInvalidError<T> extends EndpointError {
     this.format = format;
   }
 }
+
+export class UnavailableError extends EndpointError {
+  constructor() {
+    super();
+  }
+}

@@ -1,5 +1,10 @@
 export class ForbiddenError extends Error {}
 export class NotFoundError extends Error {}
+export class DataAccessFailedError extends Error {}
+
+export class DiscordIdFormatError extends Error {}
+export class UserAlreadyRegisteredError extends Error {}
+export class SubmitRequestOwnError extends Error {}
 
 export class InvalidParameterError<T> extends Error {
   readonly key: keyof T;
@@ -9,5 +14,18 @@ export class InvalidParameterError<T> extends Error {
     super();
     this.key = key;
     this.format = format;
+  }
+}
+
+export class ContentLengthLimitError extends Error {
+  public readonly min: number;
+  public readonly max: number;
+  public readonly actual: number;
+
+  public constructor(min: number, max: number, actual: number) {
+    super();
+    this.min = min;
+    this.max = max;
+    this.actual = actual;
   }
 }

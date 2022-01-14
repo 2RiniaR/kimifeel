@@ -1,20 +1,29 @@
-import { IdentityRequest, Request } from "../structures";
-import { buildRequest } from "../builders/request";
+import { Request } from "../structures";
 import { ContextModel } from "../context-model";
-import { NotFoundError } from "../errors";
 import * as db from "../../prisma";
+import { DataAccessFailedError } from "../errors";
+import { buildRequest } from "../builders/request";
 
 export class RequestManager extends ContextModel {
-  public async fetch(request: IdentityRequest): Promise<Request> {
-    const result = await db.findRequest(request.id);
-    if (!result) {
-      throw new NotFoundError("Tried to fetch data, but it wasn't found.");
-    }
-    return buildRequest(this.context, result);
-  }
+  private readonly service = new RequestManagerService(this.context);
 
   public async findByIndex(index: number): Promise<Request | undefined> {
-    const result = await db.findRequestByIndex(index);
+    return await this.service.findByIndex(index);
+  }
+}
+
+export class RequestManagerService extends ContextModel {
+  public async findByIndex(index: number): Promise<Request | undefined> {
+    let result;
+    try {
+      result = await db.findRequestByIndex(index);
+    } catch (error) {
+      if (error instanceof db.ConnectionError) {
+        throw new DataAccessFailedError();
+      }
+      throw error;
+    }
+
     if (!result) return;
     return buildRequest(this.context, result);
   }

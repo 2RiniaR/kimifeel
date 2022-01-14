@@ -1,5 +1,7 @@
 import { prisma } from "../../client";
 import { RequestQueryResult } from "../results";
+import { PrismaClientInitializationError } from "@prisma/client/runtime";
+import { ConnectionError } from "../../error";
 
 type Props = {
   order: "latest" | "oldest";
@@ -18,22 +20,29 @@ export async function searchRequests({
   targetUserId,
   applicantUserId
 }: Props): Promise<RequestQueryResult[]> {
-  return await prisma.request.findMany({
-    where: {
-      targetUserId,
-      applicantUserId,
-      content: {
-        contains: content
+  try {
+    return await prisma.request.findMany({
+      where: {
+        targetUserId,
+        applicantUserId,
+        content: {
+          contains: content
+        }
+      },
+      orderBy: {
+        createdAt: order === "latest" ? "desc" : "asc"
+      },
+      skip: start,
+      take: count,
+      include: {
+        applicantUser: true,
+        targetUser: true
       }
-    },
-    orderBy: {
-      createdAt: order === "latest" ? "desc" : "asc"
-    },
-    skip: start,
-    take: count,
-    include: {
-      applicantUser: true,
-      targetUser: true
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientInitializationError) {
+      throw new ConnectionError();
     }
-  });
+    throw error;
+  }
 }

@@ -1,6 +1,8 @@
 import { prisma } from "../../client";
 import { getRandomIntegerArray } from "helpers/random";
 import { ProfileQueryResult } from "../results";
+import { PrismaClientInitializationError } from "@prisma/client/runtime";
+import { ConnectionError } from "../../error";
 
 type Props = {
   count: number;
@@ -15,30 +17,45 @@ export async function randomProfiles({
   authorUserId,
   content
 }: Props): Promise<ProfileQueryResult[]> {
-  const resultsId = await prisma.profile.findMany({
-    select: {
-      id: true
-    },
-    where: {
-      ownerUserId,
-      authorUserId,
-      content: {
-        contains: content
+  let resultsId: { id: string }[];
+  try {
+    resultsId = await prisma.profile.findMany({
+      select: {
+        id: true
+      },
+      where: {
+        ownerUserId,
+        authorUserId,
+        content: {
+          contains: content
+        }
       }
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientInitializationError) {
+      throw new ConnectionError();
     }
-  });
+    throw error;
+  }
 
   const selectsId = getRandomIntegerArray(0, resultsId.length, count).map((v) => resultsId[v].id);
 
-  return await prisma.profile.findMany({
-    where: {
-      id: {
-        in: selectsId
+  try {
+    return await prisma.profile.findMany({
+      where: {
+        id: {
+          in: selectsId
+        }
+      },
+      include: {
+        authorUser: true,
+        ownerUser: true
       }
-    },
-    include: {
-      authorUser: true,
-      ownerUser: true
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientInitializationError) {
+      throw new ConnectionError();
     }
-  });
+    throw error;
+  }
 }

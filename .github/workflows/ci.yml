@@ -128,7 +128,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: server-image
-          path: ./kimifeel-server.tar
+          path: server/kimifeel-server.tar
 
   build-setup:
     needs: [cache-pnpm-setup]
@@ -161,7 +161,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: setup-image
-          path: ./kimifeel-setup.tar
+          path: setup/kimifeel-setup.tar
 
   deploy:
     needs: [lint-server, lint-setup, build-server, build-setup]

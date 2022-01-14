@@ -122,13 +122,13 @@ jobs:
       - name: Compile
         run: pnpm build
       - name: Run build
-        run: |
-          docker build -t kimifeel-server .
-          docker save --output ./kimifeel-server.tar kimifeel-server
+        run: docker build -t kimifeel-server .
+      - name: Run export
+        run: docker save --output ./kimifeel-server.tar kimifeel-server
       - uses: actions/upload-artifact@v2
         with:
           name: server-image
-          path: kimifeel-server.tar
+          path: ./kimifeel-server.tar
 
   build-setup:
     needs: [cache-pnpm-setup]
@@ -155,13 +155,13 @@ jobs:
       - name: Compile
         run: pnpm build
       - name: Run build
-        run: |
-          docker build -t kimifeel-setup .
-          docker save --output ./kimifeel-setup.tar kimifeel-setup
+        run: docker build -t kimifeel-setup .
+      - name: Run export
+        run: docker save --output ./kimifeel-setup.tar kimifeel-setup
       - uses: actions/upload-artifact@v2
         with:
           name: setup-image
-          path: kimifeel-setup.tar
+          path: ./kimifeel-setup.tar
 
   deploy:
     needs: [lint-server, lint-setup, build-server, build-setup]

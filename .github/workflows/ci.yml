@@ -132,7 +132,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "server/kimifeel-server.tar"
+          source: "kimifeel-server.tar"
           target: ${{ secrets.SSH_PATH }}
       - name: Restart the service
         uses: appleboy/ssh-action@master

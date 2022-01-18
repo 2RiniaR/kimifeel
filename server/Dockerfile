@@ -1,11 +1,23 @@
-FROM node:16
+FROM node:16 AS compiler
 RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
 WORKDIR /app
-COPY package.json ./pnpm-lock.yaml ./
-COPY ./prisma/schema.prisma ./prisma/schema.prisma
-RUN pnpm fetch --prod
-RUN pnpm install -r --offline --prod
-RUN pnpm add --global prisma
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
 RUN pnpx prisma generate
-COPY dist/server.js .
-CMD ["node", "server.js"]
+
+
+FROM node:16 AS builder
+RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
+WORKDIR /app
+COPY pnpm-lock.yaml package.json ./
+RUN pnpm install --frozen-lockfile --prod
+
+
+FROM node:16-bullseye-slim AS runner
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=compiler "/app/node_modules/.pnpm/@prisma+client@3.7.0_prisma@3.7.0/node_modules/.prisma/client" "./node_modules/.pnpm/@prisma+client@3.7.0_prisma@3.7.0/node_modules/.prisma/client"
+COPY --from=compiler /app/dist/server.js ./dist/server.js
+CMD ["./dist/server.js"]

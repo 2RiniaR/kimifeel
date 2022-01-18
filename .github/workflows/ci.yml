@@ -105,22 +105,6 @@ jobs:
         working-directory: ./server
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-      - uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-
-      - uses: pnpm/action-setup@v2.0.1
-        with:
-          version: 6
-          run_install: |
-            - recursive: true
-              args: [--frozen-lockfile, --prefer-offline]
-      - name: Compile
-        run: pnpm build
       - name: Run build
         run: docker build -t kimifeel-server .
       - name: Run export
@@ -130,41 +114,8 @@ jobs:
           name: server-image
           path: server/kimifeel-server.tar
 
-  build-setup:
-    needs: [cache-pnpm-setup]
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./setup
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-      - uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: ${{ runner.os }}-
-      - uses: pnpm/action-setup@v2.0.1
-        with:
-          version: 6
-          run_install: |
-            - recursive: true
-              args: [--frozen-lockfile, --prefer-offline]
-      - name: Compile
-        run: pnpm build
-      - name: Run build
-        run: docker build -t kimifeel-setup .
-      - name: Run export
-        run: docker save --output ./kimifeel-setup.tar kimifeel-setup
-      - uses: actions/upload-artifact@v2
-        with:
-          name: setup-image
-          path: setup/kimifeel-setup.tar
-
   deploy:
-    needs: [lint-server, lint-setup, build-server, build-setup]
+    needs: [lint-server, lint-setup, build-server]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' }}
     steps:
@@ -173,10 +124,6 @@ jobs:
         with:
           name: server-image
           path: kimifeel-server.tar
-      - uses: actions/download-artifact@v2
-        with:
-          name: setup-image
-          path: kimifeel-setup.tar
       - name: Deploy with SCP
         uses: appleboy/scp-action@master
         with:
@@ -185,7 +132,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "server/kimifeel-server.tar,setup/kimifeel-setup.tar"
+          source: "server/kimifeel-server.tar"
           target: ${{ secrets.SSH_PATH }}
       - name: Restart the service
         uses: appleboy/ssh-action@master

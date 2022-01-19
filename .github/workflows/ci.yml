@@ -123,7 +123,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: server-image
-          path: kimifeel-server.tar
+          path: .
       - name: Deploy with SCP
         uses: appleboy/scp-action@master
         with:

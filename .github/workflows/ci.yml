@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, AddMigrationDockerImage]
 
 jobs:
   cache-pnpm-server:
@@ -106,7 +106,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run build
-        run: docker build -t kimifeel-server .
+        run: docker build -t kimifeel-server -f ./app.Dockerfile .
       - name: Run export
         run: docker save --output ./kimifeel-server.tar kimifeel-server
       - uses: actions/upload-artifact@v2
@@ -114,12 +114,33 @@ jobs:
           name: server-image
           path: server/kimifeel-server.tar
 
+  build-migration:
+    needs: [cache-pnpm-server]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run build
+        run: docker build -t kimifeel-migration -f ./migration.Dockerfile .
+      - name: Run export
+        run: docker save --output ./kimifeel-migration.tar kimifeel-migration
+      - uses: actions/upload-artifact@v2
+        with:
+          name: migration-image
+          path: server/kimifeel-migration.tar
+
   deploy:
     needs: [lint-server, lint-setup, build-server]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: migration-image
+          path: .
       - uses: actions/download-artifact@v2
         with:
           name: server-image
@@ -132,7 +153,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "kimifeel-server.tar"
+          source: "kimifeel-server.tar,kimifeel-migration.tar"
           target: ${{ secrets.SSH_PATH }}
       - name: Restart the service
         uses: appleboy/ssh-action@master

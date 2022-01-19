@@ -132,7 +132,7 @@ jobs:
           path: server/kimifeel-migration.tar
 
   deploy:
-    needs: [lint-server, lint-setup, build-server]
+    needs: [lint-server, lint-setup, build-server, build-migration]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' }}
     steps:

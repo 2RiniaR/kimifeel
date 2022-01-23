@@ -25,3 +25,9 @@ export const contentOption: CommandOption = {
   name: "content",
   description: "含まれている文字列"
 };
+
+export const contentCreateOption: CommandOption = {
+  type: String,
+  name: "content",
+  description: "プロフィールの内容"
+};

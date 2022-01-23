@@ -2,10 +2,34 @@ import { Message } from "discord.js";
 import { CommandFragments, interpretCommand } from "command-parser";
 import { ProfileEndpoint } from "endpoints/profile";
 import { parameterTypes } from "./command";
-import { ProfileDeletedEmbed, ProfileListEmbed } from "../../views";
+import { ProfileCreatedEmbed, ProfileDeletedEmbed, ProfileListEmbed } from "../../views";
 import { CreateCommandEventAction } from "./base";
 import { ArgumentFormatInvalidError } from "../errors";
 import { ParameterFormatInvalidError } from "../../../endpoints/errors";
+
+export class CreateProfileAction extends CreateCommandEventAction {
+  private readonly endpoint: ProfileEndpoint;
+
+  constructor(endpoint: ProfileEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(message: Message, command: CommandFragments) {
+    const format = {
+      arguments: [{ name: "内容", type: "string" }],
+      options: {}
+    } as const;
+    const interpret = interpretCommand(command, format, parameterTypes);
+
+    const profile = await this.endpoint.create(message.author.id, {
+      content: interpret.arguments[0]
+    });
+
+    const embed = new ProfileCreatedEmbed(profile);
+    await message.reply({ embeds: [embed] });
+  }
+}
 
 export class DeleteProfileAction extends CreateCommandEventAction {
   private readonly endpoint: ProfileEndpoint;

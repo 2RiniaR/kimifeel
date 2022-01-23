@@ -5,6 +5,8 @@ import { ImaginaryRequest } from "./imaginary-request";
 import * as db from "../../prisma";
 import { ContextModel } from "../context-model";
 import { buildRequest } from "../builders/request";
+import { Profile } from "./profile";
+import { ImaginaryProfile } from "./imaginary-profile";
 
 export class IdentityUser extends ContextModel implements UserIdentifier {
   public readonly id: string;
@@ -50,6 +52,18 @@ export class User extends IdentityUser {
       target: this
     });
     return await request.create();
+  }
+
+  public async createProfile(content: string): Promise<Profile> {
+    if (this.context.clientUser.id !== this.id) {
+      throw new ForbiddenError();
+    }
+    const profile = new ImaginaryProfile(this.context, {
+      owner: this,
+      author: this,
+      content
+    });
+    return await profile.create();
   }
 }
 

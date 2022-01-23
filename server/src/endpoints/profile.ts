@@ -1,5 +1,10 @@
 import { ProfileResult } from "./structures";
 
+export type CreateParams = {
+  content: string;
+};
+export type CreateResult = ProfileResult;
+
 export type DeleteParams = {
   index: number;
 };
@@ -27,6 +32,7 @@ export type SearchParams = {
 export type SearchResult = ProfileResult[];
 
 export interface ProfileEndpointResponder {
+  create(clientDiscordId: string, params: CreateParams): PromiseLike<CreateResult>;
   delete(clientDiscordId: string, params: DeleteParams): PromiseLike<DeleteResult>;
   find(clientDiscordId: string, params: FindParams): PromiseLike<FindResult>;
   random(clientDiscordId: string, params: RandomParams): PromiseLike<RandomResult>;
@@ -38,6 +44,10 @@ export class ProfileEndpoint {
 
   constructor(responder: ProfileEndpointResponder) {
     this.responder = responder;
+  }
+
+  create(clientDiscordId: string, params: CreateParams): PromiseLike<CreateResult> {
+    return this.responder.create(clientDiscordId, params);
   }
 
   delete(clientDiscordId: string, params: DeleteParams): PromiseLike<DeleteResult> {

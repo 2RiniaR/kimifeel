@@ -1,9 +1,29 @@
-import { ProfileDeletedEmbed, ProfileListEmbed } from "discord/views";
+import { ProfileCreatedEmbed, ProfileDeletedEmbed, ProfileListEmbed } from "discord/views";
 import { ProfileEndpoint } from "endpoints/profile";
 import { CommandInteraction } from "discord.js";
 import { CreateCommandEventAction } from "./base";
 import { ArgumentFormatInvalidError } from "../errors";
 import { ParameterFormatInvalidError } from "endpoints/errors";
+
+export class CreateProfileAction extends CreateCommandEventAction {
+  private readonly endpoint: ProfileEndpoint;
+
+  constructor(endpoint: ProfileEndpoint) {
+    super();
+    this.endpoint = endpoint;
+  }
+
+  async run(command: CommandInteraction) {
+    const content = command.options.getString("content", true);
+
+    const profile = await this.endpoint.create(command.user.id, {
+      content
+    });
+
+    const embed = new ProfileCreatedEmbed(profile);
+    await command.reply({ embeds: [embed] });
+  }
+}
 
 export class DeleteProfileAction extends CreateCommandEventAction {
   private readonly endpoint: ProfileEndpoint;

@@ -1,7 +1,13 @@
 import { Endpoints } from "../endpoints";
 import { MessageEventRunner } from "discord/events/message";
 import { basePhrase } from "./command";
-import { DeleteProfileAction, RandomProfileAction, SearchProfileAction, ShowProfileAction } from "./profile";
+import {
+  CreateProfileAction,
+  DeleteProfileAction,
+  RandomProfileAction,
+  SearchProfileAction,
+  ShowProfileAction
+} from "./profile";
 import {
   AcceptRequestAction,
   CancelRequestAction,
@@ -25,6 +31,11 @@ export class MessageRouter {
   public registerActions() {
     this.event.registerCreateCommandEvent(new HelpAction(), {
       prefixes: [`${basePhrase} help`],
+      allowBot: false
+    });
+
+    this.event.registerCreateCommandEvent(new CreateProfileAction(this.endpoints.profile), {
+      prefixes: [`${basePhrase} profile create`],
       allowBot: false
     });
 

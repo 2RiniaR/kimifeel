@@ -1,6 +1,12 @@
 import { InteractionEventRunner } from "discord/events";
 import { Endpoints } from "../endpoints";
-import { DeleteProfileAction, RandomProfileAction, SearchProfileAction, ShowProfileAction } from "./profile";
+import {
+  CreateProfileAction,
+  DeleteProfileAction,
+  RandomProfileAction,
+  SearchProfileAction,
+  ShowProfileAction
+} from "./profile";
 import {
   AcceptRequestAction,
   CancelRequestAction,
@@ -24,6 +30,12 @@ export class InteractionRouter {
   public registerActions() {
     this.event.registerCreateCommandEvent(new HelpAction(), {
       commandName: "help",
+      allowBot: false
+    });
+
+    this.event.registerCreateCommandEvent(new CreateProfileAction(this.endpoints.profile), {
+      commandName: "profile",
+      subCommandName: "create",
       allowBot: false
     });
 

@@ -2,7 +2,12 @@ import { ProfileEndpointResponder } from "../endpoints/profile";
 import * as Endpoint from "../endpoints/profile";
 import * as EndpointError from "../endpoints/errors";
 import { Controller } from "./base";
-import { DataAccessFailedError, ForbiddenError, InvalidParameterError } from "../models/errors";
+import {
+  ContentLengthLimitError,
+  DataAccessFailedError,
+  ForbiddenError,
+  InvalidParameterError
+} from "../models/errors";
 import { ClientUser, Profile } from "../models/structures";
 
 class ProfileControllerService {
@@ -27,6 +32,25 @@ class ProfileControllerService {
 
 export class ProfileController extends Controller implements ProfileEndpointResponder {
   private readonly service = new ProfileControllerService();
+
+  async create(clientDiscordId: string, params: Endpoint.CreateParams): Promise<Endpoint.CreateResult> {
+    const client = await this.getClientUser(clientDiscordId);
+
+    let profile;
+    try {
+      profile = await client.asUser().createProfile(params.content);
+    } catch (error) {
+      if (error instanceof ContentLengthLimitError) {
+        throw new EndpointError.ContentLengthLimitError(error.min, error.max, error.actual);
+      }
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
+      }
+      throw error;
+    }
+
+    return this.convertProfileToResult(profile);
+  }
 
   async delete(clientDiscordId: string, params: Endpoint.DeleteParams): Promise<Endpoint.DeleteResult> {
     const client = await this.getClientUser(clientDiscordId);

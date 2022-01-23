@@ -22,6 +22,12 @@ function getIdentityCall(identifier: ProfileIdentifier) {
   else return `プロフィール 番号: \`${identifier.index}\``;
 }
 
+export class ProfileCreatedEmbed extends CustomMessageEmbed {
+  public constructor(profile: ProfileProps) {
+    super("succeed", "プロフィールを作成しました！", toProfileUnit(profile, true));
+  }
+}
+
 export class ProfileDeletedEmbed extends CustomMessageEmbed {
   public constructor(profile: ProfileProps) {
     super("deleted", "プロフィールを削除しました。", toProfileUnit(profile, false));

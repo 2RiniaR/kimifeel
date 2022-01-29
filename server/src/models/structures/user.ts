@@ -1,12 +1,20 @@
 import { Context } from "../context";
 import { Request } from "./request";
-import { DataAccessFailedError, ForbiddenError, InvalidParameterError, SubmitRequestOwnError } from "../errors";
+import {
+  DataAccessFailedError,
+  ForbiddenError,
+  InvalidParameterError,
+  NotFoundError,
+  SubmitRequestOwnError
+} from "../errors";
 import { ImaginaryRequest } from "./imaginary-request";
 import * as db from "../../prisma";
 import { ContextModel } from "../context-model";
 import { buildRequest } from "../builders/request";
 import { Profile } from "./profile";
 import { ImaginaryProfile } from "./imaginary-profile";
+import { buildUser } from "../builders/user";
+import { countProfile } from "../../prisma";
 
 export class IdentityUser extends ContextModel implements UserIdentifier {
   public readonly id: string;
@@ -26,9 +34,11 @@ export type UserIdentifier = {
 
 export class User extends IdentityUser {
   private readonly service = new UserService(this);
+  readonly enableMention: boolean;
 
   public constructor(ctx: Context, props: UserIdentifier & UserProps) {
     super(ctx, props);
+    this.enableMention = props.enableMention;
   }
 
   public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {
@@ -65,6 +75,17 @@ export class User extends IdentityUser {
     });
     return await profile.create();
   }
+
+  public async updateConfig(props: Partial<ConfigProps>): Promise<User> {
+    if (this.context.clientUser.id !== this.id) {
+      throw new ForbiddenError();
+    }
+    return await this.service.updateConfig(props);
+  }
+
+  public async getStatistics(): Promise<UserStatistics> {
+    return await this.service.getStatistics();
+  }
 }
 
 export type SearchRequestsProps = {
@@ -77,8 +98,16 @@ export type SearchRequestsProps = {
   applicant?: IdentityUser;
 };
 
-export type UserProps = {
-  /* nothing */
+export type UserProps = ConfigProps;
+
+export type ConfigProps = {
+  enableMention: boolean;
+};
+
+export type UserStatistics = {
+  ownedProfileCount: number;
+  writtenProfileCount: number;
+  selfProfileCount: number;
 };
 
 class UserService extends ContextModel {
@@ -123,5 +152,39 @@ class UserService extends ContextModel {
     }
 
     return results.map((result) => buildRequest(this.context, result));
+  }
+
+  public async updateConfig(props: Partial<ConfigProps>): Promise<User> {
+    let user;
+    try {
+      user = await db.updateUser(this.user.id, props);
+    } catch (error) {
+      if (error instanceof db.ConnectionError) {
+        throw new DataAccessFailedError();
+      }
+      throw error;
+    }
+
+    if (!user) {
+      throw new NotFoundError();
+    }
+
+    return buildUser(this.context, user);
+  }
+
+  public async getStatistics(): Promise<UserStatistics> {
+    const selfId = this.user.id;
+    try {
+      return {
+        ownedProfileCount: await countProfile({ ownerUserId: selfId }),
+        writtenProfileCount: await countProfile({ authorUserId: selfId }),
+        selfProfileCount: await countProfile({ ownerUserId: selfId, authorUserId: selfId })
+      };
+    } catch (error) {
+      if (error instanceof db.ConnectionError) {
+        throw new DataAccessFailedError();
+      }
+      throw error;
+    }
   }
 }

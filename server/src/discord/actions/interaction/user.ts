@@ -37,7 +37,7 @@ export class ShowStatsUserAction extends CreateCommandEventAction {
     });
 
     const embed = new UserStatsEmbed(user);
-    await command.reply({ embeds: [embed], ephemeral: true });
+    await command.reply({ embeds: [embed] });
   }
 }
 

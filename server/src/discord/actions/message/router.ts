@@ -16,7 +16,7 @@ import {
   SendRequestAction,
   ShowRequestAction
 } from "./request";
-import { RegisterUserAction } from "./user";
+import { ConfigUserAction, RegisterUserAction, ShowUserAction } from "./user";
 import { HelpAction } from "./help";
 
 export class MessageRouter {
@@ -91,6 +91,16 @@ export class MessageRouter {
 
     this.event.registerCreateCommandEvent(new RegisterUserAction(this.endpoints.user), {
       prefixes: [`${basePhrase} user register`],
+      allowBot: false
+    });
+
+    this.event.registerCreateCommandEvent(new ShowUserAction(this.endpoints.user), {
+      prefixes: [`${basePhrase} user show`],
+      allowBot: false
+    });
+
+    this.event.registerCreateCommandEvent(new ConfigUserAction(this.endpoints.user), {
+      prefixes: [`${basePhrase} user config`],
       allowBot: false
     });
   }

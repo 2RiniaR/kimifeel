@@ -15,3 +15,15 @@ export type ProfileResult = {
   ownerUserId: string;
   authorUserId: string;
 };
+
+export type UserStats = {
+  discordId: string;
+  ownedProfileCount: number;
+  selfProfileCount: number;
+  writtenProfileCount: number;
+};
+
+export type UserResult = {
+  discordId: string;
+  enableMention: boolean;
+};

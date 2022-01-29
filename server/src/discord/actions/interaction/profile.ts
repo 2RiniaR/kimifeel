@@ -1,22 +1,22 @@
 import { ProfileCreatedEmbed, ProfileDeletedEmbed, ProfileListEmbed } from "discord/views";
-import { ProfileEndpoint } from "endpoints/profile";
 import { CommandInteraction } from "discord.js";
 import { CreateCommandEventAction } from "./base";
 import { ArgumentFormatInvalidError } from "../errors";
 import { ParameterFormatInvalidError } from "endpoints/errors";
+import { Endpoints } from "../endpoints";
 
 export class CreateProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
     const content = command.options.getString("content", true);
 
-    const profile = await this.endpoint.create(command.user.id, {
+    const profile = await this.endpoints.profile.create(command.user.id, {
       content
     });
 
@@ -26,17 +26,17 @@ export class CreateProfileAction extends CreateCommandEventAction {
 }
 
 export class DeleteProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
     const number = command.options.getInteger("number", true);
 
-    const profile = await this.endpoint.delete(command.user.id, {
+    const profile = await this.endpoints.profile.delete(command.user.id, {
       index: number
     });
 
@@ -46,11 +46,11 @@ export class DeleteProfileAction extends CreateCommandEventAction {
 }
 
 export class RandomProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
@@ -58,7 +58,7 @@ export class RandomProfileAction extends CreateCommandEventAction {
     const author = command.options.getUser("author", false);
     const content = command.options.getString("content", false);
 
-    const profiles = await this.endpoint.random(command.user.id, {
+    const profiles = await this.endpoints.profile.random(command.user.id, {
       ownerDiscordId: owner?.id,
       authorDiscordId: author?.id,
       content: content ?? undefined
@@ -72,11 +72,11 @@ export class RandomProfileAction extends CreateCommandEventAction {
 }
 
 export class SearchProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
@@ -93,7 +93,7 @@ export class SearchProfileAction extends CreateCommandEventAction {
 
     let profiles;
     try {
-      profiles = await this.endpoint.search(command.user.id, {
+      profiles = await this.endpoints.profile.search(command.user.id, {
         order: (order as "latest" | "oldest" | null) ?? "latest",
         ownerDiscordId: owner?.id,
         authorDiscordId: author?.id,
@@ -113,17 +113,17 @@ export class SearchProfileAction extends CreateCommandEventAction {
 }
 
 export class ShowProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
     const number = command.options.getInteger("number", true);
 
-    const profile = await this.endpoint.find(command.user.id, {
+    const profile = await this.endpoints.profile.find(command.user.id, {
       index: number
     });
 

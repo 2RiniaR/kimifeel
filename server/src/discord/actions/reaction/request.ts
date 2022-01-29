@@ -6,16 +6,17 @@ import {
   RequestDeniedEmbed,
   RequestSentEmbed
 } from "discord/views";
-import { RequestEndpoint } from "endpoints/request";
 import { AddEventAction } from "./base";
 import { RequestNotFoundError } from "../../../endpoints/errors";
+import { Endpoints } from "../endpoints";
+import { filterMentionable } from "../mention";
 
 export class AcceptRequestAction extends AddEventAction {
-  private readonly endpoint: RequestEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: RequestEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(reaction: MessageReaction, user: User, message: Message) {
@@ -31,7 +32,7 @@ export class AcceptRequestAction extends AddEventAction {
 
     let profile;
     try {
-      profile = await this.endpoint.accept(user.id, {
+      profile = await this.endpoints.request.accept(user.id, {
         index
       });
     } catch (error) {
@@ -40,7 +41,11 @@ export class AcceptRequestAction extends AddEventAction {
     }
 
     const embed = new RequestAcceptedEmbed(profile);
-    const mentionedUsers = [profile.ownerUserId, profile.authorUserId];
+    const mentionableCheck = await this.endpoints.user.checkMentionable(user.id, {
+      targetUsersDiscordId: [profile.ownerUserId, profile.authorUserId]
+    });
+    const mentionedUsers = filterMentionable(mentionableCheck);
+
     await message.reply({
       content: mentionUsers(mentionedUsers),
       embeds: [embed],
@@ -50,11 +55,11 @@ export class AcceptRequestAction extends AddEventAction {
 }
 
 export class CancelRequestAction extends AddEventAction {
-  private readonly endpoint: RequestEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: RequestEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(reaction: MessageReaction, user: User, message: Message) {
@@ -70,7 +75,7 @@ export class CancelRequestAction extends AddEventAction {
 
     let request;
     try {
-      request = await this.endpoint.cancel(user.id, {
+      request = await this.endpoints.request.cancel(user.id, {
         index
       });
     } catch (error) {
@@ -84,11 +89,11 @@ export class CancelRequestAction extends AddEventAction {
 }
 
 export class DenyRequestAction extends AddEventAction {
-  private readonly endpoint: RequestEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: RequestEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(reaction: MessageReaction, user: User, message: Message) {
@@ -104,7 +109,7 @@ export class DenyRequestAction extends AddEventAction {
 
     let request;
     try {
-      request = await this.endpoint.deny(user.id, {
+      request = await this.endpoints.request.deny(user.id, {
         index
       });
     } catch (error) {
@@ -113,7 +118,11 @@ export class DenyRequestAction extends AddEventAction {
     }
 
     const embed = new RequestDeniedEmbed(request);
-    const mentionedUsers = [request.targetUserId, request.requesterUserId];
+    const mentionableCheck = await this.endpoints.user.checkMentionable(user.id, {
+      targetUsersDiscordId: [request.targetUserId, request.requesterUserId]
+    });
+    const mentionedUsers = filterMentionable(mentionableCheck);
+
     await message.reply({
       content: mentionUsers(mentionedUsers),
       embeds: [embed],

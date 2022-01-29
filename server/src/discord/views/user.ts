@@ -1,15 +1,9 @@
 import { CustomMessageEmbed } from "./base";
-import { UserIdentifier } from "endpoints/structures";
+import { UserResult, UserIdentifier, UserStats } from "endpoints/structures";
 
 export type UserProps = {
   discordId: string;
 };
-
-export class UserRegisteredEmbed extends CustomMessageEmbed {
-  public constructor({ discordId }: UserProps) {
-    super("succeed", "ユーザーが登録されました！", toMention(discordId));
-  }
-}
 
 export function toMention(userId: string): string {
   return `<@${userId}>`;
@@ -23,6 +17,12 @@ function getIdentityCall(identifier: UserIdentifier) {
 const removeRegex = /^<@(\d+)>$/;
 export function removeMention(mention: string): string {
   return mention.replace(removeRegex, "$1");
+}
+
+export class UserRegisteredEmbed extends CustomMessageEmbed {
+  public constructor({ discordId }: UserProps) {
+    super("succeed", "ユーザーが登録されました！", toMention(discordId));
+  }
 }
 
 export class UserRegisterRequiredEmbed extends CustomMessageEmbed {
@@ -56,6 +56,27 @@ export class UserNotFoundEmbed extends CustomMessageEmbed {
       "ユーザーが見つかりませんでした。",
       `${identity} は存在しない、もしくは削除された可能性があります。`
     );
+  }
+}
+
+export class UserStatsEmbed extends CustomMessageEmbed {
+  public constructor(user: UserStats) {
+    const mention = `**${toMention(user.discordId)}**`;
+    const owned = `書かれたプロフィール: ${user.ownedProfileCount} 件 (うち自己紹介 ${user.selfProfileCount} 件)`;
+    const written = `書いたプロフィール: ${user.writtenProfileCount} 件`;
+
+    const message = [mention, "```", owned, written, "```"].join("\n");
+    super("user", "ユーザー", message);
+  }
+}
+
+export class UserConfiguredEmbed extends CustomMessageEmbed {
+  public constructor(user: UserResult) {
+    const mention = `**${toMention(user.discordId)}**`;
+    const enableMention = `メンション: ${user.enableMention ? "ON" : "OFF"}`;
+
+    const message = [mention, "```", enableMention, "```"].join("\n");
+    super("user", "ユーザー", message);
   }
 }
 

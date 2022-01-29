@@ -7,8 +7,11 @@ import * as db from "../../prisma";
 
 export class ClientUser {
   private readonly service = new ClientUserService(this);
+
   public readonly discordId: string;
   public readonly id: string;
+  public readonly enableMention: boolean;
+
   private readonly context: Context;
   public readonly users: UserManager;
   public readonly profiles: ProfileManager;
@@ -17,6 +20,8 @@ export class ClientUser {
   public constructor(props: UserIdentifier & UserProps) {
     this.id = props.id;
     this.discordId = props.discordId;
+    this.enableMention = props.enableMention;
+
     this.context = new Context(this);
     this.users = new UserManager(this.context);
     this.profiles = new ProfileManager(this.context);

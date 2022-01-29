@@ -1,18 +1,18 @@
 import { Message } from "discord.js";
 import { CommandFragments, interpretCommand } from "command-parser";
-import { ProfileEndpoint } from "endpoints/profile";
 import { parameterTypes } from "./command";
 import { ProfileCreatedEmbed, ProfileDeletedEmbed, ProfileListEmbed } from "../../views";
 import { CreateCommandEventAction } from "./base";
 import { ArgumentFormatInvalidError } from "../errors";
 import { ParameterFormatInvalidError } from "../../../endpoints/errors";
+import { Endpoints } from "../endpoints";
 
 export class CreateProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(message: Message, command: CommandFragments) {
@@ -22,7 +22,7 @@ export class CreateProfileAction extends CreateCommandEventAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const profile = await this.endpoint.create(message.author.id, {
+    const profile = await this.endpoints.profile.create(message.author.id, {
       content: interpret.arguments[0]
     });
 
@@ -32,11 +32,11 @@ export class CreateProfileAction extends CreateCommandEventAction {
 }
 
 export class DeleteProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(message: Message, command: CommandFragments) {
@@ -46,7 +46,7 @@ export class DeleteProfileAction extends CreateCommandEventAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const profile = await this.endpoint.delete(message.author.id, {
+    const profile = await this.endpoints.profile.delete(message.author.id, {
       index: interpret.arguments[0]
     });
 
@@ -56,11 +56,11 @@ export class DeleteProfileAction extends CreateCommandEventAction {
 }
 
 export class RandomProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(message: Message, command: CommandFragments) {
@@ -74,7 +74,7 @@ export class RandomProfileAction extends CreateCommandEventAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const profiles = await this.endpoint.random(message.author.id, {
+    const profiles = await this.endpoints.profile.random(message.author.id, {
       ownerDiscordId: interpret.options.owner,
       authorDiscordId: interpret.options.author,
       content: interpret.options.content
@@ -86,11 +86,11 @@ export class RandomProfileAction extends CreateCommandEventAction {
 }
 
 export class SearchProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(message: Message, command: CommandFragments) {
@@ -115,7 +115,7 @@ export class SearchProfileAction extends CreateCommandEventAction {
     let profiles;
 
     try {
-      profiles = await this.endpoint.search(message.author.id, {
+      profiles = await this.endpoints.profile.search(message.author.id, {
         order: (order as "oldest" | "latest") ?? "latest",
         ownerDiscordId: interpret.options.owner,
         authorDiscordId: interpret.options.author,
@@ -135,11 +135,11 @@ export class SearchProfileAction extends CreateCommandEventAction {
 }
 
 export class ShowProfileAction extends CreateCommandEventAction {
-  private readonly endpoint: ProfileEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: ProfileEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(message: Message, command: CommandFragments) {
@@ -149,7 +149,7 @@ export class ShowProfileAction extends CreateCommandEventAction {
     } as const;
     const interpret = interpretCommand(command, format, parameterTypes);
 
-    const profile = await this.endpoint.find(message.author.id, {
+    const profile = await this.endpoints.profile.find(message.author.id, {
       index: interpret.arguments[0]
     });
 

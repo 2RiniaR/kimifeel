@@ -5,6 +5,7 @@ export type CustomMessageType =
   | "deleted"
   | "profile"
   | "request"
+  | "user"
   | "info"
   | "invalid"
   | "failed"
@@ -17,6 +18,7 @@ export class CustomMessageEmbed extends MessageEmbed {
     deleted: (title) => this.setTitle(`🗑 ${title}`).setColor("GREY"),
     profile: (title) => this.setTitle(`📓 ${title}`).setColor("AQUA"),
     request: (title) => this.setTitle(`📢 ${title}`).setColor("PURPLE"),
+    user: (title) => this.setTitle(`👤 ${title}`).setColor("DARK_BLUE"),
     info: (title) => this.setTitle(`ℹ ${title}`).setColor("BLUE"),
     invalid: (title) => this.setTitle(`🚫 ${title}`).setColor("DARK_GOLD"),
     failed: (title) => this.setTitle(`❌ ${title}`).setColor("DARK_RED"),

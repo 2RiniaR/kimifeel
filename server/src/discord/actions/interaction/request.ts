@@ -6,31 +6,36 @@ import {
   RequestListEmbed,
   RequestSentEmbed
 } from "discord/views";
-import { RequestEndpoint } from "endpoints/request";
 import { CommandInteraction, Message } from "discord.js";
 import { CreateCommandEventAction } from "./base";
 import { ArgumentFormatInvalidError } from "../errors";
 import { ParameterFormatInvalidError } from "../../../endpoints/errors";
+import { Endpoints } from "../endpoints";
+import { filterMentionable } from "../mention";
 
 export class AcceptRequestAction extends CreateCommandEventAction {
-  private readonly endpoint: RequestEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: RequestEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
     const number = command.options.getInteger("number", true);
 
-    const profile = await this.endpoint.accept(command.user.id, {
+    const profile = await this.endpoints.request.accept(command.user.id, {
       index: number
     });
 
     const embed = new RequestAcceptedEmbed(profile);
-    const mentionedUsers = [profile.ownerUserId, profile.authorUserId];
+    const mentionableCheck = await this.endpoints.user.checkMentionable(command.user.id, {
+      targetUsersDiscordId: [profile.ownerUserId, profile.authorUserId]
+    });
+    const mentionedUsers = filterMentionable(mentionableCheck);
+
     await command.reply({
-      content: mentionUsers(mentionedUsers),
+      content: mentionedUsers.length > 0 ? mentionUsers(mentionedUsers) : undefined,
       embeds: [embed],
       allowedMentions: { repliedUser: true, users: mentionedUsers }
     });
@@ -38,17 +43,17 @@ export class AcceptRequestAction extends CreateCommandEventAction {
 }
 
 export class CancelRequestAction extends CreateCommandEventAction {
-  private readonly endpoint: RequestEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: RequestEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
     const number = command.options.getInteger("number", true);
 
-    const request = await this.endpoint.cancel(command.user.id, {
+    const request = await this.endpoints.request.cancel(command.user.id, {
       index: number
     });
 
@@ -58,24 +63,28 @@ export class CancelRequestAction extends CreateCommandEventAction {
 }
 
 export class DenyRequestAction extends CreateCommandEventAction {
-  private readonly endpoint: RequestEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: RequestEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
     const number = command.options.getInteger("number", true);
 
-    const request = await this.endpoint.deny(command.user.id, {
+    const request = await this.endpoints.request.deny(command.user.id, {
       index: number
     });
 
     const embed = new RequestDeniedEmbed(request);
-    const mentionedUsers = [request.targetUserId, request.requesterUserId];
+    const mentionableCheck = await this.endpoints.user.checkMentionable(command.user.id, {
+      targetUsersDiscordId: [request.targetUserId, request.requesterUserId]
+    });
+    const mentionedUsers = filterMentionable(mentionableCheck);
+
     await command.reply({
-      content: mentionUsers(mentionedUsers),
+      content: mentionedUsers.length > 0 ? mentionUsers(mentionedUsers) : undefined,
       embeds: [embed],
       allowedMentions: { repliedUser: true, users: mentionedUsers }
     });
@@ -83,11 +92,11 @@ export class DenyRequestAction extends CreateCommandEventAction {
 }
 
 export class SearchRequestAction extends CreateCommandEventAction {
-  private readonly endpoint: RequestEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: RequestEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
@@ -109,7 +118,7 @@ export class SearchRequestAction extends CreateCommandEventAction {
 
     let requests;
     try {
-      requests = await this.endpoint.search(command.user.id, {
+      requests = await this.endpoints.request.search(command.user.id, {
         status: (genre as "received" | "sent" | null) ?? "received",
         order: (order as "latest" | "oldest" | null) ?? "latest",
         page: page ?? defaultPage,
@@ -130,18 +139,18 @@ export class SearchRequestAction extends CreateCommandEventAction {
 }
 
 export class SendRequestAction extends CreateCommandEventAction {
-  private readonly endpoint: RequestEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: RequestEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
     const target = command.options.getUser("target", true);
     const content = command.options.getString("content", true);
 
-    const request = await this.endpoint.create(command.user.id, {
+    const request = await this.endpoints.request.create(command.user.id, {
       targetDiscordId: target.id,
       content: content
     });
@@ -153,9 +162,13 @@ export class SendRequestAction extends CreateCommandEventAction {
       targetUserId: target.id
     });
 
-    const mentionedUsers = [request.targetUserId, request.requesterUserId];
+    const mentionableCheck = await this.endpoints.user.checkMentionable(command.user.id, {
+      targetUsersDiscordId: [request.targetUserId, request.requesterUserId]
+    });
+    const mentionedUsers = filterMentionable(mentionableCheck);
+
     const card = await command.reply({
-      content: mentionUsers(mentionedUsers),
+      content: mentionedUsers.length > 0 ? mentionUsers(mentionedUsers) : undefined,
       embeds: [embed],
       fetchReply: true,
       allowedMentions: { repliedUser: true, users: mentionedUsers }
@@ -168,17 +181,17 @@ export class SendRequestAction extends CreateCommandEventAction {
 }
 
 export class ShowRequestAction extends CreateCommandEventAction {
-  private readonly endpoint: RequestEndpoint;
+  private readonly endpoints: Endpoints;
 
-  constructor(endpoint: RequestEndpoint) {
+  constructor(endpoints: Endpoints) {
     super();
-    this.endpoint = endpoint;
+    this.endpoints = endpoints;
   }
 
   async run(command: CommandInteraction) {
     const index = command.options.getInteger("number", true);
 
-    const request = await this.endpoint.find(command.user.id, {
+    const request = await this.endpoints.request.find(command.user.id, {
       index
     });
 

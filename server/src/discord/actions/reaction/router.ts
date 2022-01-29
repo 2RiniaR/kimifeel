@@ -12,19 +12,19 @@ export class ReactionRouter {
   }
 
   public registerActions() {
-    this.event.registerAddEvent(new AcceptRequestAction(this.endpoints.request), {
+    this.event.registerAddEvent(new AcceptRequestAction(this.endpoints), {
       emojis: ["✅"],
       allowBot: false,
       myMessageOnly: true
     });
 
-    this.event.registerAddEvent(new CancelRequestAction(this.endpoints.request), {
+    this.event.registerAddEvent(new CancelRequestAction(this.endpoints), {
       emojis: ["⛔"],
       allowBot: false,
       myMessageOnly: true
     });
 
-    this.event.registerAddEvent(new DenyRequestAction(this.endpoints.request), {
+    this.event.registerAddEvent(new DenyRequestAction(this.endpoints), {
       emojis: ["❌"],
       allowBot: false,
       myMessageOnly: true

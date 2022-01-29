@@ -38,7 +38,7 @@ model Request {
 model User {
   id               String    @id @default(uuid())
   discordId        String    @unique
-  enableMention    Boolean   @default(true)
+  enableMention    Boolean   @default(false)
 
   sentRequests     Request[] @relation(name: "SentRequestsOnUser")
   receivedRequests Request[] @relation(name: "ReceivedRequestsOnUser")

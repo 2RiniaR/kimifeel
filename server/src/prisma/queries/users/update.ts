@@ -4,7 +4,7 @@ import { PrismaClientInitializationError, PrismaClientKnownRequestError } from "
 import { ConnectionError } from "../../error";
 
 type Props = {
-  enableMention: boolean;
+  enableMention?: boolean;
 };
 
 export async function updateUser(id: string, { enableMention }: Props): Promise<UserQueryResult | undefined> {

@@ -1,3 +1,4 @@
+export * from "./profiles/count";
 export * from "./profiles/create";
 export * from "./profiles/delete";
 export * from "./profiles/find";
@@ -12,5 +13,6 @@ export * from "./requests/search";
 export * from "./users/create";
 export * from "./users/delete";
 export * from "./users/find";
+export * from "./users/update";
 
 export * from "./results";

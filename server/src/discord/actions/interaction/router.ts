@@ -15,7 +15,7 @@ import {
   SendRequestAction,
   ShowRequestAction
 } from "./request";
-import { RegisterUserAction } from "./user";
+import { ConfigUserAction, RegisterUserAction, ShowUserAction } from "./user";
 import { HelpAction } from "./help";
 
 export class InteractionRouter {
@@ -102,6 +102,18 @@ export class InteractionRouter {
     this.event.registerCreateCommandEvent(new RegisterUserAction(this.endpoints.user), {
       commandName: "user",
       subCommandName: "register",
+      allowBot: false
+    });
+
+    this.event.registerCreateCommandEvent(new ShowUserAction(this.endpoints.user), {
+      commandName: "user",
+      subCommandName: "show",
+      allowBot: false
+    });
+
+    this.event.registerCreateCommandEvent(new ConfigUserAction(this.endpoints.user), {
+      commandName: "user",
+      subCommandName: "config",
       allowBot: false
     });
   }

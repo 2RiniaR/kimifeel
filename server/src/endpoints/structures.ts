@@ -16,14 +16,14 @@ export type ProfileResult = {
   authorUserId: string;
 };
 
-export type UserStatistics = {
+export type UserStats = {
   discordId: string;
   ownedProfileCount: number;
   selfProfileCount: number;
   writtenProfileCount: number;
 };
 
-export type UserConfig = {
+export type UserResult = {
   discordId: string;
   enableMention: boolean;
 };

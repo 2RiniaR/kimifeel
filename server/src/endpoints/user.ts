@@ -1,19 +1,27 @@
-import { UserConfig, UserStatistics } from "./structures";
+import { UserResult, UserStats } from "./structures";
 
-export type ShowParams = {
+export type CheckMentionableParams = {
+  targetUsersDiscordId: string[];
+};
+export type CheckMentionableResult = {
+  [discordId in string]: boolean;
+};
+
+export type GetStatsParams = {
   targetUserDiscordId: string;
 };
-export type ShowResult = UserStatistics;
+export type GetStatsResult = UserStats;
 
 export type ConfigParams = {
   enableMention?: boolean;
 };
-export type ConfigResult = UserConfig;
+export type ConfigResult = UserResult;
 
 export interface UserEndpointResponder {
   register(clientDiscordId: string): PromiseLike<void>;
   unregister(clientDiscordId: string): PromiseLike<void>;
-  show(clientDiscordId: string, params: ShowParams): PromiseLike<ShowResult>;
+  getStats(clientDiscordId: string, params: GetStatsParams): PromiseLike<GetStatsResult>;
+  checkMentionable(clientDiscordId: string, params: CheckMentionableParams): PromiseLike<CheckMentionableResult>;
   config(clientDiscordId: string, params: ConfigParams): PromiseLike<ConfigResult>;
 }
 
@@ -32,8 +40,12 @@ export class UserEndpoint {
     return this.responder.unregister(clientDiscordId);
   }
 
-  show(clientDiscordId: string, params: ShowParams): PromiseLike<ShowResult> {
-    return this.responder.show(clientDiscordId, params);
+  checkMentionable(clientDiscordId: string, params: CheckMentionableParams): PromiseLike<CheckMentionableResult> {
+    return this.responder.checkMentionable(clientDiscordId, params);
+  }
+
+  getStats(clientDiscordId: string, params: GetStatsParams): PromiseLike<GetStatsResult> {
+    return this.responder.getStats(clientDiscordId, params);
   }
 
   config(clientDiscordId: string, params: ConfigParams): PromiseLike<ConfigResult> {

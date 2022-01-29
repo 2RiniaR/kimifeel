@@ -34,3 +34,19 @@ export async function findUserByDiscordId(discordId: string): Promise<UserQueryR
     throw error;
   }
 }
+
+export async function findManyUserByDiscordId(discordId: string[]): Promise<UserQueryResult[]> {
+  try {
+    const result = await prisma.user.findMany({
+      where: {
+        discordId: { in: discordId }
+      }
+    });
+    return result ?? undefined;
+  } catch (error) {
+    if (error instanceof PrismaClientInitializationError) {
+      throw new ConnectionError();
+    }
+    throw error;
+  }
+}

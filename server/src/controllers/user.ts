@@ -55,7 +55,7 @@ export class UserController extends Controller implements UserEndpointResponder 
     };
   }
 
-  async show(clientDiscordId: string, params: Endpoint.ShowParams): Promise<Endpoint.ShowResult> {
+  async getStats(clientDiscordId: string, params: Endpoint.GetStatsParams): Promise<Endpoint.GetStatsResult> {
     const client = await this.getClientUser(clientDiscordId);
 
     let user: User | undefined;
@@ -72,9 +72,9 @@ export class UserController extends Controller implements UserEndpointResponder 
       throw new EndpointError.UserNotFoundError({ discordId: params.targetUserDiscordId });
     }
 
-    let statistics;
+    let stats;
     try {
-      statistics = await user.getStatistics();
+      stats = await user.getStats();
     } catch (error) {
       if (error instanceof DataAccessFailedError) {
         throw new EndpointError.UnavailableError();
@@ -84,7 +84,31 @@ export class UserController extends Controller implements UserEndpointResponder 
 
     return {
       discordId: user.discordId,
-      ...statistics
+      ...stats
     };
+  }
+
+  async checkMentionable(
+    clientDiscordId: string,
+    params: Endpoint.CheckMentionableParams
+  ): Promise<Endpoint.CheckMentionableResult> {
+    const client = await this.getClientUser(clientDiscordId);
+
+    let users: User[];
+    try {
+      users = await client.users.findManyByDiscordId(params.targetUsersDiscordId);
+    } catch (error) {
+      if (error instanceof DataAccessFailedError) {
+        throw new EndpointError.UnavailableError();
+      }
+      throw error;
+    }
+
+    const result: Endpoint.CheckMentionableResult = {};
+    for (const discordId of params.targetUsersDiscordId) {
+      const user = users.find((user) => user.discordId === discordId);
+      result[discordId] = user ? user.enableMention : false;
+    }
+    return result;
   }
 }

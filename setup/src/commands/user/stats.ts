@@ -2,9 +2,9 @@ import { CommandOption } from "src/commands/format";
 import { SubCommand } from "src/option-types";
 import { userOption } from "./options";
 
-export const showCommand: CommandOption = {
+export const statsCommand: CommandOption = {
   type: SubCommand,
-  name: "show",
-  description: "ユーザー情報を見る",
-  options: [userOption]
+  name: "stats",
+  description: "ユーザーの統計情報を見る",
+  options: [{ ...userOption, required: true }]
 };

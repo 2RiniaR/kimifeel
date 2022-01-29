@@ -83,8 +83,8 @@ export class User extends IdentityUser {
     return await this.service.updateConfig(props);
   }
 
-  public async getStatistics(): Promise<UserStatistics> {
-    return await this.service.getStatistics();
+  public async getStats(): Promise<UserStats> {
+    return await this.service.getStats();
   }
 }
 
@@ -104,7 +104,7 @@ export type ConfigProps = {
   enableMention: boolean;
 };
 
-export type UserStatistics = {
+export type UserStats = {
   ownedProfileCount: number;
   writtenProfileCount: number;
   selfProfileCount: number;
@@ -172,7 +172,7 @@ class UserService extends ContextModel {
     return buildUser(this.context, user);
   }
 
-  public async getStatistics(): Promise<UserStatistics> {
+  public async getStats(): Promise<UserStats> {
     const selfId = this.user.id;
     try {
       return {

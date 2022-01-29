@@ -1,5 +1,5 @@
 import { CustomMessageEmbed } from "./base";
-import { UserConfig, UserIdentifier, UserStatistics } from "endpoints/structures";
+import { UserResult, UserIdentifier, UserStats } from "endpoints/structures";
 
 export type UserProps = {
   discordId: string;
@@ -59,8 +59,8 @@ export class UserNotFoundEmbed extends CustomMessageEmbed {
   }
 }
 
-export class UserStatisticsEmbed extends CustomMessageEmbed {
-  public constructor(user: UserStatistics) {
+export class UserStatsEmbed extends CustomMessageEmbed {
+  public constructor(user: UserStats) {
     const mention = `**${toMention(user.discordId)}**`;
     const owned = `書かれたプロフィール: ${user.ownedProfileCount} 件 (うち自己紹介 ${user.selfProfileCount} 件)`;
     const written = `書いたプロフィール: ${user.writtenProfileCount} 件`;
@@ -71,7 +71,7 @@ export class UserStatisticsEmbed extends CustomMessageEmbed {
 }
 
 export class UserConfiguredEmbed extends CustomMessageEmbed {
-  public constructor(user: UserConfig) {
+  public constructor(user: UserResult) {
     const mention = `**${toMention(user.discordId)}**`;
     const enableMention = `メンション: ${user.enableMention ? "ON" : "OFF"}`;
 

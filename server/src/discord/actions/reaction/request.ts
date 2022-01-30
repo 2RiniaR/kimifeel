@@ -47,7 +47,7 @@ export class AcceptRequestAction extends AddEventAction {
     const mentionedUsers = filterMentionable(mentionableCheck);
 
     await message.reply({
-      content: mentionUsers(mentionedUsers),
+      content: mentionedUsers.length > 0 ? mentionUsers(mentionedUsers) : undefined,
       embeds: [embed],
       allowedMentions: { repliedUser: true, users: mentionedUsers }
     });
@@ -124,7 +124,7 @@ export class DenyRequestAction extends AddEventAction {
     const mentionedUsers = filterMentionable(mentionableCheck);
 
     await message.reply({
-      content: mentionUsers(mentionedUsers),
+      content: mentionedUsers.length > 0 ? mentionUsers(mentionedUsers) : undefined,
       embeds: [embed],
       allowedMentions: { repliedUser: true, users: mentionedUsers }
     });

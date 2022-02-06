@@ -1,20 +1,24 @@
-import { CustomMessageEmbed } from "./base";
+import { SystemMessage } from "../structures";
 
-export class ErrorEmbed extends CustomMessageEmbed {
+export class ErrorEmbed extends SystemMessage {
   constructor(error: unknown) {
+    super();
+    this.type = "error";
+    this.title = "不明なエラー";
     const code = error instanceof Error ? error.name : "unknown";
-    const message = [
+    this.message = [
       `コード: \`${code}\``,
       "",
       "▼ ここから制作者に報告してください。",
       "https://github.com/watano1168/kimifeel/issues"
     ].join("\n");
-    super("error", "不明なエラー", message);
   }
 }
 
-export class UnavailableEmbed extends CustomMessageEmbed {
+export class UnavailableEmbed extends SystemMessage {
   constructor() {
-    super("error", "現在サービスは利用できません");
+    super();
+    this.type = "error";
+    this.title = "現在サービスは利用できません";
   }
 }

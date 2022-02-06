@@ -1,8 +1,8 @@
-import { CustomMessageEmbed } from "./base";
 import { ProfileProps, toProfileUnit } from "./profile";
 import { MessageEmbed } from "discord.js";
 import { removeMention, toMention } from "./user";
-import { RequestIdentifier } from "endpoints/structures";
+import { RequestSpecifier } from "app/endpoints/structures";
+import { SystemMessage } from "../structures";
 
 export type RequestProps = {
   index: number;
@@ -24,46 +24,67 @@ export function toRequestUnit(
   }
 }
 
-function getIdentityCall(identifier: RequestIdentifier) {
-  if ("id" in identifier) return `リクエスト ID: \`${identifier.id}\``;
-  else return `プロフィール 番号: \`${identifier.index}\``;
+function getIdentityCall(specifier: RequestSpecifier) {
+  if ("id" in specifier) return `リクエスト ID: \`${specifier.id}\``;
+  else return `プロフィール 番号: \`${specifier.index}\``;
 }
 
-export class RequestAcceptedEmbed extends CustomMessageEmbed {
+export class RequestAcceptedEmbed extends SystemMessage {
   public constructor(profile: ProfileProps) {
-    super("succeed", "リクエストが承認されました！", toProfileUnit(profile));
+    super();
+    this.type = "succeed";
+    this.title = "リクエストが承認されました！";
+    this.message = toProfileUnit(profile);
   }
 }
 
-export class RequestCanceledEmbed extends CustomMessageEmbed {
+export class RequestCanceledEmbed extends SystemMessage {
   public constructor(request: RequestProps) {
-    super("failed", "リクエストがキャンセルされました。", toRequestUnit(request, false));
+    super();
+    this.type = "failed";
+    this.title = "リクエストがキャンセルされました";
+    this.message = toRequestUnit(request, false);
   }
 }
 
-export class RequestDeniedEmbed extends CustomMessageEmbed {
+export class RequestDeniedEmbed extends SystemMessage {
   public constructor(request: RequestProps) {
-    super("failed", "リクエストが拒否されました。", toRequestUnit(request, false));
+    super();
+    this.type = "failed";
+    this.title = "リクエストが拒否されました";
+    this.message = toRequestUnit(request, false);
   }
 }
 
-export class RequestListEmbed extends CustomMessageEmbed {
+export class RequestListEmbed extends SystemMessage {
   public constructor(requests: RequestProps[]) {
-    super("request", "リクエスト", requests.map((element) => toRequestUnit(element)).join("\n\n"));
+    super();
+    this.type = "request";
+    this.title = "リクエスト";
+    if (requests.length > 0) {
+      this.message = requests.map((element) => toRequestUnit(element)).join("\n\n");
+    } else {
+      this.message = "該当する結果はありませんでした。";
+    }
   }
 }
 
-export class RequestSentEmbed extends CustomMessageEmbed {
+export class RequestSentEmbed extends SystemMessage {
   public static readonly UserIdFieldName = "To";
   public static readonly IndexFieldName = "Request No.";
 
-  public constructor(props: RequestProps) {
-    super("request", "リクエストが作成されました！", RequestSentEmbed.buildDescription(props));
-    this.addField(RequestSentEmbed.UserIdFieldName, toMention(props.targetUserId), true).addField(
-      RequestSentEmbed.IndexFieldName,
-      props.index.toString(),
-      true
-    );
+  public constructor(public readonly request: RequestProps) {
+    super();
+    this.type = "request";
+    this.title = "リクエストが作成されました！";
+    this.message = RequestSentEmbed.buildDescription(request);
+  }
+
+  public getEmbed(): MessageEmbed {
+    return super
+      .getEmbed()
+      .addField(RequestSentEmbed.UserIdFieldName, toMention(this.request.targetUserId), true)
+      .addField(RequestSentEmbed.IndexFieldName, this.request.index.toString(), true);
   }
 
   public static getUserId(embed: MessageEmbed): string | undefined {
@@ -88,19 +109,20 @@ export class RequestSentEmbed extends CustomMessageEmbed {
   }
 }
 
-export class SendRequestOwnEmbed extends CustomMessageEmbed {
+export class SendRequestOwnEmbed extends SystemMessage {
   public constructor() {
-    super("invalid", "自分自身にリクエストを送信することはできません。");
+    super();
+    this.type = "invalid";
+    this.title = "自分自身にリクエストを送信することはできません";
   }
 }
 
-export class RequestNotFoundEmbed extends CustomMessageEmbed {
-  public constructor(identifier: RequestIdentifier) {
-    const identity = getIdentityCall(identifier);
-    super(
-      "failed",
-      "リクエストが見つかりませんでした。",
-      `${identity} は存在しない、もしくは削除された可能性があります。`
-    );
+export class RequestNotFoundEmbed extends SystemMessage {
+  public constructor(specifier: RequestSpecifier) {
+    super();
+    this.type = "failed";
+    this.title = "リクエストが見つかりませんでした";
+    const identity = getIdentityCall(specifier);
+    this.message = `${identity} は存在しない、もしくは削除された可能性があります。`;
   }
 }

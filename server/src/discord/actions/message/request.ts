@@ -11,7 +11,7 @@ import {
 } from "../../views";
 import { CreateCommandEventAction } from "./base";
 import { ArgumentFormatInvalidError } from "../errors";
-import { ParameterFormatInvalidError } from "../../../endpoints/errors";
+import { ParameterFormatInvalidError } from "../../../app/endpoints/errors";
 import { Endpoints } from "../endpoints";
 import { filterMentionable } from "../mention";
 

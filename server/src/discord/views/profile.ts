@@ -1,6 +1,6 @@
-import { CustomMessageEmbed } from "./base";
 import { toMention } from "./user";
-import { ProfileIdentifier } from "endpoints/structures";
+import { ProfileSpecifier } from "app/endpoints/structures";
+import { SystemMessage } from "../structures";
 
 export type ProfileProps = {
   index: number;
@@ -17,46 +17,57 @@ export function toProfileUnit({ index, content, authorUserId, ownerUserId }: Pro
   }
 }
 
-function getIdentityCall(identifier: ProfileIdentifier) {
-  if ("id" in identifier) return `プロフィール ID: \`${identifier.id}\``;
-  else return `プロフィール 番号: \`${identifier.index}\``;
+function getIdentityCall(specifier: ProfileSpecifier) {
+  if ("id" in specifier) return `プロフィール ID: \`${specifier.id}\``;
+  else return `プロフィール 番号: \`${specifier.index}\``;
 }
 
-export class ProfileCreatedEmbed extends CustomMessageEmbed {
+export class ProfileCreatedEmbed extends SystemMessage {
   public constructor(profile: ProfileProps) {
-    super("succeed", "プロフィールを作成しました！", toProfileUnit(profile, true));
+    super();
+    this.type = "succeed";
+    this.title = "プロフィールを作成しました！";
+    this.message = toProfileUnit(profile, true);
   }
 }
 
-export class ProfileDeletedEmbed extends CustomMessageEmbed {
+export class ProfileDeletedEmbed extends SystemMessage {
   public constructor(profile: ProfileProps) {
-    super("deleted", "プロフィールを削除しました。", toProfileUnit(profile, false));
+    super();
+    this.type = "deleted";
+    this.title = "プロフィールを削除しました";
+    this.message = toProfileUnit(profile, false);
   }
 }
 
-export class ProfileListEmbed extends CustomMessageEmbed {
+export class ProfileListEmbed extends SystemMessage {
   public constructor(profiles: ProfileProps[]) {
-    super("profile", "プロフィール", profiles.map((element) => toProfileUnit(element)).join("\n\n"));
+    super();
+    this.type = "profile";
+    this.title = "プロフィール";
+    if (profiles.length > 0) {
+      this.message = profiles.map((element) => toProfileUnit(element)).join("\n\n");
+    } else {
+      this.message = "該当する結果はありませんでした。";
+    }
   }
 }
 
-export class ProfileNotFoundEmbed extends CustomMessageEmbed {
-  public constructor(identifier: ProfileIdentifier) {
-    const identity = getIdentityCall(identifier);
-    super(
-      "failed",
-      "プロフィールが見つかりませんでした。",
-      `${identity} は存在しない、もしくは削除された可能性があります。`
-    );
+export class ProfileNotFoundEmbed extends SystemMessage {
+  public constructor(specifier: ProfileSpecifier) {
+    super();
+    this.type = "failed";
+    this.title = "プロフィールが見つかりませんでした";
+    const identity = getIdentityCall(specifier);
+    this.message = `${identity} は存在しない、もしくは削除された可能性があります。`;
   }
 }
 
-export class ProfileContentLengthLimitEmbed extends CustomMessageEmbed {
+export class ProfileContentLengthLimitEmbed extends SystemMessage {
   public constructor(min: number, max: number, actual: number) {
-    super(
-      "invalid",
-      "内容が長すぎます",
-      `\`${min}\`文字以上、かつ\`${max}\`文字以下にしてください。（現在：\`${actual}\`文字）`
-    );
+    super();
+    this.type = "invalid";
+    this.title = "内容が長すぎます";
+    this.message = `\`${min}\`文字以上、かつ\`${max}\`文字以下にしてください。（現在：\`${actual}\`文字）`;
   }
 }

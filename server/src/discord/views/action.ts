@@ -1,33 +1,37 @@
-import { CustomMessageEmbed } from "./base";
+import { SystemMessage } from "../structures";
 
-export class FetchFailedEmbed extends CustomMessageEmbed {
+export class FetchFailedMessage extends SystemMessage {
   constructor() {
-    super("failed", "Discordのデータ取得に失敗しました。", "Discordから、何らかのデータを取得することに失敗しました。");
+    super();
+    this.type = "failed";
+    this.title = "Discordのデータ取得に失敗しました";
+    this.message = "Discordから、何らかのデータを取得することに失敗しました。";
   }
 }
 
-export class ParameterFormatInvalidEmbed extends CustomMessageEmbed {
+export class ParameterFormatInvalidMessage extends SystemMessage {
   constructor(position: string, format: string) {
-    super("invalid", "パラメータの形式が不正です。", `\`${position}\` には、 \`${format}\` を入力してください。`);
+    super();
+    this.type = "invalid";
+    this.title = "パラメータの形式が不正です";
+    this.message = `\`${position}\` には、 \`${format}\` を入力してください。`;
   }
 }
 
-export class CommandUnexpectedArgumentEmbed extends CustomMessageEmbed {
+export class CommandUnexpectedArgumentMessage extends SystemMessage {
   constructor(expected: number, actual: number) {
-    super(
-      "invalid",
-      "引数の個数が不正です。",
-      `\`${expected.toString()}\` 個の引数が必要ですが、\`${actual.toString()}\` 個入力されています。`
-    );
+    super();
+    this.type = "invalid";
+    this.title = "引数の個数が不正です";
+    this.message = `\`${expected.toString()}\` 個の引数が必要ですが、\`${actual.toString()}\` 個入力されています。`;
   }
 }
 
-export class CommandUnexpectedOptionEmbed extends CustomMessageEmbed {
+export class CommandUnexpectedOptionMessage extends SystemMessage {
   constructor(options: readonly string[]) {
-    super(
-      "invalid",
-      "不明なオプションが入力されています。",
-      `オプション ${options.map((name) => `\`${name}\``).join(", ")} は要求されていません。`
-    );
+    super();
+    this.type = "invalid";
+    this.title = "不明なオプションが入力されています";
+    this.message = `オプション ${options.map((name) => `\`${name}\``).join(", ")} は要求されていません。`;
   }
 }

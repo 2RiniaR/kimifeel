@@ -8,7 +8,7 @@ import {
   UnavailableError,
   UserAlreadyRegisteredError,
   UserNotFoundError
-} from "endpoints/errors";
+} from "app/endpoints/errors";
 import {
   ErrorEmbed,
   ProfileContentLengthLimitEmbed,
@@ -38,7 +38,7 @@ export function getErrorEmbed(error: unknown): MessageEmbed {
     return new UserNotFoundEmbed(error.identifier);
   }
   if (error instanceof RequestNotFoundError) {
-    return new RequestNotFoundEmbed(error.identifier);
+    return new RequestNotFoundEmbed(error.specifier);
   }
   if (error instanceof ContentLengthLimitError) {
     return new ProfileContentLengthLimitEmbed(error.min, error.max, error.actual);

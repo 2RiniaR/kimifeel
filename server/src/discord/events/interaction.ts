@@ -1,5 +1,6 @@
 import { CommandInteraction, Interaction } from "discord.js";
 import { ClientManager } from "../client";
+import { SlashCommand } from "../structures";
 
 export type CreateCommandEventOptions = {
   commandName: string;
@@ -9,7 +10,7 @@ export type CreateCommandEventOptions = {
 };
 
 export interface CreateCommandEventListener {
-  onCommandCreated(command: CommandInteraction): PromiseLike<void>;
+  onCommandCreated(command: SlashCommand): PromiseLike<void>;
 }
 
 type CreateCommandEventRegistration = {
@@ -48,7 +49,8 @@ export class InteractionEventRunner {
     registrations = registrations.filter((registration) => this.checkBot(command, registration.options));
     registrations = registrations.filter((registration) => this.checkCommandName(command, registration.options));
 
-    await registrations.mapAsync(async (registration) => await registration.listener.onCommandCreated(command));
+    const slashCommand = new SlashCommand(command);
+    await registrations.mapAsync(async (registration) => await registration.listener.onCommandCreated(slashCommand));
   }
 
   private checkBot(interaction: Interaction, options: CreateCommandEventOptions) {

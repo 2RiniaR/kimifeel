@@ -2,7 +2,7 @@ import { ProfileCreatedEmbed, ProfileDeletedEmbed, ProfileListEmbed } from "disc
 import { CommandInteraction } from "discord.js";
 import { CreateCommandEventAction } from "./base";
 import { ArgumentFormatInvalidError } from "../errors";
-import { ParameterFormatInvalidError } from "endpoints/errors";
+import { ParameterFormatInvalidError } from "app/endpoints/errors";
 import { Endpoints } from "../endpoints";
 
 export class CreateProfileAction extends CreateCommandEventAction {

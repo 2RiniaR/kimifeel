@@ -1,5 +1,5 @@
-import { CheckMentionableResult } from "../../endpoints/user";
+import { FindManyResult } from "../../app/endpoints/user";
 
-export function filterMentionable(result: CheckMentionableResult): string[] {
+export function filterMentionable(result: FindManyResult): string[] {
   return Object.keys(result).filter((id) => result[id]);
 }

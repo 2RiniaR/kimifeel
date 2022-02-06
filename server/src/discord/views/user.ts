@@ -1,5 +1,5 @@
-import { CustomMessageEmbed } from "./base";
-import { UserResult, UserIdentifier, UserStats } from "endpoints/structures";
+import { UserBody, UserSpecifier, UserStatsBody } from "app/endpoints/structures";
+import { SystemMessage } from "../structures";
 
 export type UserProps = {
   discordId: string;
@@ -9,9 +9,9 @@ export function toMention(userId: string): string {
   return `<@${userId}>`;
 }
 
-function getIdentityCall(identifier: UserIdentifier) {
-  if ("id" in identifier) return `ユーザー ID: \`${identifier.id}\``;
-  else return toMention(identifier.discordId);
+function getIdentityCall(specifier: UserSpecifier) {
+  if ("id" in specifier) return `ユーザー ID: \`${specifier.id}\``;
+  else return toMention(specifier.discordId);
 }
 
 const removeRegex = /^<@(\d+)>$/;
@@ -19,15 +19,21 @@ export function removeMention(mention: string): string {
   return mention.replace(removeRegex, "$1");
 }
 
-export class UserRegisteredEmbed extends CustomMessageEmbed {
+export class UserRegisteredEmbed extends SystemMessage {
   public constructor({ discordId }: UserProps) {
-    super("succeed", "ユーザーが登録されました！", toMention(discordId));
+    super();
+    this.type = "succeed";
+    this.title = "ユーザーが登録されました！";
+    this.message = toMention(discordId);
   }
 }
 
-export class UserRegisterRequiredEmbed extends CustomMessageEmbed {
+export class UserRegisterRequiredEmbed extends SystemMessage {
   public constructor() {
-    const message = [
+    super();
+    this.type = "info";
+    this.title = "ユーザーが登録されていません";
+    this.message = [
       "当サービスを使用するには、ユーザー登録をしてください。",
       "```",
       "▼ スラッシュコマンドの場合",
@@ -37,46 +43,51 @@ export class UserRegisterRequiredEmbed extends CustomMessageEmbed {
       "!kimi user register",
       "```"
     ].join("\n");
-    super("info", "ユーザーが登録されていません", message);
   }
 }
 
-export class UserAlreadyRegisteredEmbed extends CustomMessageEmbed {
-  public constructor(identifier: UserIdentifier) {
-    const identity = getIdentityCall(identifier);
-    super("failed", "ユーザー登録に失敗しました", `${identity} は既に登録されています`);
+export class UserAlreadyRegisteredEmbed extends SystemMessage {
+  public constructor(specifier: UserSpecifier) {
+    super();
+    this.type = "failed";
+    this.title = "ユーザー登録に失敗しました";
+    const identity = getIdentityCall(specifier);
+    this.message = `${identity} は既に登録されています`;
   }
 }
 
-export class UserNotFoundEmbed extends CustomMessageEmbed {
-  public constructor(identifier: UserIdentifier) {
-    const identity = getIdentityCall(identifier);
-    super(
-      "failed",
-      "ユーザーが見つかりませんでした。",
-      `${identity} は存在しない、もしくは削除された可能性があります。`
-    );
+export class UserNotFoundEmbed extends SystemMessage {
+  public constructor(specifier: UserSpecifier) {
+    super();
+    this.type = "failed";
+    this.title = "ユーザーが見つかりませんでした";
+    const identity = getIdentityCall(specifier);
+    this.message = `${identity} は存在しない、もしくは削除された可能性があります。`;
   }
 }
 
-export class UserStatsEmbed extends CustomMessageEmbed {
-  public constructor(user: UserStats) {
+export class UserStatsEmbed extends SystemMessage {
+  public constructor(user: UserStatsBody) {
+    super();
     const mention = `**${toMention(user.discordId)}**`;
     const owned = `書かれたプロフィール: ${user.ownedProfileCount} 件 (うち自己紹介 ${user.selfProfileCount} 件)`;
     const written = `書いたプロフィール: ${user.writtenProfileCount} 件`;
 
-    const message = [mention, "```", owned, written, "```"].join("\n");
-    super("user", "ユーザー", message);
+    this.type = "user";
+    this.title = "ユーザー";
+    this.message = [mention, "```", owned, written, "```"].join("\n");
   }
 }
 
-export class UserConfiguredEmbed extends CustomMessageEmbed {
-  public constructor(user: UserResult) {
+export class UserConfiguredEmbed extends SystemMessage {
+  public constructor(user: UserBody) {
+    super();
     const mention = `**${toMention(user.discordId)}**`;
     const enableMention = `メンション: ${user.enableMention ? "ON" : "OFF"}`;
 
-    const message = [mention, "```", enableMention, "```"].join("\n");
-    super("user", "ユーザー", message);
+    this.type = "user";
+    this.title = "ユーザー";
+    this.message = [mention, "```", enableMention, "```"].join("\n");
   }
 }
 

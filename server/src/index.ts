@@ -1,5 +1,5 @@
 import "./helpers";
-import "./prisma";
+import "./app/prisma";
 import "./build";
 
 console.log("Kimifeel started!");

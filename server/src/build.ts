@@ -1,5 +1,5 @@
-import { ProfileController, RequestController, UserController } from "controllers";
-import { ProfileEndpoint, RequestEndpoint, UserEndpoint } from "endpoints";
+import { ProfileController, RequestController, UserController } from "app/controllers";
+import { ProfileEndpoint, RequestEndpoint, UserEndpoint } from "app/endpoints";
 import { InteractionEventRunner, MessageEventRunner, ReactionEventRunner } from "discord/events";
 import { InteractionRouter, MessageRouter, ReactionRouter } from "discord/actions";
 import { ClientManager } from "./discord/client";

@@ -7,7 +7,7 @@ import {
   RequestSentEmbed
 } from "discord/views";
 import { AddEventAction } from "./base";
-import { RequestNotFoundError } from "../../../endpoints/errors";
+import { RequestNotFoundError } from "../../../app/endpoints/errors";
 import { Endpoints } from "../endpoints";
 import { filterMentionable } from "../mention";
 

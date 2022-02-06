@@ -1,6 +1,6 @@
-import { UserEndpoint } from "endpoints/user";
-import { ProfileEndpoint } from "endpoints/profile";
-import { RequestEndpoint } from "endpoints/request";
+import { UserEndpoint } from "app/endpoints/user";
+import { ProfileEndpoint } from "app/endpoints/profile";
+import { RequestEndpoint } from "app/endpoints/request";
 
 export type Endpoints = {
   profile: ProfileEndpoint;

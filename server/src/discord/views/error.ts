@@ -1,6 +1,6 @@
 import { SystemMessage } from "../structures";
 
-export class ErrorEmbed extends SystemMessage {
+export class ErrorMessage extends SystemMessage {
   constructor(error: unknown) {
     super();
     this.type = "error";
@@ -15,7 +15,7 @@ export class ErrorEmbed extends SystemMessage {
   }
 }
 
-export class UnavailableEmbed extends SystemMessage {
+export class UnavailableMessage extends SystemMessage {
   constructor() {
     super();
     this.type = "error";

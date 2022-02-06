@@ -1,9 +1,9 @@
-import { Communicator, ReplyOptions } from "./communicator";
 import { SystemMessage } from "./system-message";
 import { mentionUsers } from "../views";
 import { Message as DiscordMessage } from "discord.js";
+import { ReplyOptions } from "../runner/communicator";
 
-export class MessageCommand implements Communicator<DiscordMessage> {
+export class MessageCommand {
   public constructor(public readonly raw: DiscordMessage) {}
 
   public async reply(message: SystemMessage, options: ReplyOptions): Promise<void> {

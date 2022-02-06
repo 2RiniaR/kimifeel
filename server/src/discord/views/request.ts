@@ -29,7 +29,7 @@ function getIdentityCall(specifier: RequestSpecifier) {
   else return `プロフィール 番号: \`${specifier.index}\``;
 }
 
-export class RequestAcceptedEmbed extends SystemMessage {
+export class RequestAcceptedMessage extends SystemMessage {
   public constructor(profile: ProfileProps) {
     super();
     this.type = "succeed";
@@ -38,7 +38,7 @@ export class RequestAcceptedEmbed extends SystemMessage {
   }
 }
 
-export class RequestCanceledEmbed extends SystemMessage {
+export class RequestCanceledMessage extends SystemMessage {
   public constructor(request: RequestProps) {
     super();
     this.type = "failed";
@@ -47,7 +47,7 @@ export class RequestCanceledEmbed extends SystemMessage {
   }
 }
 
-export class RequestDeniedEmbed extends SystemMessage {
+export class RequestDeniedMessage extends SystemMessage {
   public constructor(request: RequestProps) {
     super();
     this.type = "failed";
@@ -56,7 +56,7 @@ export class RequestDeniedEmbed extends SystemMessage {
   }
 }
 
-export class RequestListEmbed extends SystemMessage {
+export class RequestListMessage extends SystemMessage {
   public constructor(requests: RequestProps[]) {
     super();
     this.type = "request";
@@ -69,7 +69,7 @@ export class RequestListEmbed extends SystemMessage {
   }
 }
 
-export class RequestSentEmbed extends SystemMessage {
+export class RequestSentMessage extends SystemMessage {
   public static readonly UserIdFieldName = "To";
   public static readonly IndexFieldName = "Request No.";
 
@@ -77,24 +77,24 @@ export class RequestSentEmbed extends SystemMessage {
     super();
     this.type = "request";
     this.title = "リクエストが作成されました！";
-    this.message = RequestSentEmbed.buildDescription(request);
+    this.message = RequestSentMessage.buildDescription(request);
   }
 
   public getEmbed(): MessageEmbed {
     return super
       .getEmbed()
-      .addField(RequestSentEmbed.UserIdFieldName, toMention(this.request.targetUserId), true)
-      .addField(RequestSentEmbed.IndexFieldName, this.request.index.toString(), true);
+      .addField(RequestSentMessage.UserIdFieldName, toMention(this.request.targetUserId), true)
+      .addField(RequestSentMessage.IndexFieldName, this.request.index.toString(), true);
   }
 
   public static getUserId(embed: MessageEmbed): string | undefined {
-    const indexField = embed.fields.find((field) => field.name === RequestSentEmbed.UserIdFieldName);
+    const indexField = embed.fields.find((field) => field.name === RequestSentMessage.UserIdFieldName);
     if (!indexField) return;
     return removeMention(indexField.value);
   }
 
   public static getIndex(embed: MessageEmbed): number | undefined {
-    const indexField = embed.fields.find((field) => field.name === RequestSentEmbed.IndexFieldName);
+    const indexField = embed.fields.find((field) => field.name === RequestSentMessage.IndexFieldName);
     if (!indexField) return;
     return parseInt(indexField.value);
   }
@@ -109,7 +109,7 @@ export class RequestSentEmbed extends SystemMessage {
   }
 }
 
-export class SendRequestOwnEmbed extends SystemMessage {
+export class SendRequestOwnMessage extends SystemMessage {
   public constructor() {
     super();
     this.type = "invalid";
@@ -117,7 +117,7 @@ export class SendRequestOwnEmbed extends SystemMessage {
   }
 }
 
-export class RequestNotFoundEmbed extends SystemMessage {
+export class RequestNotFoundMessage extends SystemMessage {
   public constructor(specifier: RequestSpecifier) {
     super();
     this.type = "failed";

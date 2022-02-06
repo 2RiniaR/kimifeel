@@ -1,9 +1,11 @@
-import { ProfileCreatedEmbed, ProfileDeletedEmbed, ProfileListEmbed } from "discord/views";
+import { Endpoints } from "./endpoints";
+import { ArgumentFormatInvalidError } from "./errors";
 import { CommandInteraction } from "discord.js";
-import { CreateCommandEventAction } from "./base";
-import { ArgumentFormatInvalidError } from "../errors";
-import { ParameterFormatInvalidError } from "app/endpoints/errors";
-import { Endpoints } from "../endpoints";
+import { ParameterFormatInvalidError } from "../../app/endpoints/errors";
+
+export interface ProfilePropsProvider {
+
+};
 
 export class ProfileAction {
   public async create(command: CommandInteraction) {

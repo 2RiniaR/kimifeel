@@ -19,7 +19,7 @@ export function removeMention(mention: string): string {
   return mention.replace(removeRegex, "$1");
 }
 
-export class UserRegisteredEmbed extends SystemMessage {
+export class UserRegisteredMessage extends SystemMessage {
   public constructor({ discordId }: UserProps) {
     super();
     this.type = "succeed";
@@ -28,7 +28,7 @@ export class UserRegisteredEmbed extends SystemMessage {
   }
 }
 
-export class UserRegisterRequiredEmbed extends SystemMessage {
+export class UserRegisterRequiredMessage extends SystemMessage {
   public constructor() {
     super();
     this.type = "info";
@@ -46,7 +46,7 @@ export class UserRegisterRequiredEmbed extends SystemMessage {
   }
 }
 
-export class UserAlreadyRegisteredEmbed extends SystemMessage {
+export class UserAlreadyRegisteredMessage extends SystemMessage {
   public constructor(specifier: UserSpecifier) {
     super();
     this.type = "failed";
@@ -56,7 +56,7 @@ export class UserAlreadyRegisteredEmbed extends SystemMessage {
   }
 }
 
-export class UserNotFoundEmbed extends SystemMessage {
+export class UserNotFoundMessage extends SystemMessage {
   public constructor(specifier: UserSpecifier) {
     super();
     this.type = "failed";
@@ -66,7 +66,7 @@ export class UserNotFoundEmbed extends SystemMessage {
   }
 }
 
-export class UserStatsEmbed extends SystemMessage {
+export class UserStatsMessage extends SystemMessage {
   public constructor(user: UserStatsBody) {
     super();
     const mention = `**${toMention(user.discordId)}**`;
@@ -79,7 +79,7 @@ export class UserStatsEmbed extends SystemMessage {
   }
 }
 
-export class UserConfiguredEmbed extends SystemMessage {
+export class UserConfiguredMessage extends SystemMessage {
   public constructor(user: UserBody) {
     super();
     const mention = `**${toMention(user.discordId)}**`;

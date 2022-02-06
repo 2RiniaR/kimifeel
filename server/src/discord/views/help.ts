@@ -1,6 +1,6 @@
 import { SystemMessage } from "../structures";
 
-export class HelpEmbed extends SystemMessage {
+export class HelpMessage extends SystemMessage {
   constructor() {
     super();
     this.type = "info";

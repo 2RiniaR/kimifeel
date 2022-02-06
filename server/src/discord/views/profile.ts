@@ -22,7 +22,7 @@ function getIdentityCall(specifier: ProfileSpecifier) {
   else return `プロフィール 番号: \`${specifier.index}\``;
 }
 
-export class ProfileCreatedEmbed extends SystemMessage {
+export class ProfileCreatedMessage extends SystemMessage {
   public constructor(profile: ProfileProps) {
     super();
     this.type = "succeed";
@@ -31,7 +31,7 @@ export class ProfileCreatedEmbed extends SystemMessage {
   }
 }
 
-export class ProfileDeletedEmbed extends SystemMessage {
+export class ProfileDeletedMessage extends SystemMessage {
   public constructor(profile: ProfileProps) {
     super();
     this.type = "deleted";
@@ -40,7 +40,7 @@ export class ProfileDeletedEmbed extends SystemMessage {
   }
 }
 
-export class ProfileListEmbed extends SystemMessage {
+export class ProfileListMessage extends SystemMessage {
   public constructor(profiles: ProfileProps[]) {
     super();
     this.type = "profile";
@@ -53,7 +53,7 @@ export class ProfileListEmbed extends SystemMessage {
   }
 }
 
-export class ProfileNotFoundEmbed extends SystemMessage {
+export class ProfileNotFoundMessage extends SystemMessage {
   public constructor(specifier: ProfileSpecifier) {
     super();
     this.type = "failed";
@@ -63,7 +63,7 @@ export class ProfileNotFoundEmbed extends SystemMessage {
   }
 }
 
-export class ProfileContentLengthLimitEmbed extends SystemMessage {
+export class ProfileContentLengthLimitMessage extends SystemMessage {
   public constructor(min: number, max: number, actual: number) {
     super();
     this.type = "invalid";

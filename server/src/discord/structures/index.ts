@@ -1,4 +1,4 @@
-export * from "./communicator";
+export * from "./discord-user";
 export * from "./message-command";
 export * from "./reaction";
 export * from "./slash-command";

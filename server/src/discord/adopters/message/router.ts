@@ -1,4 +1,4 @@
-import { Endpoints } from "../endpoints";
+import { Endpoints } from "../../actions/endpoints";
 import { MessageEventRunner } from "discord/events/message";
 import { basePhrase } from "./command";
 import {
@@ -17,7 +17,7 @@ import {
   ShowRequestAction
 } from "./request";
 import { ConfigUserAction, RegisterUserAction, ShowStatsUserAction } from "./user";
-import { HelpAction } from "./help";
+import { HelpCommunicator } from "./help";
 
 export class MessageRouter {
   private readonly event: MessageEventRunner;
@@ -29,7 +29,7 @@ export class MessageRouter {
   }
 
   public registerActions() {
-    this.event.registerCreateCommandEvent(new HelpAction(), {
+    this.event.registerCreateCommandEvent(new HelpCommunicator(), {
       prefixes: [`${basePhrase} help`],
       allowBot: false
     });

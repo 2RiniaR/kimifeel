@@ -1,4 +1,5 @@
 import { SystemMessage } from "../structures";
+import { code } from "./elements";
 
 export class FetchFailedMessage extends SystemMessage {
   constructor() {
@@ -14,7 +15,7 @@ export class ParameterFormatInvalidMessage extends SystemMessage {
     super();
     this.type = "invalid";
     this.title = "パラメータの形式が不正です";
-    this.message = `\`${position}\` には、 \`${format}\` を入力してください。`;
+    this.message = `${code(position)} には、 ${code(format)} を入力してください。`;
   }
 }
 
@@ -23,7 +24,7 @@ export class CommandUnexpectedArgumentMessage extends SystemMessage {
     super();
     this.type = "invalid";
     this.title = "引数の個数が不正です";
-    this.message = `\`${expected.toString()}\` 個の引数が必要ですが、\`${actual.toString()}\` 個入力されています。`;
+    this.message = `${code(expected.toString())} 個の引数が必要ですが、${code(actual.toString())} 個入力されています。`;
   }
 }
 
@@ -32,6 +33,6 @@ export class CommandUnexpectedOptionMessage extends SystemMessage {
     super();
     this.type = "invalid";
     this.title = "不明なオプションが入力されています";
-    this.message = `オプション ${options.map((name) => `\`${name}\``).join(", ")} は要求されていません。`;
+    this.message = `オプション ${options.map((name) => code(name)).join(", ")} は要求されていません。`;
   }
 }

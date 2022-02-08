@@ -1,5 +1,5 @@
 import { ClientUser, Profile } from "../../models/structures";
-import { ProfileBody, ProfileSpecifier } from "../../endpoints/structures";
+import { ProfileBody, ProfileSpecifier } from "../../endpoints";
 import * as EndpointError from "../../endpoints/errors";
 import { withHandleModelErrors } from "../errors";
 import { UserService } from "./user";

@@ -1,13 +1,9 @@
-import { UserBody, UserSpecifier, UserStatsBody } from "./structures";
-
-export type ConfigParams = {
-  enableMention?: boolean;
-};
+import { UserBody, UserConfigParams, UserSpecifier, UserStatsBody } from "./structures";
 
 export interface UserEndpointResponder {
   getStats(clientId: string, params: UserSpecifier): PromiseLike<UserStatsBody>;
   findMany(clientId: string, params: UserSpecifier[]): PromiseLike<UserBody[]>;
-  config(clientId: string, params: ConfigParams): PromiseLike<UserBody>;
+  config(clientId: string, params: UserConfigParams): PromiseLike<UserBody>;
 }
 
 export class UserEndpoint {
@@ -25,7 +21,7 @@ export class UserEndpoint {
     return this.responder.getStats(clientId, params);
   }
 
-  config(clientId: string, params: ConfigParams): PromiseLike<UserBody> {
+  config(clientId: string, params: UserConfigParams): PromiseLike<UserBody> {
     return this.responder.config(clientId, params);
   }
 }

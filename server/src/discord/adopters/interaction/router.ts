@@ -1,5 +1,5 @@
 import { InteractionEventRunner } from "discord/events";
-import { Endpoints } from "../endpoints";
+import { Endpoints } from "../../actions/endpoints";
 import {
   CreateProfileAction,
   DeleteProfileAction,
@@ -16,7 +16,7 @@ import {
   ShowRequestAction
 } from "./request";
 import { ConfigUserAction, RegisterUserAction, ShowStatsUserAction } from "./user";
-import { HelpAction } from "./help";
+import { HelpCommunicator } from "./help";
 
 export class InteractionRouter {
   private readonly event: InteractionEventRunner;
@@ -28,7 +28,7 @@ export class InteractionRouter {
   }
 
   public registerActions() {
-    this.event.registerCreateCommandEvent(new HelpAction(), {
+    this.event.registerCreateCommandEvent(new HelpCommunicator(), {
       commandName: "help",
       allowBot: false
     });

@@ -1,5 +1,5 @@
 import { ClientUser, Request } from "../../models/structures";
-import { RequestBody, RequestSpecifier } from "../../endpoints/structures";
+import { RequestBody, RequestSpecifier } from "../../endpoints";
 import * as EndpointError from "../../endpoints/errors";
 import { withHandleModelErrors } from "../errors";
 import { UserService } from "./user";
@@ -10,7 +10,7 @@ export class RequestService {
     return {
       index: request.index,
       content: request.profile.content,
-      requester: userService.toBody(request.profile.author),
+      applicant: userService.toBody(request.profile.author),
       target: userService.toBody(request.profile.owner)
     };
   }

@@ -8,8 +8,8 @@ import {
 } from "discord/views";
 import { AddEventAction } from "./base";
 import { RequestNotFoundError } from "../../../app/endpoints/errors";
-import { Endpoints } from "../endpoints";
-import { filterMentionable } from "../mention";
+import { Endpoints } from "../../actions/endpoints";
+import { filterMentionable } from "../../actions/mention";
 
 export class AcceptRequestAction extends AddEventAction {
   private readonly endpoints: Endpoints;

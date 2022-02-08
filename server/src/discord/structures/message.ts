@@ -1,19 +1,15 @@
 import { SystemMessage } from "./system-message";
-import { mentionUsers } from "../views";
 import { Message as DiscordMessage } from "discord.js";
-import { ReplyOptions } from "../runner/communicator";
+import { ReplyOptions } from "./communicator";
+import { UsersMention } from "../views/mention";
+import { CommandFragments } from "../../command-parser";
 
-export class MessageCommand {
-  public constructor(public readonly raw: DiscordMessage) {}
+export class Message {
+  public constructor(public readonly raw: DiscordMessage, public readonly fragments: CommandFragments) {}
 
   public async reply(message: SystemMessage, options: ReplyOptions): Promise<void> {
-    let mentions = undefined;
-    if (options.mentions && options.mentions.length > 0) {
-      mentions = mentionUsers(options.mentions);
-    }
-
     const card = await this.raw.reply({
-      content: mentions,
+      content: options.mentions ? new UsersMention(options.mentions).getContent() : undefined,
       embeds: [message.getEmbed()]
     });
 

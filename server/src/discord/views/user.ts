@@ -1,30 +1,12 @@
-import { UserBody, UserSpecifier, UserStatsBody } from "app/endpoints/structures";
 import { SystemMessage } from "../structures";
-
-export type UserProps = {
-  discordId: string;
-};
-
-export function toMention(userId: string): string {
-  return `<@${userId}>`;
-}
-
-function getIdentityCall(specifier: UserSpecifier) {
-  if ("id" in specifier) return `ユーザー ID: \`${specifier.id}\``;
-  else return toMention(specifier.discordId);
-}
-
-const removeRegex = /^<@(\d+)>$/;
-export function removeMention(mention: string): string {
-  return mention.replace(removeRegex, "$1");
-}
+import { UserStatsBodyView, UserSpecifierView, UserBodyView } from "./structures";
 
 export class UserRegisteredMessage extends SystemMessage {
-  public constructor({ discordId }: UserProps) {
+  public constructor(user: UserSpecifierView) {
     super();
     this.type = "succeed";
     this.title = "ユーザーが登録されました！";
-    this.message = toMention(discordId);
+    this.message = user.mention();
   }
 }
 
@@ -47,50 +29,37 @@ export class UserRegisterRequiredMessage extends SystemMessage {
 }
 
 export class UserAlreadyRegisteredMessage extends SystemMessage {
-  public constructor(specifier: UserSpecifier) {
+  public constructor(user: UserSpecifierView) {
     super();
     this.type = "failed";
     this.title = "ユーザー登録に失敗しました";
-    const identity = getIdentityCall(specifier);
-    this.message = `${identity} は既に登録されています`;
+    this.message = `${user.mention()} は既に登録されています`;
   }
 }
 
 export class UserNotFoundMessage extends SystemMessage {
-  public constructor(specifier: UserSpecifier) {
+  public constructor(user: UserSpecifierView) {
     super();
     this.type = "failed";
     this.title = "ユーザーが見つかりませんでした";
-    const identity = getIdentityCall(specifier);
-    this.message = `${identity} は存在しない、もしくは削除された可能性があります。`;
+    this.message = `${user.mention()} は存在しない、もしくは削除された可能性があります。`;
   }
 }
 
 export class UserStatsMessage extends SystemMessage {
-  public constructor(user: UserStatsBody) {
+  public constructor(stats: UserStatsBodyView) {
     super();
-    const mention = `**${toMention(user.discordId)}**`;
-    const owned = `書かれたプロフィール: ${user.ownedProfileCount} 件 (うち自己紹介 ${user.selfProfileCount} 件)`;
-    const written = `書いたプロフィール: ${user.writtenProfileCount} 件`;
-
     this.type = "user";
     this.title = "ユーザー";
-    this.message = [mention, "```", owned, written, "```"].join("\n");
+    this.message = stats.detail();
   }
 }
 
 export class UserConfiguredMessage extends SystemMessage {
-  public constructor(user: UserBody) {
+  public constructor(user: UserBodyView) {
     super();
-    const mention = `**${toMention(user.discordId)}**`;
-    const enableMention = `メンション: ${user.enableMention ? "ON" : "OFF"}`;
-
     this.type = "user";
     this.title = "ユーザー";
-    this.message = [mention, "```", enableMention, "```"].join("\n");
+    this.message = user.detail();
   }
-}
-
-export function mentionUsers(usersId: readonly string[]) {
-  return usersId.map((id) => toMention(id)).join(", ");
 }

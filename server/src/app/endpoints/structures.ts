@@ -5,7 +5,7 @@ export type UserSpecifier = { id: string } | { discordId: string };
 export type RequestBody = {
   index: number;
   content: string;
-  requester: UserBody;
+  applicant: UserBody;
   target: UserBody;
 };
 
@@ -26,6 +26,10 @@ export type UserStatsBody = UserBody & {
   ownedProfileCount: number;
   selfProfileCount: number;
   writtenProfileCount: number;
+};
+
+export type UserConfigParams = {
+  enableMention?: boolean;
 };
 
 export type CreateRequestParams = {

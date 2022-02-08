@@ -1,6 +1,6 @@
 import { ClientUser, User } from "../../models/structures";
 import * as EndpointError from "../../endpoints/errors";
-import { UserBody, UserSpecifier } from "../../endpoints/structures";
+import { UserBody, UserSpecifier } from "../../endpoints";
 import { withHandleModelErrors } from "../errors";
 
 export class UserService {

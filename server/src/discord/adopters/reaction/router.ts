@@ -1,4 +1,4 @@
-import { Endpoints } from "../endpoints";
+import { Endpoints } from "../../actions/endpoints";
 import { AcceptRequestAction, CancelRequestAction, DenyRequestAction } from "./request";
 import { ReactionEventRunner } from "discord/events/reaction";
 

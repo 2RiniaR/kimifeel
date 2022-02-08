@@ -1,3 +1,4 @@
+export * from "./structures";
 export * from "./error";
 export * from "./action";
 export * from "./profile";

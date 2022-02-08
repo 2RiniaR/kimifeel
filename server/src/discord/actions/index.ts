@@ -1,3 +1,3 @@
-export * from "./interaction/router";
-export * from "./message/router";
-export * from "./reaction/router";
+export * from "../adopters/interaction/router";
+export * from "../adopters/message/router";
+export * from "../adopters/reaction/router";

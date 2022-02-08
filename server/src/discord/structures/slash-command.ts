@@ -1,21 +1,17 @@
-import { Communicator, ReplyOptions } from "./communicator";
+import { ReplyOptions } from "./communicator";
 import { SystemMessage } from "./system-message";
-import { mentionUsers } from "../views";
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, Message, User } from "discord.js";
+import { UsersMention } from "../views/mention";
 
-export class SlashCommand implements Communicator<CommandInteraction> {
+export class SlashCommand {
   public constructor(public readonly raw: CommandInteraction) {}
 
   public async reply(message: SystemMessage, options: ReplyOptions): Promise<void> {
-    let mentions = undefined;
-    if (options.mentions && options.mentions.length > 0) {
-      mentions = mentionUsers(options.mentions);
-    }
-
     const card = await this.raw.reply({
-      content: mentions,
+      content: options.mentions ? new UsersMention(options.mentions).getContent() : undefined,
       embeds: [message.getEmbed()],
-      fetchReply: true
+      fetchReply: true,
+      ephemeral: options.showOnlySender
     });
     if (!(card instanceof Message)) return;
 
@@ -24,19 +20,35 @@ export class SlashCommand implements Communicator<CommandInteraction> {
     }
   }
 
-  public getInteger(name: string, required: boolean) {
-    return this.raw.options.getInteger(name, required) ?? undefined;
+  public getInteger(name: string): number {
+    return this.raw.options.getInteger(name, true);
   }
 
-  public getString(name: string, required: boolean) {
-    return this.raw.options.getString(name, required) ?? undefined;
+  public getIntegerOptional(name: string): number | undefined {
+    return this.raw.options.getInteger(name, false) ?? undefined;
   }
 
-  public getBoolean(name: string, required: boolean) {
-    return this.raw.options.getBoolean(name, required) ?? undefined;
+  public getString(name: string): string {
+    return this.raw.options.getString(name, true);
   }
 
-  public getUser(name: string, required: boolean) {
-    return this.raw.options.getUser(name, required) ?? undefined;
+  public getStringOptional(name: string): string | undefined {
+    return this.raw.options.getString(name, false) ?? undefined;
+  }
+
+  public getBoolean(name: string): boolean {
+    return this.raw.options.getBoolean(name, true);
+  }
+
+  public getBooleanOptional(name: string): boolean | undefined {
+    return this.raw.options.getBoolean(name) ?? undefined;
+  }
+
+  public getUser(name: string): User {
+    return this.raw.options.getUser(name, true);
+  }
+
+  public getUserOptional(name: string): User | undefined {
+    return this.raw.options.getUser(name, false) ?? undefined;
   }
 }

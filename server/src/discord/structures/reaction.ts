@@ -1,5 +1,5 @@
-import { MessageCommand } from "./message-command";
+import { Message } from "./message";
 
 export class Reaction {
-  public constructor(public readonly message: MessageCommand) {}
+  public constructor(public readonly message: Message) {}
 }

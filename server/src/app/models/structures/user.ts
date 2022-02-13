@@ -1,3 +1,4 @@
+import { RawUser, UserRepository, RequestRepository, ProfileRepository } from "data-store";
 import { Context, ContextModel } from "../context";
 import { Request } from "./request";
 import {
@@ -5,12 +6,11 @@ import {
   InvalidParameterError,
   NotFoundError,
   SubmitRequestOwnError,
-  withHandleRepositoryErrors
+  withConvertRepositoryErrors
 } from "../errors";
 import { ImaginaryRequest } from "./imaginary-request";
 import { Profile } from "./profile";
 import { ImaginaryProfile } from "./imaginary-profile";
-import { RawUser, UserRepository, RequestRepository, ProfileRepository } from "../../../prisma";
 
 export class IdentityUser extends ContextModel implements UserIdentifier {
   public readonly id: string;
@@ -138,7 +138,7 @@ class UserService extends ContextModel {
       applicantUserId = props.applicant?.id;
     }
 
-    const results = await withHandleRepositoryErrors(() =>
+    const results = await withConvertRepositoryErrors.invoke(() =>
       new RequestRepository().search({
         order: props.order,
         start: props.start,
@@ -152,7 +152,7 @@ class UserService extends ContextModel {
   }
 
   public async updateConfig(props: Partial<ConfigProps>): Promise<User> {
-    const user = await withHandleRepositoryErrors(() => new UserRepository().update(this.user.id, props));
+    const user = await withConvertRepositoryErrors.invoke(() => new UserRepository().update(this.user.id, props));
     if (!user) throw new NotFoundError();
     return User.fromRaw(this.context, user);
   }
@@ -160,7 +160,7 @@ class UserService extends ContextModel {
   public async getStats(): Promise<UserStats> {
     const selfId = this.user.id;
     const profileRepository = new ProfileRepository();
-    return await withHandleRepositoryErrors(async () => ({
+    return await withConvertRepositoryErrors.invoke(async () => ({
       ownedProfileCount: await profileRepository.count({ ownerUserId: selfId }),
       writtenProfileCount: await profileRepository.count({ authorUserId: selfId }),
       selfProfileCount: await profileRepository.count({ ownerUserId: selfId, authorUserId: selfId })

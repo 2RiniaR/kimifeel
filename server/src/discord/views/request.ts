@@ -1,85 +1,78 @@
 import { MessageEmbed } from "discord.js";
-import { SystemMessage } from "../structures";
-import { ProfileBodyView, RequestBodyView, RequestSpecifierView } from "./structures";
+import { ProfileView, RequestView, UserIdentityView } from "./structures";
+import { MessageImpl } from "../adapters/structures";
+import { Profile, Request, RequestIdentity, SystemMessage, SystemMessageRead } from "../structures";
+import { RequestMessageGenerator } from "../actions";
 
-export class RequestAcceptedMessage extends SystemMessage {
-  public constructor(profile: ProfileBodyView) {
-    super();
-    this.type = "succeed";
-    this.title = "リクエストが承認されました！";
-    this.message = profile.detail();
+export class RequestMessageGeneratorImpl implements RequestMessageGenerator {
+  accepted(profile: Profile): SystemMessage {
+    return {
+      type: "succeed",
+      title: "リクエストが承認されました！",
+      message: new ProfileView(profile).detail()
+    };
   }
-}
 
-export class RequestCanceledMessage extends SystemMessage {
-  public constructor(request: RequestBodyView) {
-    super();
-    this.type = "failed";
-    this.title = "リクエストがキャンセルされました";
-    this.message = request.abstract();
+  canceled(request: Request): SystemMessage {
+    return {
+      type: "failed",
+      title: "リクエストがキャンセルされました",
+      message: new RequestView(request).abstract()
+    };
   }
-}
 
-export class RequestDeniedMessage extends SystemMessage {
-  public constructor(request: RequestBodyView) {
-    super();
-    this.type = "failed";
-    this.title = "リクエストが拒否されました";
-    this.message = request.abstract();
+  denied(request: Request): SystemMessage {
+    return {
+      type: "failed",
+      title: "リクエストが拒否されました",
+      message: new RequestView(request).abstract()
+    };
   }
-}
 
-export class RequestListMessage extends SystemMessage {
-  public constructor(requests: RequestBodyView[]) {
-    super();
-    this.type = "request";
-    this.title = "リクエスト";
+  list(requests: Request[]): SystemMessage {
+    let message;
     if (requests.length > 0) {
-      this.message = requests.map((request) => request.detail()).join("\n\n");
+      message = requests.map((request) => new RequestView(request).detail()).join("\n\n");
     } else {
-      this.message = "該当する結果はありませんでした。";
+      message = "該当する結果はありませんでした。";
     }
+
+    return {
+      type: "request",
+      title: "リクエスト",
+      message
+    };
+  }
+
+  sent(request: Request): SystemMessage {
+    return new RequestSentMessage(request);
   }
 }
 
-export class RequestSentMessage extends SystemMessage {
+export class RequestSentMessage implements SystemMessage {
   public static readonly UserIdFieldName = "To";
   public static readonly IndexFieldName = "Request No.";
+  public readonly type = "request";
+  public readonly title = "リクエストが作成されました！";
+  public readonly message;
+  public readonly fields;
 
-  public constructor(public readonly request: RequestBodyView) {
-    super();
-    this.type = "request";
-    this.title = "リクエストが作成されました！";
-    this.message = request.reviewCard();
+  public constructor(public readonly request: Request) {
+    this.message = new RequestView(request).reviewCard();
+    this.fields = [
+      {
+        name: RequestSentMessage.UserIdFieldName,
+        value: new UserIdentityView(this.request.target).mention(),
+        inline: true
+      },
+      { name: RequestSentMessage.IndexFieldName, value: request.index.toString(), inline: true }
+    ];
   }
 
-  public getEmbed(): MessageEmbed {
-    return super
-      .getEmbed()
-      .addField(RequestSentMessage.UserIdFieldName, this.request.target.mention(), true)
-      .addField(RequestSentMessage.IndexFieldName, this.request.index.toString(), true);
-  }
-
-  public static getIndex(embed: MessageEmbed): number | undefined {
-    const indexField = embed.fields.find((field) => field.name === RequestSentMessage.IndexFieldName);
+  public static fromMessage(message: SystemMessageRead): RequestIdentity | undefined {
+    if (!message.fields) return;
+    const indexField = message.fields.find((field) => field.name === RequestSentMessage.IndexFieldName);
     if (!indexField) return;
-    return parseInt(indexField.value);
-  }
-}
-
-export class SendRequestOwnMessage extends SystemMessage {
-  public constructor() {
-    super();
-    this.type = "invalid";
-    this.title = "自分自身にリクエストを送信することはできません";
-  }
-}
-
-export class RequestNotFoundMessage extends SystemMessage {
-  public constructor(request: RequestSpecifierView) {
-    super();
-    this.type = "failed";
-    this.title = "リクエストが見つかりませんでした";
-    this.message = `${request.call()} は存在しない、もしくは削除された可能性があります。`;
+    return { index: parseInt(indexField.value) };
   }
 }

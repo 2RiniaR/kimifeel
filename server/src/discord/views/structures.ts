@@ -1,52 +1,61 @@
-import { bold, codeBlock, italic } from "./elements";
+import { bold, codeBlock, italic } from "./format";
+import {
+  Profile,
+  ProfileIdentity,
+  DiscordUserIdentity,
+  RequestIdentity,
+  Request,
+  DiscordUser,
+  DiscordUserStats
+} from "../structures";
 
-export class ProfileSpecifierView {
-  public constructor(public readonly index: number) {}
+export class ProfileIdentityView {
+  public constructor(public readonly profile: ProfileIdentity) {}
 
   public call(): string {
-    return bold(`No.${this.index}`);
+    return bold(`No.${this.profile.index}`);
   }
 }
 
-export class ProfileBodyView extends ProfileSpecifierView {
-  public readonly owner: UserSpecifierView;
-  public readonly author: UserSpecifierView;
+export class ProfileView extends ProfileIdentityView {
+  public readonly owner: UserIdentityView;
+  public readonly author: UserIdentityView;
 
-  public constructor(index: number, public readonly content: string, ownerId: string, authorId: string) {
-    super(index);
-    this.owner = new UserSpecifierView(ownerId);
-    this.author = new UserSpecifierView(authorId);
+  public constructor(public readonly profile: Profile) {
+    super(profile);
+    this.owner = new UserIdentityView(profile.owner);
+    this.author = new UserIdentityView(profile.author);
   }
 
   public abstract(): string {
-    return `${bold(`No.${this.index}`)} ${this.owner.mention()} ―――― ${italic(`by ${this.author.mention()}`)}`;
+    return `${bold(`No.${this.profile.index}`)} ${this.owner.mention()} ―――― ${italic(`by ${this.author.mention()}`)}`;
   }
 
   public detail(): string {
     return [
-      `${bold(`No.${this.index}`)} ${this.owner.mention()}`,
-      codeBlock(this.content),
+      `${bold(`No.${this.profile.index}`)} ${this.owner.mention()}`,
+      codeBlock(this.profile.content),
       `―――― ${italic(`by ${this.author.mention()}`)}`
     ].join("\n");
   }
 }
 
-export class RequestSpecifierView {
-  public constructor(public readonly index: number) {}
+export class RequestIdentityView {
+  public constructor(public readonly request: RequestIdentity) {}
 
   public call(): string {
-    return bold(`No.${this.index}`);
+    return bold(`No.${this.request.index}`);
   }
 }
 
-export class RequestBodyView extends RequestSpecifierView {
-  public readonly target: UserSpecifierView;
-  public readonly applicant: UserSpecifierView;
+export class RequestView extends RequestIdentityView {
+  public readonly target: UserIdentityView;
+  public readonly applicant: UserIdentityView;
 
-  public constructor(index: number, public readonly content: string, targetId: string, applicantId: string) {
-    super(index);
-    this.target = new UserSpecifierView(targetId);
-    this.applicant = new UserSpecifierView(applicantId);
+  public constructor(public readonly request: Request) {
+    super(request);
+    this.target = new UserIdentityView(request.target);
+    this.applicant = new UserIdentityView(request.applicant);
   }
 
   public abstract(): string {
@@ -56,13 +65,13 @@ export class RequestBodyView extends RequestSpecifierView {
   public detail(): string {
     return [
       `${this.call()} ${this.target.mention()}`,
-      codeBlock(this.content),
+      codeBlock(this.request.content),
       `―――― ${italic(`by ${this.applicant.mention()}`)}`
     ].join("\n");
   }
 
   public reviewCard(): string {
-    const content = codeBlock(this.content);
+    const content = codeBlock(this.request.content);
     const targetActions = [
       this.target.mention(),
       "承認→✅のリアクションを付ける",
@@ -73,43 +82,38 @@ export class RequestBodyView extends RequestSpecifierView {
   }
 }
 
-export class UserSpecifierView {
-  public constructor(public readonly id: string) {}
+export class UserIdentityView {
+  public constructor(public readonly user: DiscordUserIdentity) {}
   private static unpackMentionRegex = /^<@(\d+)>$/;
 
   public mention(): string {
-    return `<@${this.id}>`;
+    return `<@${this.user.id}>`;
   }
 
-  public static fromMention(mention: string): UserSpecifierView {
-    const id = mention.replace(UserSpecifierView.unpackMentionRegex, "$1");
-    return new UserSpecifierView(id);
-  }
-}
-
-export class UserBodyView extends UserSpecifierView {
-  public constructor(id: string, public readonly enableMention: boolean) {
-    super(id);
-  }
-
-  public detail(): string {
-    return [this.mention(), codeBlock(`メンション: ${this.enableMention ? "ON" : "OFF"}`)].join("\n");
+  public static fromMention(mention: string): UserIdentityView {
+    const id = mention.replace(UserIdentityView.unpackMentionRegex, "$1");
+    return new UserIdentityView({ id });
   }
 }
 
-export class UserStatsBodyView extends UserSpecifierView {
-  public constructor(
-    id: string,
-    public readonly ownedProfileCount: number,
-    public readonly selfProfileCount: number,
-    public readonly writtenProfileCount: number
-  ) {
-    super(id);
+export class UserView extends UserIdentityView {
+  public constructor(public readonly user: DiscordUser) {
+    super(user);
   }
 
   public detail(): string {
-    const owned = `書かれたプロフィール: ${this.ownedProfileCount} 件 (うち自己紹介 ${this.selfProfileCount} 件)`;
-    const written = `書いたプロフィール: ${this.writtenProfileCount} 件`;
+    return [this.mention(), codeBlock(`メンション: ${this.user.enableMention ? "ON" : "OFF"}`)].join("\n");
+  }
+}
+
+export class UserStatsView extends UserIdentityView {
+  public constructor(public readonly stats: DiscordUserStats) {
+    super(stats);
+  }
+
+  public detail(): string {
+    const owned = `書かれたプロフィール: ${this.stats.ownedProfileCount} 件 (うち自己紹介 ${this.stats.selfProfileCount} 件)`;
+    const written = `書いたプロフィール: ${this.stats.writtenProfileCount} 件`;
     return [this.mention(), codeBlock([owned, written].join("\n"))].join("\n");
   }
 }

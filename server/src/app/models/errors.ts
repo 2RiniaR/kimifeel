@@ -1,10 +1,12 @@
-import { ConnectionError } from "../../prisma";
+import { ConnectionError } from "data-store";
+import { emptyErrorPipeline } from "../../helpers/catch";
 
 export class ForbiddenError extends Error {}
+
 export class NotFoundError extends Error {}
+
 export class DataAccessFailedError extends Error {}
 
-export class UserAlreadyRegisteredError extends Error {}
 export class SubmitRequestOwnError extends Error {}
 
 export class InvalidParameterError<T> extends Error {
@@ -31,11 +33,6 @@ export class ContentLengthLimitError extends Error {
   }
 }
 
-export function withHandleRepositoryErrors<TReturn>(inner: () => TReturn) {
-  try {
-    return inner();
-  } catch (error) {
-    if (error instanceof ConnectionError) throw new DataAccessFailedError();
-    throw error;
-  }
-}
+export const withConvertRepositoryErrors = emptyErrorPipeline.guard((error) => {
+  if (error instanceof ConnectionError) throw new DataAccessFailedError();
+});

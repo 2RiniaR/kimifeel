@@ -1,6 +1,6 @@
+import { UserRepository } from "data-store";
 import { ClientUser } from "../structures";
-import { withHandleRepositoryErrors } from "../errors";
-import { UserRepository } from "../../../prisma";
+import { withConvertRepositoryErrors } from "../errors";
 
 export class ClientUserManager {
   private readonly service = new ClientUserManagerService();
@@ -12,7 +12,7 @@ export class ClientUserManager {
 
 export class ClientUserManagerService {
   public async find(id: string): Promise<ClientUser | undefined> {
-    const result = await withHandleRepositoryErrors(() => new UserRepository().find({ id }));
+    const result = await withConvertRepositoryErrors.invoke(() => new UserRepository().find({ id }));
     if (!result) return;
     return ClientUser.fromQuery(result);
   }

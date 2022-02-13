@@ -1,7 +1,7 @@
+import { ProfileRepository, ProfileUniqueField } from "data-store";
 import { ContextModel } from "../context";
 import { IdentityUser, Profile } from "../structures";
-import { InvalidParameterError, withHandleRepositoryErrors } from "../errors";
-import { ProfileRepository, ProfileUniqueField } from "../../../prisma";
+import { InvalidParameterError, withConvertRepositoryErrors } from "../errors";
 
 export class ProfileManager extends ContextModel {
   private readonly service = new ProfileManagerService(this.context);
@@ -46,13 +46,13 @@ export type RandomOptions = {
 
 export class ProfileManagerService extends ContextModel {
   public async find(unique: ProfileUniqueField): Promise<Profile | undefined> {
-    const result = await withHandleRepositoryErrors(() => new ProfileRepository().find(unique));
+    const result = await withConvertRepositoryErrors.invoke(() => new ProfileRepository().find(unique));
     if (!result) return;
     return Profile.fromRaw(this.context, result);
   }
 
   public async search(options: SearchOptions): Promise<Profile[]> {
-    const results = await withHandleRepositoryErrors(() =>
+    const results = await withConvertRepositoryErrors.invoke(() =>
       new ProfileRepository().search({
         order: options.order,
         start: options.start,
@@ -66,7 +66,7 @@ export class ProfileManagerService extends ContextModel {
   }
 
   public async random(options: RandomOptions): Promise<Profile[]> {
-    const results = await withHandleRepositoryErrors(() =>
+    const results = await withConvertRepositoryErrors.invoke(() =>
       new ProfileRepository().getRandom({
         count: options.count,
         authorUserId: options.author?.id,

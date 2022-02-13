@@ -1,25 +1,7 @@
-export type AuthParams = { discordId: string };
+import { AuthParams, ClientBody } from "./structures";
 
-export type AuthResult = { clientId: string };
-
-export interface AuthEndpointResponder {
-  register(params: AuthParams): PromiseLike<AuthResult>;
-  unregister(params: AuthParams): PromiseLike<AuthResult>;
-  authorize(params: AuthParams): PromiseLike<AuthResult>;
-}
-
-export class AuthEndpoint {
-  constructor(private readonly responder: AuthEndpointResponder) {}
-
-  register(params: AuthParams): PromiseLike<AuthResult> {
-    return this.responder.register(params);
-  }
-
-  unregister(params: AuthParams): PromiseLike<AuthResult> {
-    return this.responder.unregister(params);
-  }
-
-  authorize(params: AuthParams): PromiseLike<AuthResult> {
-    return this.responder.authorize(params);
-  }
+export interface AuthEndpoint {
+  register(params: AuthParams): PromiseLike<ClientBody>;
+  unregister(params: AuthParams): PromiseLike<ClientBody>;
+  authorize(params: AuthParams): PromiseLike<ClientBody>;
 }

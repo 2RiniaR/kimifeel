@@ -1,10 +1,9 @@
-import { ClientUser, User } from "../../models/structures";
-import * as EndpointError from "../../endpoints/errors";
-import { UserBody, UserSpecifier } from "../../endpoints";
-import { withHandleModelErrors } from "../errors";
+import { ClientUser, User } from "app/models";
+import * as Endpoint from "app/endpoints";
+import { withConvertModelErrors } from "../errors";
 
 export class UserService {
-  public toBody(user: User): UserBody {
+  public toBody(user: User): Endpoint.UserBody {
     return {
       id: user.id,
       discordId: user.discordId,
@@ -12,9 +11,9 @@ export class UserService {
     };
   }
 
-  public async find(client: ClientUser, specifier: UserSpecifier): Promise<User> {
-    const user = await withHandleModelErrors(() => client.users.find(specifier));
-    if (!user) throw new EndpointError.UserNotFoundError(specifier);
+  public async find(client: ClientUser, specifier: Endpoint.UserSpecifier): Promise<User> {
+    const user = await withConvertModelErrors.invoke(() => client.users.find(specifier));
+    if (!user) throw new Endpoint.UserNotFoundError(specifier);
     return user;
   }
 }

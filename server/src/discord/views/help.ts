@@ -1,10 +1,18 @@
 import { SystemMessage } from "../structures";
+import { HelpMessageGenerator } from "../actions";
 
-export class HelpMessage extends SystemMessage {
+export class HelpMessageGeneratorImpl implements HelpMessageGenerator {
+  show(): SystemMessage {
+    return new HelpMessage();
+  }
+}
+
+export class HelpMessage implements SystemMessage {
+  public readonly type = "info";
+  public readonly title = "「キミフィール」ヘルプ";
+  public readonly message;
+
   constructor() {
-    super();
-    this.type = "info";
-    this.title = "「キミフィール」ヘルプ";
     this.message = [
       "他の人に自分のプロフィールを書いてもらえるサービスです。",
       "",

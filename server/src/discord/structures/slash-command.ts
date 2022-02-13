@@ -1,54 +1,23 @@
-import { ReplyOptions } from "./communicator";
 import { SystemMessage } from "./system-message";
-import { CommandInteraction, Message, User } from "discord.js";
-import { UsersMention } from "../views/mention";
+import { DiscordUser, DiscordUserIdentity } from "./discord-user";
 
-export class SlashCommand {
-  public constructor(public readonly raw: CommandInteraction) {}
+export type SlashCommandReplyOptions = {
+  mentions?: DiscordUser[];
+  reactions?: string[];
+  showOnlySender?: boolean;
+};
 
-  public async reply(message: SystemMessage, options: ReplyOptions): Promise<void> {
-    const card = await this.raw.reply({
-      content: options.mentions ? new UsersMention(options.mentions).getContent() : undefined,
-      embeds: [message.getEmbed()],
-      fetchReply: true,
-      ephemeral: options.showOnlySender
-    });
-    if (!(card instanceof Message)) return;
+export interface SlashCommand {
+  sender: DiscordUserIdentity;
 
-    if (options.reactions) {
-      await options.reactions.mapAsync((emoji) => card.react(emoji));
-    }
-  }
+  reply(message: SystemMessage, options: SlashCommandReplyOptions): Promise<void>;
 
-  public getInteger(name: string): number {
-    return this.raw.options.getInteger(name, true);
-  }
-
-  public getIntegerOptional(name: string): number | undefined {
-    return this.raw.options.getInteger(name, false) ?? undefined;
-  }
-
-  public getString(name: string): string {
-    return this.raw.options.getString(name, true);
-  }
-
-  public getStringOptional(name: string): string | undefined {
-    return this.raw.options.getString(name, false) ?? undefined;
-  }
-
-  public getBoolean(name: string): boolean {
-    return this.raw.options.getBoolean(name, true);
-  }
-
-  public getBooleanOptional(name: string): boolean | undefined {
-    return this.raw.options.getBoolean(name) ?? undefined;
-  }
-
-  public getUser(name: string): User {
-    return this.raw.options.getUser(name, true);
-  }
-
-  public getUserOptional(name: string): User | undefined {
-    return this.raw.options.getUser(name, false) ?? undefined;
-  }
+  getInteger(name: string): number;
+  getIntegerOptional(name: string): number | undefined;
+  getString(name: string): string;
+  getStringOptional(name: string): string | undefined;
+  getBoolean(name: string): boolean;
+  getBooleanOptional(name: string): boolean | undefined;
+  getUser(name: string): DiscordUserIdentity;
+  getUserOptional(name: string): DiscordUserIdentity | undefined;
 }

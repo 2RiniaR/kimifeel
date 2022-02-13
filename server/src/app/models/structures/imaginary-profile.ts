@@ -1,7 +1,7 @@
+import { ProfileRepository } from "data-store";
 import { Context, ContextModel } from "../context";
-import { ContentLengthLimitError, withHandleRepositoryErrors } from "../errors";
+import { ContentLengthLimitError, withConvertRepositoryErrors } from "../errors";
 import { User } from "./user";
-import { ProfileRepository } from "../../../prisma";
 import { Profile } from "./profile";
 
 export class ImaginaryProfile extends ContextModel {
@@ -53,7 +53,7 @@ class ImaginaryProfileService extends ContextModel {
   }
 
   public async create() {
-    const result = await withHandleRepositoryErrors(() =>
+    const result = await withConvertRepositoryErrors.invoke(() =>
       new ProfileRepository().create({
         ownerUserId: this.profile.owner.id,
         authorUserId: this.profile.author.id,

@@ -1,7 +1,7 @@
+import { RawProfile, ProfileRepository } from "data-store";
 import { Context, ContextModel } from "../context";
-import { ForbiddenError, NotFoundError, withHandleRepositoryErrors } from "../errors";
+import { ForbiddenError, NotFoundError, withConvertRepositoryErrors } from "../errors";
 import { User } from "./user";
-import { RawProfile, ProfileRepository } from "../../../prisma";
 
 export class IdentityProfile extends ContextModel implements ProfileIdentifier {
   public readonly id: string;
@@ -73,7 +73,9 @@ class ProfileService extends ContextModel {
   }
 
   public async delete(): Promise<Profile> {
-    const result = await withHandleRepositoryErrors(() => new ProfileRepository().delete({ id: this.profile.id }));
+    const result = await withConvertRepositoryErrors.invoke(() =>
+      new ProfileRepository().delete({ id: this.profile.id })
+    );
     if (!result) throw new NotFoundError();
     return Profile.fromRaw(this.context, result);
   }

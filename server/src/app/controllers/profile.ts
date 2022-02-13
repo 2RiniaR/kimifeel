@@ -1,65 +1,51 @@
-import * as EndpointError from "../endpoints/errors";
-import { ContentLengthLimitError, ForbiddenError, InvalidParameterError } from "../models/errors";
+import * as Endpoint from "app/endpoints";
+import { ContentLengthLimitError, ForbiddenError, InvalidParameterError } from "app/models";
 import { ClientUserService, ProfileService, UserService } from "./services";
-import {
-  CreateProfileParams,
-  ProfileBody,
-  ProfileCondition,
-  ProfileSpecifier,
-  SearchProfileParams
-} from "../endpoints/structures";
-import { ProfileEndpointResponder } from "../endpoints/profile";
-import { withHandleModelErrors } from "./errors";
+import { withConvertModelErrors } from "./errors";
 
-export class ProfileController implements ProfileEndpointResponder {
-  async create(clientId: string, { content }: CreateProfileParams): Promise<ProfileBody> {
+export class ProfileController implements Endpoint.ProfileEndpoint {
+  async create(clientId: string, { content }: Endpoint.CreateProfileParams): Promise<Endpoint.ProfileBody> {
     const client = await new ClientUserService().getById(clientId);
 
-    const profile = await withHandleModelErrors(() => {
-      try {
-        return client.asUser().createProfile(content);
-      } catch (error) {
+    const profile = await withConvertModelErrors
+      .guard((error) => {
         if (error instanceof ContentLengthLimitError) {
-          throw new EndpointError.ContentLengthLimitError(error.min, error.max, error.actual);
+          throw new Endpoint.ContentLengthLimitError(error.min, error.max, error.actual);
         }
-        throw error;
-      }
-    });
+      })
+      .invoke(() => client.asUser().createProfile(content));
 
     return new ProfileService().toBody(profile);
   }
 
-  async delete(clientId: string, specifier: ProfileSpecifier): Promise<ProfileBody> {
+  async delete(clientId: string, specifier: Endpoint.ProfileSpecifier): Promise<Endpoint.ProfileBody> {
     const client = await new ClientUserService().getById(clientId);
     const profileService = new ProfileService();
 
-    const result = await withHandleModelErrors(async () => {
-      try {
+    const result = await withConvertModelErrors
+      .guard((error) => {
+        if (error instanceof ForbiddenError) throw new Endpoint.ProfileNotFoundError(specifier);
+      })
+      .invoke(async () => {
         const profile = await profileService.find(client, specifier);
         return await profile.delete();
-      } catch (error) {
-        if (error instanceof ForbiddenError) {
-          throw new EndpointError.ProfileNotFoundError(specifier);
-        }
-        throw error;
-      }
-    });
+      });
 
     return profileService.toBody(result);
   }
 
-  async find(clientId: string, specifier: ProfileSpecifier): Promise<ProfileBody> {
+  async find(clientId: string, specifier: Endpoint.ProfileSpecifier): Promise<Endpoint.ProfileBody> {
     const client = await new ClientUserService().getById(clientId);
-    const profile = await withHandleModelErrors(() => new ProfileService().find(client, specifier));
+    const profile = await withConvertModelErrors.invoke(() => new ProfileService().find(client, specifier));
     return new ProfileService().toBody(profile);
   }
 
-  async random(clientId: string, params: ProfileCondition): Promise<ProfileBody[]> {
+  async random(clientId: string, params: Endpoint.ProfileCondition): Promise<Endpoint.ProfileBody[]> {
     const resultPerPage = 5;
     const client = await new ClientUserService().getById(clientId);
 
     const userService = new UserService();
-    const profiles = await withHandleModelErrors(async () =>
+    const profiles = await withConvertModelErrors.invoke(async () =>
       client.profiles.random({
         count: resultPerPage,
         content: params.content,
@@ -72,28 +58,27 @@ export class ProfileController implements ProfileEndpointResponder {
     return profiles.map((profile) => profileService.toBody(profile));
   }
 
-  async search(clientId: string, params: SearchProfileParams): Promise<ProfileBody[]> {
+  async search(clientId: string, params: Endpoint.SearchProfileParams): Promise<Endpoint.ProfileBody[]> {
     const resultPerPage = 5;
     const client = await new ClientUserService().getById(clientId);
 
     const userService = new UserService();
-    const profiles = await withHandleModelErrors(async () => {
-      try {
-        return await client.profiles.search({
+    const profiles = await withConvertModelErrors
+      .guard((error) => {
+        if (error instanceof InvalidParameterError && error.key === "start") {
+          throw new Endpoint.ParameterFormatInvalidError<Endpoint.SearchProfileParams>("page", ">= 1");
+        }
+      })
+      .invoke(async () =>
+        client.profiles.search({
           order: params.order,
           start: (params.page - 1) * resultPerPage,
           count: resultPerPage,
           content: params.content,
           author: params.author ? await userService.find(client, params.author) : undefined,
           owner: params.owner ? await userService.find(client, params.owner) : undefined
-        });
-      } catch (error) {
-        if (error instanceof InvalidParameterError && error.key === "start") {
-          throw new EndpointError.ParameterFormatInvalidError<SearchProfileParams>("page", ">= 1");
-        }
-        throw error;
-      }
-    });
+        })
+      );
 
     const profileService = new ProfileService();
     return profiles.map((profile) => profileService.toBody(profile));

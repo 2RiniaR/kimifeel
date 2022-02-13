@@ -1,11 +1,10 @@
-import { ClientUser, Request } from "../../models/structures";
-import { RequestBody, RequestSpecifier } from "../../endpoints";
-import * as EndpointError from "../../endpoints/errors";
-import { withHandleModelErrors } from "../errors";
+import { ClientUser, Request } from "app/models";
+import * as Endpoint from "app/endpoints";
+import { withConvertModelErrors } from "../errors";
 import { UserService } from "./user";
 
 export class RequestService {
-  public toBody(request: Request): RequestBody {
+  public toBody(request: Request): Endpoint.RequestBody {
     const userService = new UserService();
     return {
       index: request.index,
@@ -15,9 +14,9 @@ export class RequestService {
     };
   }
 
-  public async find(client: ClientUser, specifier: RequestSpecifier): Promise<Request> {
-    const request = await withHandleModelErrors(() => client.requests.find(specifier));
-    if (!request) throw new EndpointError.RequestNotFoundError(specifier);
+  public async find(client: ClientUser, specifier: Endpoint.RequestSpecifier): Promise<Request> {
+    const request = await withConvertModelErrors.invoke(() => client.requests.find(specifier));
+    if (!request) throw new Endpoint.RequestNotFoundError(specifier);
     return request;
   }
 }

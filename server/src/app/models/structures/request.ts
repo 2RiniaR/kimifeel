@@ -1,9 +1,9 @@
+import { RawRequest, RequestRepository } from "data-store";
 import { Context, ContextModel } from "../context";
 import { ImaginaryProfile } from "./imaginary-profile";
-import { ForbiddenError, NotFoundError, withHandleRepositoryErrors } from "../errors";
+import { ForbiddenError, NotFoundError, withConvertRepositoryErrors } from "../errors";
 import { Profile } from "./profile";
 import { User } from "./user";
-import { RawRequest, RequestRepository } from "../../../prisma";
 
 export class IdentityRequest extends ContextModel {
   public readonly id: string;
@@ -90,7 +90,9 @@ class RequestService extends ContextModel {
   }
 
   public async delete(): Promise<Request> {
-    const result = await withHandleRepositoryErrors(() => new RequestRepository().delete({ id: this.request.id }));
+    const result = await withConvertRepositoryErrors.invoke(() =>
+      new RequestRepository().delete({ id: this.request.id })
+    );
     if (!result) throw new NotFoundError();
     return Request.fromRaw(this.context, result);
   }

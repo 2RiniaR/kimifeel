@@ -1,11 +1,7 @@
-import { DataAccessFailedError } from "../models/errors";
-import { UnavailableError } from "../endpoints/errors";
+import { DataAccessFailedError } from "app/models";
+import * as Endpoint from "app/endpoints";
+import { emptyErrorPipeline } from "helpers/catch";
 
-export function withHandleModelErrors<TReturn>(inner: () => TReturn) {
-  try {
-    return inner();
-  } catch (error) {
-    if (error instanceof DataAccessFailedError) throw new UnavailableError();
-    throw error;
-  }
-}
+export const withConvertModelErrors = emptyErrorPipeline.guard((error) => {
+  if (error instanceof DataAccessFailedError) throw new Endpoint.UnavailableError();
+});

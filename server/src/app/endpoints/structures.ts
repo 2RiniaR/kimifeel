@@ -1,6 +1,17 @@
-export type ProfileSpecifier = { id: string } | { index: number };
-export type RequestSpecifier = { id: string } | { index: number };
-export type UserSpecifier = { id: string } | { discordId: string };
+export type ProfileSpecifier = {
+  id?: string;
+  index?: number;
+};
+
+export type RequestSpecifier = {
+  id?: string;
+  index?: number;
+};
+
+export type UserSpecifier = {
+  id?: string;
+  discordId?: string;
+};
 
 export type RequestBody = {
   index: number;

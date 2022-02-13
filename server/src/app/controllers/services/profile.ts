@@ -1,11 +1,10 @@
-import { ClientUser, Profile } from "../../models/structures";
-import { ProfileBody, ProfileSpecifier } from "../../endpoints";
-import * as EndpointError from "../../endpoints/errors";
-import { withHandleModelErrors } from "../errors";
+import { ClientUser, Profile } from "app/models";
+import * as Endpoint from "app/endpoints";
+import { withConvertModelErrors } from "../errors";
 import { UserService } from "./user";
 
 export class ProfileService {
-  public toBody(profile: Profile): ProfileBody {
+  public toBody(profile: Profile): Endpoint.ProfileBody {
     const userService = new UserService();
     return {
       index: profile.index,
@@ -15,9 +14,9 @@ export class ProfileService {
     };
   }
 
-  public async find(client: ClientUser, specifier: ProfileSpecifier): Promise<Profile> {
-    const profile = await withHandleModelErrors(() => client.profiles.find(specifier));
-    if (!profile) throw new EndpointError.ProfileNotFoundError(specifier);
+  public async find(client: ClientUser, specifier: Endpoint.ProfileSpecifier): Promise<Profile> {
+    const profile = await withConvertModelErrors.invoke(() => client.profiles.find(specifier));
+    if (!profile) throw new Endpoint.ProfileNotFoundError(specifier);
     return profile;
   }
 }

@@ -1,7 +1,7 @@
+import { UserRepository } from "data-store";
 import { AuthorizedUser } from "./authorized-user";
-import { withHandleRepositoryErrors } from "../errors";
+import { withConvertRepositoryErrors } from "../errors";
 import { ImaginaryAuthorizedUser } from "./imaginary-authorized-user";
-import { UserRepository } from "../../../prisma";
 
 export class DiscordUser {
   private readonly service = new DiscordUserService(this);
@@ -21,7 +21,7 @@ class DiscordUserService {
   constructor(private readonly user: DiscordUser) {}
 
   public async authorize(): Promise<AuthorizedUser | undefined> {
-    const result = await withHandleRepositoryErrors(() =>
+    const result = await withConvertRepositoryErrors.invoke(() =>
       new UserRepository().find({ discordId: this.user.discordId })
     );
     if (!result) return;

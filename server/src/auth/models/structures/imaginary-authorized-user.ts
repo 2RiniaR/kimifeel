@@ -1,5 +1,5 @@
-import { DiscordIdFormatError, UserAlreadyRegisteredError, withHandleRepositoryErrors } from "../errors";
-import { DiscordIdDuplicatedError, UserRepository } from "../../../prisma";
+import { DiscordIdDuplicatedError, UserRepository } from "data-store";
+import { DiscordIdFormatError, UserAlreadyRegisteredError, withConvertRepositoryErrors } from "../errors";
 import { AuthorizedUser } from "./authorized-user";
 
 const snowflakeRegex = /^(\d+)$/;
@@ -31,16 +31,11 @@ class ImaginaryDiscordUserService {
   public constructor(private readonly user: ImaginaryAuthorizedUser) {}
 
   public async create(): Promise<AuthorizedUser> {
-    const result = await withHandleRepositoryErrors(() => {
-      try {
-        return new UserRepository().create({ discordId: this.user.discordId });
-      } catch (error) {
-        if (error instanceof DiscordIdDuplicatedError) {
-          throw new UserAlreadyRegisteredError();
-        }
-        throw error;
-      }
-    });
+    const result = await withConvertRepositoryErrors
+      .guard((error) => {
+        if (error instanceof DiscordIdDuplicatedError) throw new UserAlreadyRegisteredError();
+      })
+      .invoke(() => new UserRepository().create({ discordId: this.user.discordId }));
     return AuthorizedUser.fromRaw(result);
   }
 }

@@ -1,39 +1,37 @@
 import { ProfileSpecifier, RequestSpecifier, UserSpecifier } from "./structures";
 
-export abstract class EndpointError extends Error {}
+export class ClientUserNotExistError extends Error {}
 
-export class ClientUserNotExistError extends EndpointError {}
-
-export class ProfileNotFoundError extends EndpointError {
-  constructor(public readonly specifier: ProfileSpecifier) {
+export class ProfileNotFoundError extends Error {
+  public constructor(public readonly specifier: ProfileSpecifier) {
     super();
   }
 }
 
-export class UserNotFoundError extends EndpointError {
-  constructor(public readonly specifier: UserSpecifier) {
+export class UserNotFoundError extends Error {
+  public constructor(public readonly specifier: UserSpecifier) {
     super();
   }
 }
 
-export class RequestNotFoundError extends EndpointError {
-  constructor(public readonly specifier: RequestSpecifier) {
+export class RequestNotFoundError extends Error {
+  public constructor(public readonly specifier: RequestSpecifier) {
     super();
   }
 }
 
-export class ContentLengthLimitError extends EndpointError {
+export class ContentLengthLimitError extends Error {
   public constructor(public readonly min: number, public readonly max: number, public readonly actual: number) {
     super();
   }
 }
 
-export class SendRequestOwnError extends EndpointError {}
+export class SentRequestOwnError extends Error {}
 
-export class ParameterFormatInvalidError<T> extends EndpointError {
-  constructor(public readonly key: keyof T, public readonly format: string) {
+export class ParameterFormatInvalidError<T> extends Error {
+  public constructor(public readonly key: keyof T, public readonly format: string) {
     super();
   }
 }
 
-export class UnavailableError extends EndpointError {}
+export class UnavailableError extends Error {}

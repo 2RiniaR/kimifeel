@@ -1,7 +1,7 @@
+import { RequestRepository, RequestUniqueField } from "data-store";
 import { Request } from "../structures";
 import { ContextModel } from "../context";
-import { withHandleRepositoryErrors } from "../errors";
-import { RequestRepository, RequestUniqueField } from "../../../prisma";
+import { withConvertRepositoryErrors } from "../errors";
 
 export class RequestManager extends ContextModel {
   private readonly service = new RequestManagerService(this.context);
@@ -13,7 +13,7 @@ export class RequestManager extends ContextModel {
 
 export class RequestManagerService extends ContextModel {
   public async find(unique: RequestUniqueField): Promise<Request | undefined> {
-    const result = await withHandleRepositoryErrors(() => new RequestRepository().find(unique));
+    const result = await withConvertRepositoryErrors.invoke(() => new RequestRepository().find(unique));
     if (!result) return;
     return Request.fromRaw(this.context, result);
   }

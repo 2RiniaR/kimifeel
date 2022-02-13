@@ -1,8 +1,8 @@
+import { RequestRepository } from "data-store";
 import { Context, ContextModel } from "../context";
 import { ImaginaryProfile } from "./imaginary-profile";
-import { withHandleRepositoryErrors } from "../errors";
+import { withConvertRepositoryErrors } from "../errors";
 import { User } from "./user";
-import { RequestRepository } from "../../../prisma";
 import { Request } from "./request";
 
 export class ImaginaryRequest extends ContextModel {
@@ -38,7 +38,7 @@ class ImaginaryRequestService extends ContextModel {
   }
 
   public async create() {
-    const result = await withHandleRepositoryErrors(() =>
+    const result = await withConvertRepositoryErrors.invoke(() =>
       new RequestRepository().create({
         targetUserId: this.request.profile.owner.id,
         applicantUserId: this.request.profile.author.id,

@@ -1,7 +1,7 @@
+import { RawUser } from "data-store";
 import { Context } from "../context";
 import { ProfileManager, RequestManager, UserManager } from "../managers";
 import { User, UserIdentifier, UserProps } from "./user";
-import { RawUser } from "../../../prisma";
 
 export class ClientUser {
   public readonly discordId: string;

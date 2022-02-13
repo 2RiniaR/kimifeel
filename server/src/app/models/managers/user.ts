@@ -1,7 +1,7 @@
+import { UserRepository, UserUniqueField } from "data-store";
 import { User } from "../structures";
 import { ContextModel } from "../context";
-import { withHandleRepositoryErrors } from "../errors";
-import { UserRepository, UserUniqueField } from "../../../prisma";
+import { withConvertRepositoryErrors } from "../errors";
 
 export class UserManager extends ContextModel {
   private readonly service = new UserManagerService(this.context);
@@ -17,13 +17,13 @@ export class UserManager extends ContextModel {
 
 export class UserManagerService extends ContextModel {
   public async find(unique: UserUniqueField): Promise<User | undefined> {
-    const result = await withHandleRepositoryErrors(() => new UserRepository().find(unique));
+    const result = await withConvertRepositoryErrors.invoke(() => new UserRepository().find(unique));
     if (!result) return;
     return User.fromRaw(this.context, result);
   }
 
   public async findMany(uniques: UserUniqueField[]): Promise<User[]> {
-    const results = await withHandleRepositoryErrors(() => new UserRepository().findMany(uniques));
+    const results = await withConvertRepositoryErrors.invoke(() => new UserRepository().findMany(uniques));
     return results.map((result) => User.fromRaw(this.context, result));
   }
 }

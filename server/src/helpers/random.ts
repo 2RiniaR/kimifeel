@@ -18,11 +18,6 @@ export function getRandomIntegerArray(min: number, max: number, count: number): 
   if (range <= count) {
     return getRange(range).map((i) => i + min);
   }
-  // const selects = getRange(count).map((i) => getRandomInteger(0, range - i));
-  // return selects.reduce<number[]>((results, select, i) => {
-  //   const over = results.filter((result) => select > result - min - i).length;
-  //   return [...results, select + min + over];
-  // }, []);
   const list = getRange(range).map((x) => x + min);
   const result = [] as number[];
   for (let i = 0; i < count; i++) {

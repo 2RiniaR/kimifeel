@@ -15,33 +15,33 @@ export interface RequestMessageGenerator {
 }
 
 export type AcceptRequestProps = {
-  index: number;
+  readonly index: number;
 };
 
 export type CancelRequestProps = {
-  index: number;
+  readonly index: number;
 };
 
 export type DenyRequestProps = {
-  index: number;
+  readonly index: number;
 };
 
 export type SendRequestProps = {
-  targetId: string;
-  content: string;
+  readonly targetId: string;
+  readonly content: string;
 };
 
 export type SearchRequestProps = {
-  status: "sent" | "received";
-  order: "oldest" | "latest";
-  page: number;
-  targetId?: string;
-  applicantId?: string;
-  content?: string;
+  readonly status: "sent" | "received";
+  readonly order: "oldest" | "latest";
+  readonly page: number;
+  readonly targetId?: string;
+  readonly applicantId?: string;
+  readonly content?: string;
 };
 
 export type ShowRequestProps = {
-  index: number;
+  readonly index: number;
 };
 
 export class RequestAction {

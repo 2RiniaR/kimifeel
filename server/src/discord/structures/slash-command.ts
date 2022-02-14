@@ -2,9 +2,9 @@ import { SystemMessage } from "./system-message";
 import { DiscordUser, DiscordUserIdentity } from "./discord-user";
 
 export type SlashCommandReplyOptions = {
-  mentions?: DiscordUser[];
-  reactions?: string[];
-  showOnlySender?: boolean;
+  readonly mentions?: DiscordUser[];
+  readonly reactions?: string[];
+  readonly showOnlySender?: boolean;
 };
 
 export interface SlashCommand {

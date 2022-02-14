@@ -7,10 +7,18 @@ function userQuerySample() {
   return prisma.user.findFirst();
 }
 
-export type UserUniqueField = { id: string } | { discordId: string };
+export type UserUniqueField = { readonly id: string } | { readonly discordId: string };
 type UserUniqueCondition = {
-  id?: string;
-  discordId?: string;
+  readonly id?: string;
+  readonly discordId?: string;
+};
+
+type CreateProps = {
+  readonly discordId: string;
+};
+
+type UpdateProps = {
+  readonly enableMention?: boolean;
 };
 
 function toUniqueCondition(field: UserUniqueField): UserUniqueCondition {
@@ -19,14 +27,6 @@ function toUniqueCondition(field: UserUniqueField): UserUniqueCondition {
     discordId: "discordId" in field ? field.discordId : undefined
   };
 }
-
-type CreateProps = {
-  discordId: string;
-};
-
-type UpdateProps = {
-  enableMention?: boolean;
-};
 
 export class UserRepository {
   async find(unique: UserUniqueField): Promise<RawUser | undefined> {

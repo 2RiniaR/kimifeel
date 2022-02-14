@@ -42,7 +42,6 @@ class ErrorGuardPipelineImpl implements ErrorGuardPipeline {
     } catch (error) {
       // Errorは親のhandlerから順番にcatchが試行される。
       // handler内でerrorがthrowされた場合、子のhandlerに伝播する。
-      // この性質を用いて、Errorの発生元から呼び出し元をたどる際に、Errorを順次変換しながら流すことが可能。
       this.handler(error);
       throw error;
     }

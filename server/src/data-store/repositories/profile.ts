@@ -13,10 +13,38 @@ function profileQuerySample() {
   });
 }
 
-export type ProfileUniqueField = { id: string } | { index: number };
+export type ProfileUniqueField = { readonly id: string } | { readonly index: number };
+
 type ProfileUniqueCondition = {
-  id?: string;
-  index?: number;
+  readonly id?: string;
+  readonly index?: number;
+};
+
+type CreateProps = {
+  readonly ownerUserId: string;
+  readonly authorUserId: string;
+  readonly content: string;
+};
+
+export type CountCondition = {
+  readonly authorUserId?: string;
+  readonly ownerUserId?: string;
+};
+
+type RandomProps = {
+  readonly count: number;
+  readonly content?: string;
+  readonly ownerUserId?: string;
+  readonly authorUserId?: string;
+};
+
+type SearchProps = {
+  readonly order: "latest" | "oldest";
+  readonly start: number;
+  readonly count: number;
+  readonly content?: string;
+  readonly ownerUserId?: string;
+  readonly authorUserId?: string;
 };
 
 function toUniqueCondition(field: ProfileUniqueField): ProfileUniqueCondition {
@@ -25,33 +53,6 @@ function toUniqueCondition(field: ProfileUniqueField): ProfileUniqueCondition {
     index: "index" in field ? field.index : undefined
   };
 }
-
-type CreateProps = {
-  ownerUserId: string;
-  authorUserId: string;
-  content: string;
-};
-
-export type CountCondition = {
-  authorUserId?: string;
-  ownerUserId?: string;
-};
-
-type RandomProps = {
-  count: number;
-  content?: string;
-  ownerUserId?: string;
-  authorUserId?: string;
-};
-
-type SearchProps = {
-  order: "latest" | "oldest";
-  start: number;
-  count: number;
-  content?: string;
-  ownerUserId?: string;
-  authorUserId?: string;
-};
 
 export class ProfileRepository {
   async find(unique: ProfileUniqueField): Promise<RawProfile | undefined> {

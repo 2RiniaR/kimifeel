@@ -1,3 +1,3 @@
-export type AuthParams = { discordId: string };
+export type AuthParams = { readonly discordId: string };
 
-export type ClientBody = { clientId: string };
+export type ClientBody = { readonly clientId: string };

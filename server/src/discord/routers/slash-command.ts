@@ -1,4 +1,4 @@
-import { ErrorAction, ProfileAction, RequestAction, UserAction, HelpAction } from "../actions";
+import { ProfileAction, RequestAction, UserAction, HelpAction } from "../actions";
 import { SlashCommand } from "../structures";
 import {
   AcceptRequestCommunicator,

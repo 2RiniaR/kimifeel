@@ -5,6 +5,17 @@ import { ForbiddenError, NotFoundError, withConvertRepositoryErrors } from "../e
 import { Profile } from "./profile";
 import { User } from "./user";
 
+export type RequestIdentifier = {
+  readonly id: string;
+  readonly index: number;
+};
+
+export type RequestProps = {
+  readonly content: string;
+  readonly target: User;
+  readonly applicant: User;
+};
+
 export class IdentityRequest extends ContextModel {
   public readonly id: string;
   public readonly index: number;
@@ -15,11 +26,6 @@ export class IdentityRequest extends ContextModel {
     this.index = props.index;
   }
 }
-
-export type RequestIdentifier = {
-  id: string;
-  index: number;
-};
 
 export class Request extends IdentityRequest {
   private readonly service = new RequestService(this);
@@ -74,12 +80,6 @@ export class Request extends IdentityRequest {
     });
   }
 }
-
-export type RequestProps = {
-  content: string;
-  target: User;
-  applicant: User;
-};
 
 class RequestService extends ContextModel {
   private readonly request: Request;

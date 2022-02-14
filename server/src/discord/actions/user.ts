@@ -4,7 +4,7 @@ import { Communicator } from "./communicator";
 import { DiscordUser, DiscordUserIdentity, DiscordUserStats, SystemMessage } from "../structures";
 import { toUser, toUserIdentity, toUserStats } from "./converters";
 import { authorize } from "./auth";
-import { ErrorAction, UserAlreadyRegisteredError, withConvertAppErrors, withConvertAuthErrors } from "./errors";
+import { ErrorAction, withConvertAppErrors, withConvertAuthErrors } from "./errors";
 
 export interface UserMessageGenerator {
   registered(user: DiscordUserIdentity): SystemMessage;
@@ -13,11 +13,11 @@ export interface UserMessageGenerator {
 }
 
 export type ConfigUserProps = {
-  enableMention?: boolean;
+  readonly enableMention?: boolean;
 };
 
 export type ShowUserStatsProps = {
-  userId: string;
+  readonly userId: string;
 };
 
 export class UserAction {

@@ -4,6 +4,12 @@ import { ContentLengthLimitError, withConvertRepositoryErrors } from "../errors"
 import { User } from "./user";
 import { Profile } from "./profile";
 
+export type CreateProfileProps = {
+  readonly owner: User;
+  readonly author: User;
+  readonly content: string;
+};
+
 export class ImaginaryProfile extends ContextModel {
   private readonly service = new ImaginaryProfileService(this);
   public readonly owner: User;
@@ -37,12 +43,6 @@ export class ImaginaryProfile extends ContextModel {
     return await this.service.create();
   }
 }
-
-export type CreateProfileProps = {
-  owner: User;
-  author: User;
-  content: string;
-};
 
 class ImaginaryProfileService extends ContextModel {
   private readonly profile: ImaginaryProfile;

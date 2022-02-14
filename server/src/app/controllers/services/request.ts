@@ -15,7 +15,13 @@ export class RequestService {
   }
 
   public async find(client: ClientUser, specifier: Endpoint.RequestSpecifier): Promise<Request> {
-    const request = await withConvertModelErrors.invoke(() => client.requests.find(specifier));
+    const request = await withConvertModelErrors.invoke(() => {
+      if (specifier.id) {
+        return client.requests.find({ id: specifier.id });
+      } else if (specifier.index) {
+        return client.requests.find({ index: specifier.index });
+      }
+    });
     if (!request) throw new Endpoint.RequestNotFoundError(specifier);
     return request;
   }

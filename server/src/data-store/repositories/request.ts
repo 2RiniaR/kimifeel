@@ -12,10 +12,25 @@ function requestQuerySample() {
   });
 }
 
-export type RequestUniqueField = { id: string } | { index: number };
+export type RequestUniqueField = { readonly id: string } | { readonly index: number };
 type RequestUniqueCondition = {
-  id?: string;
-  index?: number;
+  readonly id?: string;
+  readonly index?: number;
+};
+
+type CreateProps = {
+  readonly applicantUserId: string;
+  readonly targetUserId: string;
+  readonly content: string;
+};
+
+type SearchProps = {
+  readonly order: "latest" | "oldest";
+  readonly start: number;
+  readonly count: number;
+  readonly content?: string;
+  readonly targetUserId?: string;
+  readonly applicantUserId?: string;
 };
 
 function toUniqueCondition(field: RequestUniqueField): RequestUniqueCondition {
@@ -24,21 +39,6 @@ function toUniqueCondition(field: RequestUniqueField): RequestUniqueCondition {
     index: "index" in field ? field.index : undefined
   };
 }
-
-type CreateProps = {
-  applicantUserId: string;
-  targetUserId: string;
-  content: string;
-};
-
-type SearchProps = {
-  order: "latest" | "oldest";
-  start: number;
-  count: number;
-  content?: string;
-  targetUserId?: string;
-  applicantUserId?: string;
-};
 
 export class RequestRepository {
   async find(unique: RequestUniqueField): Promise<RawRequest | undefined> {

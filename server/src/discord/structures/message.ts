@@ -2,8 +2,8 @@ import { SystemMessage, SystemMessageRead } from "./system-message";
 import { DiscordUser, DiscordUserIdentity } from "./discord-user";
 
 export type MessageReplyOptions = {
-  mentions?: DiscordUser[];
-  reactions?: string[];
+  readonly mentions?: DiscordUser[];
+  readonly reactions?: string[];
 };
 
 export interface Message {

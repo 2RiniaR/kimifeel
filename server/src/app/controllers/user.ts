@@ -15,19 +15,23 @@ export class UserController implements Endpoint.UserEndpoint {
 
   async getStats(clientId: string, specifier: Endpoint.UserSpecifier): Promise<Endpoint.UserStatsBody> {
     const client = await new ClientUserService().getById(clientId);
-    const user = await withConvertModelErrors.invoke(() => client.users.find(specifier));
-    if (!user) throw new Endpoint.UserNotFoundError(specifier);
+    const userService = new UserService();
+
+    const user = await userService.find(client, specifier);
     const stats = await withConvertModelErrors.invoke(() => user.getStats());
+
     return {
-      ...new UserService().toBody(user),
+      ...userService.toBody(user),
       ...stats
     };
   }
 
   async findMany(clientId: string, specifiers: Endpoint.UserSpecifier[]): Promise<Endpoint.UserBody[]> {
     const client = await new ClientUserService().getById(clientId);
-    const users = await withConvertModelErrors.invoke(() => client.users.findMany(specifiers));
     const userService = new UserService();
+
+    const users = await Promise.all(specifiers.map((specifier) => userService.find(client, specifier)));
+
     return users.map((user) => userService.toBody(user));
   }
 }

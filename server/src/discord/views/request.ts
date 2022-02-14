@@ -1,6 +1,4 @@
-import { MessageEmbed } from "discord.js";
 import { ProfileView, RequestView, UserIdentityView } from "./structures";
-import { MessageImpl } from "../adapters/structures";
 import { Profile, Request, RequestIdentity, SystemMessage, SystemMessageRead } from "../structures";
 import { RequestMessageGenerator } from "../actions";
 

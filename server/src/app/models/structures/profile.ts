@@ -3,6 +3,17 @@ import { Context, ContextModel } from "../context";
 import { ForbiddenError, NotFoundError, withConvertRepositoryErrors } from "../errors";
 import { User } from "./user";
 
+export type ProfileIdentifier = {
+  readonly id: string;
+  readonly index: number;
+};
+
+export type ProfileProps = {
+  readonly content: string;
+  readonly owner: User;
+  readonly author: User;
+};
+
 export class IdentityProfile extends ContextModel implements ProfileIdentifier {
   public readonly id: string;
   public readonly index: number;
@@ -13,11 +24,6 @@ export class IdentityProfile extends ContextModel implements ProfileIdentifier {
     this.index = props.index;
   }
 }
-
-export type ProfileIdentifier = {
-  id: string;
-  index: number;
-};
 
 export class Profile extends IdentityProfile {
   private readonly service = new ProfileService(this);
@@ -57,12 +63,6 @@ export class Profile extends IdentityProfile {
     });
   }
 }
-
-export type ProfileProps = {
-  content: string;
-  owner: User;
-  author: User;
-};
 
 class ProfileService extends ContextModel {
   private readonly profile: Profile;

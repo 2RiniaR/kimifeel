@@ -12,6 +12,33 @@ import { ImaginaryRequest } from "./imaginary-request";
 import { Profile } from "./profile";
 import { ImaginaryProfile } from "./imaginary-profile";
 
+export type UserIdentifier = {
+  readonly id: string;
+  readonly discordId: string;
+};
+
+export type SearchRequestsProps = {
+  readonly status: "sent" | "received";
+  readonly order: "latest" | "oldest";
+  readonly start: number;
+  readonly count: number;
+  readonly content?: string;
+  readonly target?: IdentityUser;
+  readonly applicant?: IdentityUser;
+};
+
+export type UserProps = ConfigProps;
+
+export type ConfigProps = {
+  readonly enableMention: boolean;
+};
+
+export type UserStats = {
+  readonly ownedProfileCount: number;
+  readonly writtenProfileCount: number;
+  readonly selfProfileCount: number;
+};
+
 export class IdentityUser extends ContextModel implements UserIdentifier {
   public readonly id: string;
   public readonly discordId: string;
@@ -22,11 +49,6 @@ export class IdentityUser extends ContextModel implements UserIdentifier {
     this.discordId = props.discordId;
   }
 }
-
-export type UserIdentifier = {
-  id: string;
-  discordId: string;
-};
 
 export class User extends IdentityUser {
   private readonly service = new UserService(this);
@@ -91,28 +113,6 @@ export class User extends IdentityUser {
     });
   }
 }
-
-export type SearchRequestsProps = {
-  status: "sent" | "received";
-  order: "latest" | "oldest";
-  start: number;
-  count: number;
-  content?: string;
-  target?: IdentityUser;
-  applicant?: IdentityUser;
-};
-
-export type UserProps = ConfigProps;
-
-export type ConfigProps = {
-  enableMention: boolean;
-};
-
-export type UserStats = {
-  ownedProfileCount: number;
-  writtenProfileCount: number;
-  selfProfileCount: number;
-};
 
 class UserService extends ContextModel {
   private readonly user: User;

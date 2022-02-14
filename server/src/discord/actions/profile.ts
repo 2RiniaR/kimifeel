@@ -13,29 +13,29 @@ export interface ProfileMessageGenerator {
 }
 
 export type CreateProfileProps = {
-  content: string;
+  readonly content: string;
 };
 
 export type DeleteProfileProps = {
-  index: number;
+  readonly index: number;
 };
 
 export type RandomProfileProps = {
-  ownerId?: string;
-  authorId?: string;
-  content?: string;
+  readonly ownerId?: string;
+  readonly authorId?: string;
+  readonly content?: string;
 };
 
 export type SearchProfileProps = {
-  order: "oldest" | "latest";
-  page: number;
-  ownerId?: string;
-  authorId?: string;
-  content?: string;
+  readonly order: "oldest" | "latest";
+  readonly page: number;
+  readonly ownerId?: string;
+  readonly authorId?: string;
+  readonly content?: string;
 };
 
 export type ShowProfileProps = {
-  index: number;
+  readonly index: number;
 };
 
 export class ProfileAction {

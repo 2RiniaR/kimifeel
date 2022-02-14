@@ -1,4 +1,3 @@
-import * as CommandParser from "command-parser";
 import * as Auth from "auth";
 import * as App from "app";
 import { emptyErrorPipeline, ErrorGuardEnd } from "helpers/catch";

@@ -2,6 +2,10 @@ import { DiscordIdDuplicatedError, UserRepository } from "data-store";
 import { DiscordIdFormatError, UserAlreadyRegisteredError, withConvertRepositoryErrors } from "../errors";
 import { AuthorizedUser } from "./authorized-user";
 
+export type CreateUserProps = {
+  readonly discordId: string;
+};
+
 const snowflakeRegex = /^(\d+)$/;
 
 export class ImaginaryAuthorizedUser {
@@ -22,10 +26,6 @@ export class ImaginaryAuthorizedUser {
     return await this.service.create();
   }
 }
-
-export type CreateUserProps = {
-  discordId: string;
-};
 
 class ImaginaryDiscordUserService {
   public constructor(private readonly user: ImaginaryAuthorizedUser) {}

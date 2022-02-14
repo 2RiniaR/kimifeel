@@ -1,9 +1,9 @@
 import { SystemMessage, DiscordUser, DiscordUserIdentity } from "../structures";
 
 export type ReplyOptions = {
-  mentions?: DiscordUser[];
-  reactions?: string[];
-  showOnlySender?: boolean;
+  readonly mentions?: DiscordUser[];
+  readonly reactions?: string[];
+  readonly showOnlySender?: boolean;
 };
 
 export interface Communicator<T = void> {

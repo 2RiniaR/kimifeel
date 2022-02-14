@@ -5,6 +5,12 @@ import { withConvertRepositoryErrors } from "../errors";
 import { User } from "./user";
 import { Request } from "./request";
 
+export type CreateRequestProps = {
+  readonly target: User;
+  readonly applicant: User;
+  readonly content: string;
+};
+
 export class ImaginaryRequest extends ContextModel {
   private readonly service = new ImaginaryRequestService(this);
   public readonly profile: ImaginaryProfile;
@@ -22,12 +28,6 @@ export class ImaginaryRequest extends ContextModel {
     return await this.service.create();
   }
 }
-
-export type CreateRequestProps = {
-  target: User;
-  applicant: User;
-  content: string;
-};
 
 class ImaginaryRequestService extends ContextModel {
   private readonly request: ImaginaryRequest;

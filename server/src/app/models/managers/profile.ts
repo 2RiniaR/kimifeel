@@ -3,6 +3,22 @@ import { ContextModel } from "../context";
 import { IdentityUser, Profile } from "../structures";
 import { InvalidParameterError, withConvertRepositoryErrors } from "../errors";
 
+export type SearchOptions = {
+  readonly order: "latest" | "oldest";
+  readonly content?: string;
+  readonly author?: IdentityUser;
+  readonly owner?: IdentityUser;
+  readonly start: number;
+  readonly count: number;
+};
+
+export type RandomOptions = {
+  readonly count: number;
+  readonly content?: string;
+  readonly author?: IdentityUser;
+  readonly owner?: IdentityUser;
+};
+
 export class ProfileManager extends ContextModel {
   private readonly service = new ProfileManagerService(this.context);
 
@@ -27,22 +43,6 @@ export class ProfileManager extends ContextModel {
     return await this.service.random(options);
   }
 }
-
-export type SearchOptions = {
-  order: "latest" | "oldest";
-  content?: string;
-  author?: IdentityUser;
-  owner?: IdentityUser;
-  start: number;
-  count: number;
-};
-
-export type RandomOptions = {
-  count: number;
-  content?: string;
-  author?: IdentityUser;
-  owner?: IdentityUser;
-};
 
 export class ProfileManagerService extends ContextModel {
   public async find(unique: ProfileUniqueField): Promise<Profile | undefined> {

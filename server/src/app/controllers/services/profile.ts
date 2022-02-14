@@ -15,7 +15,13 @@ export class ProfileService {
   }
 
   public async find(client: ClientUser, specifier: Endpoint.ProfileSpecifier): Promise<Profile> {
-    const profile = await withConvertModelErrors.invoke(() => client.profiles.find(specifier));
+    const profile = await withConvertModelErrors.invoke(() => {
+      if (specifier.id) {
+        return client.profiles.find({ id: specifier.id });
+      } else if (specifier.index) {
+        return client.profiles.find({ index: specifier.index });
+      }
+    });
     if (!profile) throw new Endpoint.ProfileNotFoundError(specifier);
     return profile;
   }

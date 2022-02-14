@@ -1,77 +1,77 @@
 export type ProfileSpecifier = {
-  id?: string;
-  index?: number;
+  readonly id?: string;
+  readonly index?: number;
 };
 
 export type RequestSpecifier = {
-  id?: string;
-  index?: number;
+  readonly id?: string;
+  readonly index?: number;
 };
 
 export type UserSpecifier = {
-  id?: string;
-  discordId?: string;
+  readonly id?: string;
+  readonly discordId?: string;
 };
 
 export type RequestBody = {
-  index: number;
-  content: string;
-  applicant: UserBody;
-  target: UserBody;
+  readonly index: number;
+  readonly content: string;
+  readonly applicant: UserBody;
+  readonly target: UserBody;
 };
 
 export type ProfileBody = {
-  index: number;
-  content: string;
-  owner: UserBody;
-  author: UserBody;
+  readonly index: number;
+  readonly content: string;
+  readonly owner: UserBody;
+  readonly author: UserBody;
 };
 
 export type UserBody = {
-  id: string;
-  discordId: string;
-  enableMention: boolean;
+  readonly id: string;
+  readonly discordId: string;
+  readonly enableMention: boolean;
 };
 
 export type UserStatsBody = UserBody & {
-  ownedProfileCount: number;
-  selfProfileCount: number;
-  writtenProfileCount: number;
+  readonly ownedProfileCount: number;
+  readonly selfProfileCount: number;
+  readonly writtenProfileCount: number;
 };
 
 export type UserConfigParams = {
-  enableMention?: boolean;
+  readonly enableMention?: boolean;
 };
 
 export type CreateRequestParams = {
-  target: UserSpecifier;
-  content: string;
+  readonly target: UserSpecifier;
+  readonly content: string;
 };
 
 export type RequestCondition = {
-  content?: string;
-  target?: UserSpecifier;
-  applicant?: UserSpecifier;
+  readonly content?: string;
+  readonly target?: UserSpecifier;
+  readonly applicant?: UserSpecifier;
 };
 
 export type SearchRequestParams = RequestCondition &
   ContentsIndex & {
-    status: "sent" | "received";
+    readonly status: "sent" | "received";
   };
 
 export type CreateProfileParams = {
-  content: string;
+  readonly content: string;
 };
 
 export type ProfileCondition = {
-  owner?: UserSpecifier;
-  author?: UserSpecifier;
-  content?: string;
+  readonly owner?: UserSpecifier;
+  readonly author?: UserSpecifier;
+  readonly content?: string;
 };
 
 export type ContentsIndex = {
-  order: "oldest" | "latest";
-  page: number;
+  readonly order: "oldest" | "latest";
+  readonly page: number;
 };
 
 export type SearchProfileParams = ProfileCondition & ContentsIndex;

@@ -1,5 +1,5 @@
-import { CommandOption } from "src/commands/format";
-import { Integer, String } from "src/option-types";
+import { CommandOption } from "./format";
+import { Integer, String } from "./option-types";
 
 export const pageOption: CommandOption = {
   type: Integer,

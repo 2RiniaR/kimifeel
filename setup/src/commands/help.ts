@@ -1,4 +1,4 @@
-import { Command } from "src/commands/format";
+import { Command } from "./format";
 
 export const helpCommand: Command = {
   name: "help",

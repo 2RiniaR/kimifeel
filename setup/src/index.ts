@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { commands } from "src/commands";
+import { commands } from "./commands";
 
 dotenv.config();
 const token = getEnvironmentVariable("DISCORD_TOKEN");

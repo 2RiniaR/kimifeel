@@ -1,16 +1,16 @@
 import { UserRepository } from "data-store";
-import { ClientUser } from "../structures";
-import { withConvertRepositoryErrors } from "../errors";
+import { ClientUser } from "./client-user";
+import { withConvertRepositoryErrors } from "./errors";
 
-export class ClientUserManager {
-  private readonly service = new ClientUserManagerService();
+export class ClientUserFinder {
+  private readonly service = new ClientUserFinderService();
 
   public async find(id: string): Promise<ClientUser | undefined> {
     return await this.service.find(id);
   }
 }
 
-export class ClientUserManagerService {
+class ClientUserFinderService {
   public async find(id: string): Promise<ClientUser | undefined> {
     const result = await withConvertRepositoryErrors.invoke(() => new UserRepository().find({ id }));
     if (!result) return;

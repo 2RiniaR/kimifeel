@@ -20,6 +20,8 @@ export class ProfileService {
         return client.profiles.find({ id: specifier.id });
       } else if (specifier.index) {
         return client.profiles.find({ index: specifier.index });
+      } else {
+        throw new Endpoint.ParameterStructureInvalidError();
       }
     });
     if (!profile) throw new Endpoint.ProfileNotFoundError(specifier);

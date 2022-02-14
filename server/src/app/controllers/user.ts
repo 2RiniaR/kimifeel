@@ -30,7 +30,15 @@ export class UserController implements Endpoint.UserEndpoint {
     const client = await new ClientUserService().getById(clientId);
     const userService = new UserService();
 
-    const users = await Promise.all(specifiers.map((specifier) => userService.find(client, specifier)));
+    const users = await withConvertModelErrors.invoke(() => {
+      const uniques: Parameters<typeof client.users.findMany>[0] = [];
+      for (const specifier of specifiers) {
+        if (specifier.id) uniques.push({ id: specifier.id });
+        else if (specifier.discordId) uniques.push({ discordId: specifier.discordId });
+        else throw new Endpoint.ParameterStructureInvalidError();
+      }
+      return client.users.findMany(uniques);
+    });
 
     return users.map((user) => userService.toBody(user));
   }

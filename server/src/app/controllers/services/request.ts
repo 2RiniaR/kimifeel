@@ -20,6 +20,8 @@ export class RequestService {
         return client.requests.find({ id: specifier.id });
       } else if (specifier.index) {
         return client.requests.find({ index: specifier.index });
+      } else {
+        throw new Endpoint.ParameterStructureInvalidError();
       }
     });
     if (!request) throw new Endpoint.RequestNotFoundError(specifier);

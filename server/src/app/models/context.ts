@@ -1,17 +1,9 @@
-import { ClientUser } from "./structures";
+import { ClientUser } from "./client-user";
 
-export class Context {
-  public readonly clientUser: ClientUser;
-
-  constructor(clientUser: ClientUser) {
-    this.clientUser = clientUser;
-  }
+export interface Context {
+  readonly clientUser: ClientUser;
 }
 
-export abstract class ContextModel {
-  public readonly context: Context;
-
-  public constructor(ctx: Context) {
-    this.context = ctx;
-  }
+export interface ContextModel {
+  readonly context: Context;
 }

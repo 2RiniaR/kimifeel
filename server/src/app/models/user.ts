@@ -1,5 +1,5 @@
 import { RawUser, UserRepository, RequestRepository, ProfileRepository } from "data-store";
-import { Context, ContextModel } from "../context";
+import { Context, ContextModel } from "./context";
 import { Request } from "./request";
 import {
   ForbiddenError,
@@ -7,7 +7,7 @@ import {
   NotFoundError,
   SubmitRequestOwnError,
   withConvertRepositoryErrors
-} from "../errors";
+} from "./errors";
 import { ImaginaryRequest } from "./imaginary-request";
 import { Profile } from "./profile";
 import { ImaginaryProfile } from "./imaginary-profile";
@@ -39,23 +39,20 @@ export type UserStats = {
   readonly selfProfileCount: number;
 };
 
-export class IdentityUser extends ContextModel implements UserIdentifier {
+export interface IdentityUser extends ContextModel, UserIdentifier {}
+
+export class User implements IdentityUser {
+  private readonly service = new UserService(this);
+  public readonly context: Context;
+
   public readonly id: string;
   public readonly discordId: string;
-
-  public constructor(ctx: Context, props: UserIdentifier) {
-    super(ctx);
-    this.id = props.id;
-    this.discordId = props.discordId;
-  }
-}
-
-export class User extends IdentityUser {
-  private readonly service = new UserService(this);
-  readonly enableMention: boolean;
+  public readonly enableMention: boolean;
 
   public constructor(ctx: Context, props: UserIdentifier & UserProps) {
-    super(ctx, props);
+    this.context = ctx;
+    this.id = props.id;
+    this.discordId = props.discordId;
     this.enableMention = props.enableMention;
   }
 
@@ -114,11 +111,12 @@ export class User extends IdentityUser {
   }
 }
 
-class UserService extends ContextModel {
+class UserService implements ContextModel {
+  public readonly context: Context;
   private readonly user: User;
 
   public constructor(user: User) {
-    super(user.context);
+    this.context = user.context;
     this.user = user;
   }
 

@@ -1,7 +1,7 @@
 import { RawRequest, RequestRepository } from "data-store";
-import { Context, ContextModel } from "../context";
+import { Context, ContextModel } from "./context";
 import { ImaginaryProfile } from "./imaginary-profile";
-import { ForbiddenError, NotFoundError, withConvertRepositoryErrors } from "../errors";
+import { ForbiddenError, NotFoundError, withConvertRepositoryErrors } from "./errors";
 import { Profile } from "./profile";
 import { User } from "./user";
 
@@ -16,23 +16,18 @@ export type RequestProps = {
   readonly applicant: User;
 };
 
-export class IdentityRequest extends ContextModel {
+export class Request implements ContextModel {
+  private readonly service = new RequestService(this);
+  public readonly context: Context;
+
   public readonly id: string;
   public readonly index: number;
-
-  public constructor(ctx: Context, props: RequestIdentifier) {
-    super(ctx);
-    this.id = props.id;
-    this.index = props.index;
-  }
-}
-
-export class Request extends IdentityRequest {
-  private readonly service = new RequestService(this);
   public readonly profile: ImaginaryProfile;
 
   public constructor(ctx: Context, props: RequestIdentifier & RequestProps) {
-    super(ctx, props);
+    this.context = ctx;
+    this.id = props.id;
+    this.index = props.index;
     this.profile = new ImaginaryProfile(ctx, {
       author: props.applicant,
       owner: props.target,
@@ -81,11 +76,12 @@ export class Request extends IdentityRequest {
   }
 }
 
-class RequestService extends ContextModel {
+class RequestService implements ContextModel {
+  public readonly context: Context;
   private readonly request: Request;
 
   public constructor(request: Request) {
-    super(request.context);
+    this.context = request.context;
     this.request = request;
   }
 

@@ -28,6 +28,8 @@ export class ContentLengthLimitError extends Error {
 
 export class SentRequestOwnError extends Error {}
 
+export class ParameterStructureInvalidError extends Error {}
+
 export class ParameterFormatInvalidError<T> extends Error {
   public constructor(public readonly key: keyof T, public readonly format: string) {
     super();

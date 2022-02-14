@@ -1,10 +1,16 @@
 import { UserRepository, UserUniqueField } from "data-store";
-import { User } from "../structures";
-import { ContextModel } from "../context";
-import { withConvertRepositoryErrors } from "../errors";
+import { User } from "./user";
+import { Context, ContextModel } from "./context";
+import { withConvertRepositoryErrors } from "./errors";
 
-export class UserManager extends ContextModel {
-  private readonly service = new UserManagerService(this.context);
+export class UserFinder implements ContextModel {
+  private readonly service: UserFinderService;
+  public readonly context: Context;
+
+  public constructor(context: Context) {
+    this.context = context;
+    this.service = new UserFinderService(this.context);
+  }
 
   public async find(unique: UserUniqueField): Promise<User | undefined> {
     return await this.service.find(unique);
@@ -15,7 +21,13 @@ export class UserManager extends ContextModel {
   }
 }
 
-export class UserManagerService extends ContextModel {
+export class UserFinderService implements ContextModel {
+  public readonly context: Context;
+
+  public constructor(context: Context) {
+    this.context = context;
+  }
+
   public async find(unique: UserUniqueField): Promise<User | undefined> {
     const result = await withConvertRepositoryErrors.invoke(() => new UserRepository().find(unique));
     if (!result) return;

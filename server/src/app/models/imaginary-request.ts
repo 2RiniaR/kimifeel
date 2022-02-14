@@ -1,7 +1,7 @@
 import { RequestRepository } from "data-store";
-import { Context, ContextModel } from "../context";
+import { Context, ContextModel } from "./context";
 import { ImaginaryProfile } from "./imaginary-profile";
-import { withConvertRepositoryErrors } from "../errors";
+import { withConvertRepositoryErrors } from "./errors";
 import { User } from "./user";
 import { Request } from "./request";
 
@@ -11,12 +11,14 @@ export type CreateRequestProps = {
   readonly content: string;
 };
 
-export class ImaginaryRequest extends ContextModel {
+export class ImaginaryRequest implements ContextModel {
   private readonly service = new ImaginaryRequestService(this);
+  public readonly context: Context;
+
   public readonly profile: ImaginaryProfile;
 
   constructor(ctx: Context, props: CreateRequestProps) {
-    super(ctx);
+    this.context = ctx;
     this.profile = new ImaginaryProfile(ctx, {
       author: props.applicant,
       owner: props.target,
@@ -29,11 +31,12 @@ export class ImaginaryRequest extends ContextModel {
   }
 }
 
-class ImaginaryRequestService extends ContextModel {
+class ImaginaryRequestService implements ContextModel {
+  public readonly context: Context;
   private readonly request: ImaginaryRequest;
 
   public constructor(request: ImaginaryRequest) {
-    super(request.context);
+    this.context = request.context;
     this.request = request;
   }
 

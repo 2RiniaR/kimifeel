@@ -1,6 +1,6 @@
 import { ProfileRepository } from "data-store";
-import { Context, ContextModel } from "../context";
-import { ContentLengthLimitError, withConvertRepositoryErrors } from "../errors";
+import { Context, ContextModel } from "./context";
+import { ContentLengthLimitError, withConvertRepositoryErrors } from "./errors";
 import { User } from "./user";
 import { Profile } from "./profile";
 
@@ -10,8 +10,10 @@ export type CreateProfileProps = {
   readonly content: string;
 };
 
-export class ImaginaryProfile extends ContextModel {
+export class ImaginaryProfile implements ContextModel {
   private readonly service = new ImaginaryProfileService(this);
+  public readonly context: Context;
+
   public readonly owner: User;
   public readonly author: User;
   public readonly content: string;
@@ -19,7 +21,7 @@ export class ImaginaryProfile extends ContextModel {
   public static readonly MaxContentLength = 200;
 
   public constructor(ctx: Context, props: CreateProfileProps) {
-    super(ctx);
+    this.context = ctx;
     this.owner = props.owner;
     this.author = props.author;
     this.content = props.content;
@@ -44,11 +46,12 @@ export class ImaginaryProfile extends ContextModel {
   }
 }
 
-class ImaginaryProfileService extends ContextModel {
+class ImaginaryProfileService implements ContextModel {
+  public readonly context: Context;
   private readonly profile: ImaginaryProfile;
 
   public constructor(profile: ImaginaryProfile) {
-    super(profile.context);
+    this.context = profile.context;
     this.profile = profile;
   }
 

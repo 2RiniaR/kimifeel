@@ -1,6 +1,6 @@
 import { RawProfile, ProfileRepository } from "data-store";
-import { Context, ContextModel } from "../context";
-import { ForbiddenError, NotFoundError, withConvertRepositoryErrors } from "../errors";
+import { Context, ContextModel } from "./context";
+import { ForbiddenError, NotFoundError, withConvertRepositoryErrors } from "./errors";
 import { User } from "./user";
 
 export type ProfileIdentifier = {
@@ -14,25 +14,22 @@ export type ProfileProps = {
   readonly author: User;
 };
 
-export class IdentityProfile extends ContextModel implements ProfileIdentifier {
+export interface IdentityProfile extends ContextModel, ProfileIdentifier {}
+
+export class Profile implements IdentityProfile {
+  private readonly service = new ProfileService(this);
+  public readonly context: Context;
+
   public readonly id: string;
   public readonly index: number;
-
-  public constructor(ctx: Context, props: ProfileIdentifier) {
-    super(ctx);
-    this.id = props.id;
-    this.index = props.index;
-  }
-}
-
-export class Profile extends IdentityProfile {
-  private readonly service = new ProfileService(this);
   public readonly content: string;
   public readonly owner: User;
   public readonly author: User;
 
   public constructor(ctx: Context, props: ProfileIdentifier & ProfileProps) {
-    super(ctx, props);
+    this.context = ctx;
+    this.id = props.id;
+    this.index = props.index;
     this.content = props.content;
     this.owner = props.owner;
     this.author = props.author;
@@ -64,11 +61,12 @@ export class Profile extends IdentityProfile {
   }
 }
 
-class ProfileService extends ContextModel {
+class ProfileService implements ContextModel {
+  public readonly context: Context;
   private readonly profile: Profile;
 
   public constructor(profile: Profile) {
-    super(profile.context);
+    this.context = profile.context;
     this.profile = profile;
   }
 

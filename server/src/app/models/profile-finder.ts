@@ -1,7 +1,8 @@
 import { ProfileRepository, ProfileUniqueField } from "data-store";
-import { ContextModel } from "../context";
-import { IdentityUser, Profile } from "../structures";
-import { InvalidParameterError, withConvertRepositoryErrors } from "../errors";
+import { Context, ContextModel } from "./context";
+import { InvalidParameterError, withConvertRepositoryErrors } from "./errors";
+import { IdentityUser } from "./user";
+import { Profile } from "./profile";
 
 export type SearchOptions = {
   readonly order: "latest" | "oldest";
@@ -19,8 +20,14 @@ export type RandomOptions = {
   readonly owner?: IdentityUser;
 };
 
-export class ProfileManager extends ContextModel {
-  private readonly service = new ProfileManagerService(this.context);
+export class ProfileFinder implements ContextModel {
+  private readonly service: ProfileFinderService;
+  public readonly context: Context;
+
+  public constructor(context: Context) {
+    this.context = context;
+    this.service = new ProfileFinderService(context);
+  }
 
   public async find(unique: ProfileUniqueField): Promise<Profile | undefined> {
     return await this.service.find(unique);
@@ -44,7 +51,13 @@ export class ProfileManager extends ContextModel {
   }
 }
 
-export class ProfileManagerService extends ContextModel {
+class ProfileFinderService implements ContextModel {
+  public readonly context: Context;
+
+  public constructor(context: Context) {
+    this.context = context;
+  }
+
   public async find(unique: ProfileUniqueField): Promise<Profile | undefined> {
     const result = await withConvertRepositoryErrors.invoke(() => new ProfileRepository().find(unique));
     if (!result) return;

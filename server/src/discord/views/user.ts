@@ -3,7 +3,7 @@ import { DiscordUser, DiscordUserIdentity, DiscordUserStats, SystemMessage } fro
 import { UserMessageGenerator } from "../actions";
 
 export class UserMessageGeneratorImpl implements UserMessageGenerator {
-  configured(user: DiscordUser): SystemMessage {
+  public configured(user: DiscordUser): SystemMessage {
     return {
       type: "user",
       title: "ユーザー",
@@ -11,7 +11,7 @@ export class UserMessageGeneratorImpl implements UserMessageGenerator {
     };
   }
 
-  registered(user: DiscordUserIdentity): SystemMessage {
+  public registered(user: DiscordUserIdentity): SystemMessage {
     return {
       type: "succeed",
       title: "ユーザーが登録されました！",
@@ -19,7 +19,7 @@ export class UserMessageGeneratorImpl implements UserMessageGenerator {
     };
   }
 
-  stats(stats: DiscordUserStats): SystemMessage {
+  public stats(stats: DiscordUserStats): SystemMessage {
     return {
       type: "user",
       title: "ユーザー",

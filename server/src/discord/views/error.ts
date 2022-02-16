@@ -4,14 +4,15 @@ import { ErrorMessageGenerator } from "../actions";
 import { code } from "./format";
 
 export class ErrorMessageGeneratorImpl implements ErrorMessageGenerator {
-  unavailable(): SystemMessage {
+  public unavailable(): SystemMessage {
     return {
       type: "error",
       title: "現在サービスは利用できません"
     };
   }
 
-  unknown(error: unknown): SystemMessage {
+  public unknown(error: unknown): SystemMessage {
+    console.error(error);
     const code = error instanceof Error ? error.name : "unknown";
     return {
       type: "error",
@@ -25,7 +26,7 @@ export class ErrorMessageGeneratorImpl implements ErrorMessageGenerator {
     };
   }
 
-  commandArgumentUnexpected(expected: number, actual: number): SystemMessage {
+  public commandArgumentUnexpected(expected: number, actual: number): SystemMessage {
     return {
       type: "invalid",
       title: "引数の個数が不正です",
@@ -33,7 +34,7 @@ export class ErrorMessageGeneratorImpl implements ErrorMessageGenerator {
     };
   }
 
-  commandOptionUnexpected(names: readonly string[]): SystemMessage {
+  public commandOptionUnexpected(names: readonly string[]): SystemMessage {
     return {
       type: "invalid",
       title: "不明なオプションが入力されています",
@@ -41,7 +42,14 @@ export class ErrorMessageGeneratorImpl implements ErrorMessageGenerator {
     };
   }
 
-  contentLengthLimited(min: number, max: number, actual: number): SystemMessage {
+  public commandParseFailed(): SystemMessage {
+    return {
+      type: "invalid",
+      title: "コマンドの文法が不正です"
+    };
+  }
+
+  public contentLengthLimited(min: number, max: number, actual: number): SystemMessage {
     return {
       type: "invalid",
       title: "内容が長すぎます",
@@ -49,7 +57,7 @@ export class ErrorMessageGeneratorImpl implements ErrorMessageGenerator {
     };
   }
 
-  invalidFormat(position: string, format: string): SystemMessage {
+  public invalidFormat(position: string, format: string): SystemMessage {
     return {
       type: "invalid",
       title: "パラメータの形式が不正です",
@@ -57,38 +65,44 @@ export class ErrorMessageGeneratorImpl implements ErrorMessageGenerator {
     };
   }
 
-  profileNotFound(profile: ProfileIdentity): SystemMessage {
+  public profileNotFound(profile?: ProfileIdentity): SystemMessage {
     return {
       type: "failed",
       title: "プロフィールが見つかりませんでした",
-      message: `${new ProfileIdentityView(profile).call()} は存在しない、もしくは削除された可能性があります。`
+      message: `${
+        profile !== undefined ? new ProfileIdentityView(profile).call() : "指定したプロフィール"
+      } は存在しない、もしくは削除された可能性があります。`
     };
   }
 
-  requestNotFound(request: RequestIdentity): SystemMessage {
+  public requestNotFound(request?: RequestIdentity): SystemMessage {
     return {
       type: "failed",
       title: "リクエストが見つかりませんでした",
-      message: `${new RequestIdentityView(request).call()} は存在しない、もしくは削除された可能性があります。`
+      message: `${
+        request !== undefined ? new RequestIdentityView(request).call() : "指定したリクエスト"
+      } は存在しない、もしくは削除された可能性があります。`
     };
   }
 
-  sentRequestOwn(): SystemMessage {
+  public sentRequestOwn(): SystemMessage {
     return {
-      type: "failed",
-      title: "リクエストが見つかりませんでした"
+      type: "invalid",
+      title: "自分自身にリクエストを送信することはできません"
     };
   }
 
-  userNotFound(user: DiscordUserIdentity): SystemMessage {
+  public userNotFound(user?: DiscordUserIdentity): SystemMessage {
     return {
       type: "failed",
       title: "ユーザーが見つかりませんでした",
-      message: `${new UserIdentityView(user).mention()} は存在しない、もしくは削除された可能性があります。`
+      message: `${
+        user !== undefined ? new UserIdentityView(user).mention() : "指定したユーザー"
+      } は存在しない、もしくは削除された可能性があります。`
     };
   }
 
-  userAlreadyRegistered(user: DiscordUserIdentity): SystemMessage {
+  public userAlreadyRegistered(user: DiscordUserIdentity): SystemMessage {
     return {
       type: "failed",
       title: "ユーザー登録に失敗しました",
@@ -96,7 +110,7 @@ export class ErrorMessageGeneratorImpl implements ErrorMessageGenerator {
     };
   }
 
-  userRegisterRequired(): SystemMessage {
+  public userRegisterRequired(): SystemMessage {
     return {
       type: "info",
       title: "ユーザーが登録されていません",

@@ -5,10 +5,8 @@ import { withConvertRepositoryErrors } from "./errors";
 
 export class UserFinder implements ContextModel {
   private readonly service: UserFinderService;
-  public readonly context: Context;
 
-  public constructor(context: Context) {
-    this.context = context;
+  public constructor(public readonly context: Context) {
     this.service = new UserFinderService(this.context);
   }
 
@@ -22,20 +20,16 @@ export class UserFinder implements ContextModel {
 }
 
 export class UserFinderService implements ContextModel {
-  public readonly context: Context;
-
-  public constructor(context: Context) {
-    this.context = context;
-  }
+  public constructor(public readonly context: Context) {}
 
   public async find(unique: UserUniqueField): Promise<User | undefined> {
-    const result = await withConvertRepositoryErrors.invoke(() => new UserRepository().find(unique));
-    if (!result) return;
+    const result = await withConvertRepositoryErrors.invokeAsync(() => new UserRepository().find(unique));
+    if (result === undefined) return;
     return User.fromRaw(this.context, result);
   }
 
   public async findMany(uniques: UserUniqueField[]): Promise<User[]> {
-    const results = await withConvertRepositoryErrors.invoke(() => new UserRepository().findMany(uniques));
+    const results = await withConvertRepositoryErrors.invokeAsync(() => new UserRepository().findMany(uniques));
     return results.map((result) => User.fromRaw(this.context, result));
   }
 }

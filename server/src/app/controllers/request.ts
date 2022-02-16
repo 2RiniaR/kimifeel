@@ -4,14 +4,14 @@ import { ClientUserService, ProfileService, RequestService, UserService } from "
 import { withConvertModelErrors } from "./errors";
 
 export class RequestController implements Endpoint.RequestEndpoint {
-  async accept(clientId: string, specifier: Endpoint.RequestSpecifier): Promise<Endpoint.ProfileBody> {
+  public async accept(clientId: string, specifier: Endpoint.RequestSpecifier): Promise<Endpoint.ProfileBody> {
     const client = await new ClientUserService().getById(clientId);
 
     const profile = await withConvertModelErrors
       .guard((error) => {
         if (error instanceof ForbiddenError) throw new Endpoint.RequestNotFoundError(specifier);
       })
-      .invoke(async () => {
+      .invokeAsync(async () => {
         const request = await new RequestService().find(client, specifier);
         return await request.accept();
       });
@@ -19,7 +19,7 @@ export class RequestController implements Endpoint.RequestEndpoint {
     return new ProfileService().toBody(profile);
   }
 
-  async cancel(clientId: string, specifier: Endpoint.RequestSpecifier): Promise<Endpoint.RequestBody> {
+  public async cancel(clientId: string, specifier: Endpoint.RequestSpecifier): Promise<Endpoint.RequestBody> {
     const client = await new ClientUserService().getById(clientId);
     const requestService = new RequestService();
 
@@ -27,7 +27,7 @@ export class RequestController implements Endpoint.RequestEndpoint {
       .guard((error) => {
         if (error instanceof ForbiddenError) throw new Endpoint.RequestNotFoundError(specifier);
       })
-      .invoke(async () => {
+      .invokeAsync(async () => {
         const request = await new RequestService().find(client, specifier);
         return await request.cancel();
       });
@@ -35,7 +35,7 @@ export class RequestController implements Endpoint.RequestEndpoint {
     return requestService.toBody(request);
   }
 
-  async create(clientId: string, params: Endpoint.CreateRequestParams): Promise<Endpoint.RequestBody> {
+  public async create(clientId: string, params: Endpoint.CreateRequestParams): Promise<Endpoint.RequestBody> {
     const client = await new ClientUserService().getById(clientId);
 
     const request = await withConvertModelErrors
@@ -45,7 +45,7 @@ export class RequestController implements Endpoint.RequestEndpoint {
         }
         if (error instanceof SubmitRequestOwnError) throw new Endpoint.SentRequestOwnError();
       })
-      .invoke(async () => {
+      .invokeAsync(async () => {
         const target = await new UserService().find(client, params.target);
         return await target.submitRequest(params.content);
       });
@@ -53,7 +53,7 @@ export class RequestController implements Endpoint.RequestEndpoint {
     return new RequestService().toBody(request);
   }
 
-  async deny(clientId: string, specifier: Endpoint.RequestSpecifier): Promise<Endpoint.RequestBody> {
+  public async deny(clientId: string, specifier: Endpoint.RequestSpecifier): Promise<Endpoint.RequestBody> {
     const client = await new ClientUserService().getById(clientId);
     const requestService = new RequestService();
 
@@ -61,7 +61,7 @@ export class RequestController implements Endpoint.RequestEndpoint {
       .guard((error) => {
         if (error instanceof ForbiddenError) throw new Endpoint.RequestNotFoundError(specifier);
       })
-      .invoke(async () => {
+      .invokeAsync(async () => {
         const request = await new RequestService().find(client, specifier);
         return await request.deny();
       });
@@ -69,14 +69,14 @@ export class RequestController implements Endpoint.RequestEndpoint {
     return requestService.toBody(request);
   }
 
-  async find(clientId: string, specifier: Endpoint.RequestSpecifier): Promise<Endpoint.RequestBody> {
+  public async find(clientId: string, specifier: Endpoint.RequestSpecifier): Promise<Endpoint.RequestBody> {
     const client = await new ClientUserService().getById(clientId);
     const requestService = new RequestService();
-    const request = await withConvertModelErrors.invoke(() => requestService.find(client, specifier));
+    const request = await withConvertModelErrors.invokeAsync(() => requestService.find(client, specifier));
     return requestService.toBody(request);
   }
 
-  async search(clientId: string, params: Endpoint.SearchRequestParams): Promise<Endpoint.RequestBody[]> {
+  public async search(clientId: string, params: Endpoint.SearchRequestParams): Promise<Endpoint.RequestBody[]> {
     const resultPerPage = 5;
     const client = await new ClientUserService().getById(clientId);
 
@@ -87,15 +87,15 @@ export class RequestController implements Endpoint.RequestEndpoint {
           throw new Endpoint.ParameterFormatInvalidError<Endpoint.SearchRequestParams>("page", ">= 1");
         }
       })
-      .invoke(async () =>
+      .invokeAsync(async () =>
         client.asUser().searchRequests({
           order: params.order,
           start: (params.page - 1) * resultPerPage,
           count: resultPerPage,
           content: params.content,
           status: params.status,
-          target: params.target ? await userService.find(client, params.target) : undefined,
-          applicant: params.applicant ? await userService.find(client, params.applicant) : undefined
+          target: params.target !== undefined ? await userService.find(client, params.target) : undefined,
+          applicant: params.applicant !== undefined ? await userService.find(client, params.applicant) : undefined
         })
       );
 

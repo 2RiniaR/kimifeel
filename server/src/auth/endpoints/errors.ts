@@ -11,4 +11,8 @@ export class UserAlreadyRegisteredError extends Error {
   }
 }
 
-export class UnavailableError extends Error {}
+export class UnavailableError extends Error {
+  public constructor() {
+    super();
+  }
+}

@@ -47,7 +47,8 @@ export class DiscordBuilder {
       profile: new ProfileAction(this.endpoints.auth, this.endpoints.profile, messages.profile, errorAction),
       request: new RequestAction(this.endpoints.auth, this.endpoints.request, messages.request, errorAction),
       user: new UserAction(this.endpoints.auth, this.endpoints.user, messages.user, errorAction),
-      help: new HelpAction(messages.help)
+      help: new HelpAction(messages.help),
+      error: errorAction
     };
 
     new AddReactionActionRouter(events.addReaction, actions).register();

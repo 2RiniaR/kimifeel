@@ -3,7 +3,7 @@ import { Profile, SystemMessage } from "../structures";
 import { ProfileMessageGenerator } from "../actions";
 
 export class ProfileMessageGeneratorImpl implements ProfileMessageGenerator {
-  created(profile: Profile): SystemMessage {
+  public created(profile: Profile): SystemMessage {
     return {
       type: "succeed",
       title: "プロフィールを作成しました！",
@@ -11,7 +11,7 @@ export class ProfileMessageGeneratorImpl implements ProfileMessageGenerator {
     };
   }
 
-  deleted(profile: Profile): SystemMessage {
+  public deleted(profile: Profile): SystemMessage {
     return {
       type: "deleted",
       title: "プロフィールを削除しました",
@@ -19,7 +19,7 @@ export class ProfileMessageGeneratorImpl implements ProfileMessageGenerator {
     };
   }
 
-  list(profiles: Profile[]): SystemMessage {
+  public list(profiles: Profile[]): SystemMessage {
     let message;
     if (profiles.length > 0) {
       message = profiles.map((profile) => new ProfileView(profile).detail()).join("\n\n");

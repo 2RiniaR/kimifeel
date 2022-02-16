@@ -2,7 +2,7 @@ import { SystemMessage } from "../structures";
 import { HelpMessageGenerator } from "../actions";
 
 export class HelpMessageGeneratorImpl implements HelpMessageGenerator {
-  show(): SystemMessage {
+  public show(): SystemMessage {
     return new HelpMessage();
   }
 }
@@ -12,7 +12,7 @@ export class HelpMessage implements SystemMessage {
   public readonly title = "「キミフィール」ヘルプ";
   public readonly message;
 
-  constructor() {
+  public constructor() {
     this.message = [
       "他の人に自分のプロフィールを書いてもらえるサービスです。",
       "",

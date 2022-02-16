@@ -21,7 +21,7 @@ export function toRequest(body: RequestBody): Request {
 }
 
 export function toUserIdentity(body: ClientBody): DiscordUserIdentity {
-  return { id: body.clientId };
+  return { id: body.discordId };
 }
 
 export function toUserStats(body: UserStatsBody): DiscordUserStats {

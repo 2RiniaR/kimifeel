@@ -22,9 +22,8 @@ export type RandomOptions = {
 
 export class ProfileFinder implements ContextModel {
   private readonly service: ProfileFinderService;
-  public readonly context: Context;
 
-  public constructor(context: Context) {
+  public constructor(public readonly context: Context) {
     this.context = context;
     this.service = new ProfileFinderService(context);
   }
@@ -52,20 +51,16 @@ export class ProfileFinder implements ContextModel {
 }
 
 class ProfileFinderService implements ContextModel {
-  public readonly context: Context;
-
-  public constructor(context: Context) {
-    this.context = context;
-  }
+  public constructor(public readonly context: Context) {}
 
   public async find(unique: ProfileUniqueField): Promise<Profile | undefined> {
-    const result = await withConvertRepositoryErrors.invoke(() => new ProfileRepository().find(unique));
-    if (!result) return;
+    const result = await withConvertRepositoryErrors.invokeAsync(() => new ProfileRepository().find(unique));
+    if (result === undefined) return;
     return Profile.fromRaw(this.context, result);
   }
 
   public async search(options: SearchOptions): Promise<Profile[]> {
-    const results = await withConvertRepositoryErrors.invoke(() =>
+    const results = await withConvertRepositoryErrors.invokeAsync(() =>
       new ProfileRepository().search({
         order: options.order,
         start: options.start,
@@ -79,7 +74,7 @@ class ProfileFinderService implements ContextModel {
   }
 
   public async random(options: RandomOptions): Promise<Profile[]> {
-    const results = await withConvertRepositoryErrors.invoke(() =>
+    const results = await withConvertRepositoryErrors.invokeAsync(() =>
       new ProfileRepository().getRandom({
         count: options.count,
         authorUserId: options.author?.id,

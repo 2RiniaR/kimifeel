@@ -53,12 +53,12 @@ export class RequestAction {
   ) {}
 
   public async accept(communicator: Communicator<AcceptRequestProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.requestEndpoint.accept(clientId, { index: props.index })
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.requestEndpoint.accept(id, { index: props.index })
       );
 
       const profile = toProfile(result);
@@ -68,12 +68,12 @@ export class RequestAction {
   }
 
   public async cancel(communicator: Communicator<CancelRequestProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.requestEndpoint.cancel(clientId, { index: props.index })
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.requestEndpoint.cancel(id, { index: props.index })
       );
 
       const request = toRequest(result);
@@ -83,27 +83,27 @@ export class RequestAction {
   }
 
   public async deny(communicator: Communicator<DenyRequestProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.requestEndpoint.deny(clientId, { index: props.index })
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.requestEndpoint.deny(id, { index: props.index })
       );
 
       const request = toRequest(result);
       const replyMessage = this.messageGenerator.denied(request);
-      await communicator.reply(replyMessage);
+      await communicator.reply(replyMessage, { mentions: [request.applicant, request.target], showOnlySender: true });
     });
   }
 
   public async send(communicator: Communicator<SendRequestProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.requestEndpoint.create(clientId, {
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.requestEndpoint.create(id, {
           target: { discordId: props.targetId },
           content: props.content
         })
@@ -111,22 +111,25 @@ export class RequestAction {
 
       const request = toRequest(result);
       const replyMessage = this.messageGenerator.sent(request);
-      await communicator.reply(replyMessage, { reactions: ["✅", "⛔", "❌"] });
+      await communicator.reply(replyMessage, {
+        mentions: [request.applicant, request.target],
+        reactions: ["✅", "⛔", "❌"]
+      });
     });
   }
 
   public async search(communicator: Communicator<SearchRequestProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.requestEndpoint.search(clientId, {
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.requestEndpoint.search(id, {
           status: props.status,
           order: props.order,
           page: props.page,
-          target: { discordId: props.targetId },
-          applicant: { discordId: props.applicantId },
+          target: props.targetId !== undefined ? { discordId: props.targetId } : undefined,
+          applicant: props.applicantId !== undefined ? { discordId: props.applicantId } : undefined,
           content: props.content
         })
       );
@@ -138,12 +141,12 @@ export class RequestAction {
   }
 
   public async show(communicator: Communicator<ShowRequestProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.requestEndpoint.find(clientId, { index: props.index })
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.requestEndpoint.find(id, { index: props.index })
       );
 
       const request = toRequest(result);

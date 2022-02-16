@@ -18,17 +18,15 @@ export type RequestProps = {
 
 export class Request implements ContextModel {
   private readonly service = new RequestService(this);
-  public readonly context: Context;
 
   public readonly id: string;
   public readonly index: number;
   public readonly profile: ImaginaryProfile;
 
-  public constructor(ctx: Context, props: RequestIdentifier & RequestProps) {
-    this.context = ctx;
+  public constructor(public readonly context: Context, props: RequestIdentifier & RequestProps) {
     this.id = props.id;
     this.index = props.index;
-    this.profile = new ImaginaryProfile(ctx, {
+    this.profile = new ImaginaryProfile(context, {
       author: props.applicant,
       owner: props.target,
       content: props.content
@@ -36,24 +34,18 @@ export class Request implements ContextModel {
   }
 
   public async accept(): Promise<Profile> {
-    if (this.context.clientUser.id !== this.profile.owner.id) {
-      throw new ForbiddenError("Can not accept the requests because you are not the reviewer.");
-    }
+    if (this.context.clientUser.id !== this.profile.owner.id) throw new ForbiddenError();
     await this.service.delete();
     return await this.profile.create();
   }
 
   public async deny(): Promise<Request> {
-    if (this.context.clientUser.id !== this.profile.owner.id) {
-      throw new ForbiddenError("Can not deny the requests because you are not the reviewer.");
-    }
+    if (this.context.clientUser.id !== this.profile.owner.id) throw new ForbiddenError();
     return await this.service.delete();
   }
 
   public async cancel(): Promise<Request> {
-    if (this.context.clientUser.id !== this.profile.author.id) {
-      throw new ForbiddenError("Can not cancel the requests because you are not the requester.");
-    }
+    if (this.context.clientUser.id !== this.profile.author.id) throw new ForbiddenError();
     return await this.service.delete();
   }
 
@@ -78,18 +70,16 @@ export class Request implements ContextModel {
 
 class RequestService implements ContextModel {
   public readonly context: Context;
-  private readonly request: Request;
 
-  public constructor(request: Request) {
+  public constructor(private readonly request: Request) {
     this.context = request.context;
-    this.request = request;
   }
 
   public async delete(): Promise<Request> {
-    const result = await withConvertRepositoryErrors.invoke(() =>
+    const result = await withConvertRepositoryErrors.invokeAsync(() =>
       new RequestRepository().delete({ id: this.request.id })
     );
-    if (!result) throw new NotFoundError();
+    if (result === undefined) throw new NotFoundError();
     return Request.fromRaw(this.context, result);
   }
 }

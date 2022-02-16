@@ -2,13 +2,13 @@ import { CommandInteraction, Interaction } from "discord.js";
 import { ClientImpl, SlashCommandImpl } from "../structures";
 import { SlashCommandTrigger, SlashCommandTriggerHandler, SlashCommandTriggerOptions } from "../../routers";
 
-type Registration = {
+type TriggerRegistration = {
   handler: SlashCommandTriggerHandler;
   options: SlashCommandTriggerOptions;
 };
 
 export class SlashCommandEventProvider implements SlashCommandTrigger {
-  private readonly registrations: Registration[] = [];
+  private readonly triggerRegistrations: TriggerRegistration[] = [];
 
   constructor(client: ClientImpl) {
     client.onInteractionCreated(async (interaction) => {
@@ -21,7 +21,7 @@ export class SlashCommandEventProvider implements SlashCommandTrigger {
   }
 
   public onTrigger(handler: SlashCommandTriggerHandler, options: SlashCommandTriggerOptions) {
-    this.registrations.push({ handler, options });
+    this.triggerRegistrations.push({ handler, options });
   }
 
   private async onInteractionCreated(interaction: Interaction) {
@@ -31,15 +31,17 @@ export class SlashCommandEventProvider implements SlashCommandTrigger {
   }
 
   private async onCommandCreated(command: CommandInteraction) {
-    let registrations = this.registrations.filter((registration) => this.checkBot(command, registration.options));
+    let registrations = this.triggerRegistrations.filter((registration) =>
+      this.checkBot(command, registration.options.allowBot)
+    );
     registrations = registrations.filter((registration) => this.checkCommandName(command, registration.options));
 
     const slashCommand = new SlashCommandImpl(command);
     await Promise.all(registrations.map(async (registration) => await registration.handler(slashCommand)));
   }
 
-  private checkBot(interaction: Interaction, options: SlashCommandTriggerOptions) {
-    return options.allowBot || !interaction.user.bot;
+  private checkBot(interaction: Interaction, allowBot: boolean) {
+    return !interaction.user.bot || allowBot;
   }
 
   private checkCommandName(interaction: CommandInteraction, options: SlashCommandTriggerOptions) {

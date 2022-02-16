@@ -15,16 +15,16 @@ export class RequestService {
   }
 
   public async find(client: ClientUser, specifier: Endpoint.RequestSpecifier): Promise<Request> {
-    const request = await withConvertModelErrors.invoke(() => {
-      if (specifier.id) {
+    const request = await withConvertModelErrors.invokeAsync(() => {
+      if (specifier.id !== undefined) {
         return client.requests.find({ id: specifier.id });
-      } else if (specifier.index) {
+      } else if (specifier.index !== undefined) {
         return client.requests.find({ index: specifier.index });
       } else {
         throw new Endpoint.ParameterStructureInvalidError();
       }
     });
-    if (!request) throw new Endpoint.RequestNotFoundError(specifier);
+    if (request === undefined) throw new Endpoint.RequestNotFoundError(specifier);
     return request;
   }
 }

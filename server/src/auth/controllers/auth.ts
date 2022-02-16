@@ -9,27 +9,36 @@ export class AuthController implements Endpoint.AuthEndpoint {
       .guard((error) => {
         if (error instanceof UserAlreadyRegisteredError) throw new Endpoint.UserAlreadyRegisteredError(params);
       })
-      .invoke(() => discordUser.register());
-    return { clientId: user.id };
+      .invokeAsync(() => discordUser.register());
+    return new AuthControllerService().toBody(user);
   }
 
   public async unregister(params: Endpoint.AuthParams): Promise<Endpoint.ClientBody> {
-    const user = await new AuthControllerService().getAuthorizedUser(params);
-    await withConvertModelErrors.invoke(() => user.unregister());
-    return { clientId: user.id };
+    const service = new AuthControllerService();
+    const user = await service.getAuthorizedUser(params);
+    await withConvertModelErrors.invokeAsync(() => user.unregister());
+    return service.toBody(user);
   }
 
   public async authorize(params: Endpoint.AuthParams): Promise<Endpoint.ClientBody> {
-    const user = await new AuthControllerService().getAuthorizedUser(params);
-    return { clientId: user.id };
+    const service = new AuthControllerService();
+    const user = await withConvertModelErrors.invokeAsync(() => service.getAuthorizedUser(params));
+    return service.toBody(user);
   }
 }
 
 class AuthControllerService {
   public async getAuthorizedUser(params: Endpoint.AuthParams): Promise<AuthorizedUser> {
     const discordUser = new DiscordUser(params.discordId);
-    const user = await withConvertModelErrors.invoke(() => discordUser.authorize());
-    if (!user) throw new Endpoint.UserNotFoundError(params);
+    const user = await withConvertModelErrors.invokeAsync(() => discordUser.authorize());
+    if (user === undefined) throw new Endpoint.UserNotFoundError(params);
     return user;
+  }
+
+  public toBody(user: AuthorizedUser): Endpoint.ClientBody {
+    return {
+      id: user.id,
+      discordId: user.discordId
+    };
   }
 }

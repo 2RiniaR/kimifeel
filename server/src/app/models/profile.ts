@@ -18,7 +18,6 @@ export interface IdentityProfile extends ContextModel, ProfileIdentifier {}
 
 export class Profile implements IdentityProfile {
   private readonly service = new ProfileService(this);
-  public readonly context: Context;
 
   public readonly id: string;
   public readonly index: number;
@@ -26,8 +25,7 @@ export class Profile implements IdentityProfile {
   public readonly owner: User;
   public readonly author: User;
 
-  public constructor(ctx: Context, props: ProfileIdentifier & ProfileProps) {
-    this.context = ctx;
+  public constructor(public readonly context: Context, props: ProfileIdentifier & ProfileProps) {
     this.id = props.id;
     this.index = props.index;
     this.content = props.content;
@@ -63,18 +61,16 @@ export class Profile implements IdentityProfile {
 
 class ProfileService implements ContextModel {
   public readonly context: Context;
-  private readonly profile: Profile;
 
-  public constructor(profile: Profile) {
+  public constructor(private readonly profile: Profile) {
     this.context = profile.context;
-    this.profile = profile;
   }
 
   public async delete(): Promise<Profile> {
-    const result = await withConvertRepositoryErrors.invoke(() =>
+    const result = await withConvertRepositoryErrors.invokeAsync(() =>
       new ProfileRepository().delete({ id: this.profile.id })
     );
-    if (!result) throw new NotFoundError();
+    if (result === undefined) throw new NotFoundError();
     return Profile.fromRaw(this.context, result);
   }
 }

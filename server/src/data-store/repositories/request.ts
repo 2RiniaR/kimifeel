@@ -42,7 +42,7 @@ function toUniqueCondition(field: RequestUniqueField): RequestUniqueCondition {
 
 export class RequestRepository {
   async find(unique: RequestUniqueField): Promise<RawRequest | undefined> {
-    const result = await withConvertPrismaErrors.invoke(async () =>
+    const result = await withConvertPrismaErrors.invokeAsync(async () =>
       prisma.request.findUnique({
         where: toUniqueCondition(unique),
         include: { applicantUser: true, targetUser: true }
@@ -52,7 +52,7 @@ export class RequestRepository {
   }
 
   async search({ order, start, count, content, targetUserId, applicantUserId }: SearchProps): Promise<RawRequest[]> {
-    return withConvertPrismaErrors.invoke(async () =>
+    return withConvertPrismaErrors.invokeAsync(async () =>
       prisma.request.findMany({
         where: { targetUserId, applicantUserId, content: { contains: content } },
         orderBy: { createdAt: order === "latest" ? "desc" : "asc" },
@@ -64,7 +64,7 @@ export class RequestRepository {
   }
 
   async create({ applicantUserId, targetUserId, content }: CreateProps): Promise<RawRequest> {
-    return withConvertPrismaErrors.invoke(async () =>
+    return withConvertPrismaErrors.invokeAsync(async () =>
       prisma.request.create({
         data: { applicantUserId, targetUserId, content },
         include: { applicantUser: true, targetUser: true }
@@ -73,7 +73,7 @@ export class RequestRepository {
   }
 
   async delete(unique: RequestUniqueField): Promise<RawRequest | undefined> {
-    return withConvertPrismaErrors.invoke(async () => {
+    return withConvertPrismaErrors.invokeAsync(async () => {
       try {
         return prisma.request.delete({
           where: toUniqueCondition(unique),

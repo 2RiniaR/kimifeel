@@ -3,9 +3,9 @@ import { ClientUserService, UserService } from "./services";
 import { withConvertModelErrors } from "./errors";
 
 export class UserController implements Endpoint.UserEndpoint {
-  async config(clientId: string, params: Endpoint.UserConfigParams): Promise<Endpoint.UserBody> {
+  public async config(clientId: string, params: Endpoint.UserConfigParams): Promise<Endpoint.UserBody> {
     const client = await new ClientUserService().getById(clientId);
-    const user = await withConvertModelErrors.invoke(() =>
+    const user = await withConvertModelErrors.invokeAsync(() =>
       client.asUser().updateConfig({
         enableMention: params.enableMention
       })
@@ -13,12 +13,12 @@ export class UserController implements Endpoint.UserEndpoint {
     return new UserService().toBody(user);
   }
 
-  async getStats(clientId: string, specifier: Endpoint.UserSpecifier): Promise<Endpoint.UserStatsBody> {
+  public async getStats(clientId: string, specifier: Endpoint.UserSpecifier): Promise<Endpoint.UserStatsBody> {
     const client = await new ClientUserService().getById(clientId);
     const userService = new UserService();
 
     const user = await userService.find(client, specifier);
-    const stats = await withConvertModelErrors.invoke(() => user.getStats());
+    const stats = await withConvertModelErrors.invokeAsync(() => user.getStats());
 
     return {
       ...userService.toBody(user),
@@ -26,15 +26,15 @@ export class UserController implements Endpoint.UserEndpoint {
     };
   }
 
-  async findMany(clientId: string, specifiers: Endpoint.UserSpecifier[]): Promise<Endpoint.UserBody[]> {
+  public async findMany(clientId: string, specifiers: Endpoint.UserSpecifier[]): Promise<Endpoint.UserBody[]> {
     const client = await new ClientUserService().getById(clientId);
     const userService = new UserService();
 
-    const users = await withConvertModelErrors.invoke(() => {
+    const users = await withConvertModelErrors.invokeAsync(() => {
       const uniques: Parameters<typeof client.users.findMany>[0] = [];
       for (const specifier of specifiers) {
-        if (specifier.id) uniques.push({ id: specifier.id });
-        else if (specifier.discordId) uniques.push({ discordId: specifier.discordId });
+        if (specifier.id !== undefined) uniques.push({ id: specifier.id });
+        else if (specifier.discordId !== undefined) uniques.push({ discordId: specifier.discordId });
         else throw new Endpoint.ParameterStructureInvalidError();
       }
       return client.users.findMany(uniques);

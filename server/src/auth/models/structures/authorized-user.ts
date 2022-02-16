@@ -4,10 +4,10 @@ import { NotFoundError, withConvertRepositoryErrors } from "../errors";
 export class AuthorizedUser {
   private readonly service = new AuthorizedUserService(this);
 
-  constructor(public readonly id: string) {}
+  public constructor(public readonly id: string, public readonly discordId: string) {}
 
   public static fromRaw(result: RawUser): AuthorizedUser {
-    return new AuthorizedUser(result.id);
+    return new AuthorizedUser(result.id, result.discordId);
   }
 
   public async unregister(): Promise<AuthorizedUser> {
@@ -19,8 +19,10 @@ class AuthorizedUserService {
   public constructor(private readonly user: AuthorizedUser) {}
 
   public async unregister(): Promise<AuthorizedUser> {
-    const result = await withConvertRepositoryErrors.invoke(() => new UserRepository().delete({ id: this.user.id }));
-    if (!result) throw new NotFoundError();
+    const result = await withConvertRepositoryErrors.invokeAsync(() =>
+      new UserRepository().delete({ id: this.user.id })
+    );
+    if (result === undefined) throw new NotFoundError();
     return AuthorizedUser.fromRaw(result);
   }
 }

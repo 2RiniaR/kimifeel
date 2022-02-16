@@ -30,14 +30,14 @@ function toUniqueCondition(field: UserUniqueField): UserUniqueCondition {
 
 export class UserRepository {
   async find(unique: UserUniqueField): Promise<RawUser | undefined> {
-    const result = await withConvertPrismaErrors.invoke(() =>
+    const result = await withConvertPrismaErrors.invokeAsync(() =>
       prisma.user.findUnique({ where: toUniqueCondition(unique) })
     );
     return result ?? undefined;
   }
 
   async update(id: string, { enableMention }: UpdateProps): Promise<RawUser | undefined> {
-    return await withConvertPrismaErrors.invoke(() => {
+    return await withConvertPrismaErrors.invokeAsync(() => {
       try {
         return prisma.user.update({
           where: { id },
@@ -58,7 +58,7 @@ export class UserRepository {
       else discordIdEntries.push(unique.discordId);
     }
 
-    const result = await withConvertPrismaErrors.invoke(() =>
+    const result = await withConvertPrismaErrors.invokeAsync(() =>
       prisma.user.findMany({
         where: { OR: [{ id: { in: idEntries } }, { discordId: { in: discordIdEntries } }] }
       })
@@ -73,11 +73,11 @@ export class UserRepository {
           throw new DiscordIdDuplicatedError();
         }
       })
-      .invoke(() => prisma.user.create({ data: { discordId } }));
+      .invokeAsync(() => prisma.user.create({ data: { discordId } }));
   }
 
   async delete(unique: UserUniqueField): Promise<RawUser | undefined> {
-    return withConvertPrismaErrors.invoke(async () => {
+    return withConvertPrismaErrors.invokeAsync(async () => {
       try {
         return prisma.user.delete({ where: toUniqueCondition(unique) });
       } catch (error) {

@@ -28,9 +28,17 @@ export class ProfileContentLengthLimitError extends Error {
   }
 }
 
-export class SentRequestOwnError extends Error {}
+export class SentRequestOwnError extends Error {
+  public constructor() {
+    super();
+  }
+}
 
-export class UnavailableError extends Error {}
+export class UnavailableError extends Error {
+  public constructor() {
+    super();
+  }
+}
 
 export class InvalidFormatError extends Error {
   public constructor(public readonly position: string, public readonly format: string) {
@@ -56,4 +64,14 @@ export class CommandOptionUnexpectedError extends Error {
   }
 }
 
-export class ReadMessageFailedError extends Error {}
+export class CommandParseFailedError extends Error {
+  public constructor() {
+    super();
+  }
+}
+
+export class ReadMessageFailedError extends Error {
+  public constructor() {
+    super();
+  }
+}

@@ -12,8 +12,8 @@ export class ClientUserFinder {
 
 class ClientUserFinderService {
   public async find(id: string): Promise<ClientUser | undefined> {
-    const result = await withConvertRepositoryErrors.invoke(() => new UserRepository().find({ id }));
-    if (!result) return;
+    const result = await withConvertRepositoryErrors.invokeAsync(() => new UserRepository().find({ id }));
+    if (result === undefined) return;
     return ClientUser.fromQuery(result);
   }
 }

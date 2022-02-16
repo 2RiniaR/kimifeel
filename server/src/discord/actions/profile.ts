@@ -47,44 +47,44 @@ export class ProfileAction {
   ) {}
 
   public async create(communicator: Communicator<CreateProfileProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.profileEndpoint.create(clientId, { content: props.content })
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.profileEndpoint.create(id, { content: props.content })
       );
 
       const profile = toProfile(result);
       const replyMessage = this.messageGenerator.created(profile);
-      await communicator.reply(replyMessage, { mentions: [profile.owner, profile.author] });
+      await communicator.reply(replyMessage, { mentions: [profile.owner] });
     });
   }
 
   public async delete(communicator: Communicator<DeleteProfileProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.profileEndpoint.delete(clientId, { index: props.index })
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.profileEndpoint.delete(id, { index: props.index })
       );
 
       const profile = toProfile(result);
       const replyMessage = this.messageGenerator.deleted(profile);
-      await communicator.reply(replyMessage);
+      await communicator.reply(replyMessage, { mentions: [profile.owner], showOnlySender: true });
     });
   }
 
   public async random(communicator: Communicator<RandomProfileProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.profileEndpoint.random(clientId, {
-          owner: { discordId: props.ownerId },
-          author: { discordId: props.authorId },
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.profileEndpoint.random(id, {
+          owner: props.ownerId !== undefined ? { discordId: props.ownerId } : undefined,
+          author: props.authorId !== undefined ? { discordId: props.authorId } : undefined,
           content: props.content
         })
       );
@@ -96,14 +96,14 @@ export class ProfileAction {
   }
 
   public async search(communicator: Communicator<SearchProfileProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.profileEndpoint.search(clientId, {
-          owner: { discordId: props.ownerId },
-          author: { discordId: props.authorId },
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.profileEndpoint.search(id, {
+          owner: props.ownerId !== undefined ? { discordId: props.ownerId } : undefined,
+          author: props.authorId !== undefined ? { discordId: props.authorId } : undefined,
           content: props.content,
           page: props.page,
           order: props.order
@@ -117,12 +117,12 @@ export class ProfileAction {
   }
 
   public async show(communicator: Communicator<ShowProfileProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.profileEndpoint.find(clientId, { index: props.index })
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.profileEndpoint.find(id, { index: props.index })
       );
       const profile = toProfile(result);
 

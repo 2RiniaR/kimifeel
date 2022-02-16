@@ -1,16 +1,17 @@
 import { MessageReaction as RawMessageReaction, PartialUser, User } from "discord.js";
 import { AddReactionTrigger, AddReactionTriggerHandler, AddReactionTriggerOptions } from "../../routers";
-import { ReactionImpl, MessageImpl, ClientImpl } from "../structures";
+import { MessageImpl, ClientImpl } from "../structures";
 import { fetchMessage } from "../fetch";
+import { Reaction } from "../../structures";
 
-type Registration = {
+type TriggerRegistration = {
   handler: AddReactionTriggerHandler;
   options: AddReactionTriggerOptions;
 };
 
 export class AddReactionEventProvider implements AddReactionTrigger {
   private readonly client: ClientImpl;
-  private readonly registrations: Registration[] = [];
+  private readonly triggerRegistrations: TriggerRegistration[] = [];
 
   constructor(client: ClientImpl) {
     this.client = client;
@@ -24,19 +25,19 @@ export class AddReactionEventProvider implements AddReactionTrigger {
   }
 
   public onTrigger(handler: AddReactionTriggerHandler, options: AddReactionTriggerOptions) {
-    this.registrations.push({ handler, options });
+    this.triggerRegistrations.push({ handler, options });
   }
 
   private async onReactionAdded(rawReaction: RawMessageReaction, user: User) {
-    const registrations = this.registrations.filter(
+    const registrations = this.triggerRegistrations.filter(
       (registrations) =>
         this.checkMessageAuthor(rawReaction, registrations.options) &&
         this.checkReactionEmoji(rawReaction, registrations.options) &&
-        this.checkBot(user, registrations.options)
+        this.checkBot(user, registrations.options.allowBot)
     );
 
     const message = new MessageImpl(await fetchMessage(rawReaction.message));
-    const reaction = new ReactionImpl(message);
+    const reaction: Reaction = { message, reactedUser: { id: user.id } };
     await Promise.all(registrations.map(async (registrations) => await registrations.handler(reaction)));
   }
 
@@ -51,7 +52,7 @@ export class AddReactionEventProvider implements AddReactionTrigger {
     return options.emojis.includes(reaction.emoji.toString());
   }
 
-  private checkBot(user: User | PartialUser, options: AddReactionTriggerOptions): boolean {
-    return options.allowBot || !user.bot;
+  private checkBot(user: User | PartialUser, allowBot: boolean): boolean {
+    return !user.bot || allowBot;
   }
 }

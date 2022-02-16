@@ -12,7 +12,6 @@ export type CreateProfileProps = {
 
 export class ImaginaryProfile implements ContextModel {
   private readonly service = new ImaginaryProfileService(this);
-  public readonly context: Context;
 
   public readonly owner: User;
   public readonly author: User;
@@ -20,8 +19,7 @@ export class ImaginaryProfile implements ContextModel {
   public static readonly MinContentLength = 1;
   public static readonly MaxContentLength = 200;
 
-  public constructor(ctx: Context, props: CreateProfileProps) {
-    this.context = ctx;
+  public constructor(public readonly context: Context, props: CreateProfileProps) {
     this.owner = props.owner;
     this.author = props.author;
     this.content = props.content;
@@ -48,15 +46,13 @@ export class ImaginaryProfile implements ContextModel {
 
 class ImaginaryProfileService implements ContextModel {
   public readonly context: Context;
-  private readonly profile: ImaginaryProfile;
 
-  public constructor(profile: ImaginaryProfile) {
+  public constructor(private readonly profile: ImaginaryProfile) {
     this.context = profile.context;
-    this.profile = profile;
   }
 
   public async create() {
-    const result = await withConvertRepositoryErrors.invoke(() =>
+    const result = await withConvertRepositoryErrors.invokeAsync(() =>
       new ProfileRepository().create({
         ownerUserId: this.profile.owner.id,
         authorUserId: this.profile.author.id,

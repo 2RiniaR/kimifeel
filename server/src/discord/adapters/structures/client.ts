@@ -14,7 +14,7 @@ export class ClientImpl {
   public constructor(private readonly tokenProvider: DiscordTokenProvider) {
     this.tokenProvider = tokenProvider;
     this.raw.on("ready", () => {
-      if (!this.raw.user) return;
+      if (this.raw.user === null) return;
       console.log(`Logged in as ${this.raw.user.tag}!`);
     });
   }

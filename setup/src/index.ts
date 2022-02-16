@@ -12,7 +12,7 @@ const rest = new REST({ version: "9" }).setToken(token);
 
 function getEnvironmentVariable(name: string): string {
   const value = process.env[name];
-  if (!value) return "";
+  if (value === undefined) return "";
   return value;
 }
 

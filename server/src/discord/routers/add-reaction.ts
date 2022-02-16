@@ -20,7 +20,7 @@ export interface AddReactionTrigger {
 }
 
 export class AddReactionActionRouter {
-  constructor(
+  public constructor(
     private readonly trigger: AddReactionTrigger,
     private readonly actions: {
       request: RequestAction;

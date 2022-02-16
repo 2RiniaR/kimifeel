@@ -1,12 +1,10 @@
 import { DiscordIdDuplicatedError, UserRepository } from "data-store";
-import { DiscordIdFormatError, UserAlreadyRegisteredError, withConvertRepositoryErrors } from "../errors";
+import { UserAlreadyRegisteredError, withConvertRepositoryErrors } from "../errors";
 import { AuthorizedUser } from "./authorized-user";
 
 export type CreateUserProps = {
   readonly discordId: string;
 };
-
-const snowflakeRegex = /^(\d+)$/;
 
 export class ImaginaryAuthorizedUser {
   private readonly service = new ImaginaryDiscordUserService(this);
@@ -14,12 +12,6 @@ export class ImaginaryAuthorizedUser {
 
   public constructor({ discordId }: CreateUserProps) {
     this.discordId = discordId;
-    this.checkDiscordIdFormat();
-  }
-
-  private checkDiscordIdFormat() {
-    const match = this.discordId.match(snowflakeRegex);
-    if (!match) throw new DiscordIdFormatError();
   }
 
   public async create() {
@@ -35,7 +27,7 @@ class ImaginaryDiscordUserService {
       .guard((error) => {
         if (error instanceof DiscordIdDuplicatedError) throw new UserAlreadyRegisteredError();
       })
-      .invoke(() => new UserRepository().create({ discordId: this.user.discordId }));
+      .invokeAsync(() => new UserRepository().create({ discordId: this.user.discordId }));
     return AuthorizedUser.fromRaw(result);
   }
 }

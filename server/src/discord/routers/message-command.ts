@@ -1,5 +1,5 @@
-import { ProfileAction, RequestAction, UserAction, HelpAction } from "../actions";
-import { MessageCommand } from "../structures";
+import { ProfileAction, RequestAction, UserAction, HelpAction, ErrorAction } from "../actions";
+import { CommandParseFailedError, Message, MessageCommand } from "../structures";
 import {
   AcceptRequestCommunicator,
   DenyRequestCommunicator,
@@ -18,32 +18,49 @@ import {
   HelpCommunicator
 } from "../communicators/message-command";
 import { runAction } from "./base";
+import { ParseFailedCommunicator } from "../communicators/message-command/parse-failed";
 
 export type MessageCommandTriggerOptions = {
   readonly prefixes: readonly string[];
   readonly allowBot: boolean;
 };
 
-export type MessageCommandTriggerHandler = (reaction: MessageCommand) => PromiseLike<void>;
+export type MessageCommandParseFailedOptions = {
+  readonly allowBot: boolean;
+};
+
+export type MessageCommandTriggerHandler = (command: MessageCommand) => PromiseLike<void>;
+export type MessageCommandParseFailedHandler = (message: Message) => PromiseLike<void>;
 
 export interface MessageCommandTrigger {
   onTrigger(handler: MessageCommandTriggerHandler, options: MessageCommandTriggerOptions): void;
+  onParseFailed(handler: MessageCommandParseFailedHandler, options: MessageCommandParseFailedOptions): void;
 }
 
 const basePhrase = "!kimi";
 
 export class MessageCommandActionRouter {
-  constructor(
+  public constructor(
     private readonly trigger: MessageCommandTrigger,
     private readonly actions: {
       profile: ProfileAction;
       request: RequestAction;
       user: UserAction;
       help: HelpAction;
+      error: ErrorAction;
     }
   ) {}
 
   public register() {
+    // ここの対応方法が汚いのどうにかしたかった...
+    this.trigger.onParseFailed(
+      (message) =>
+        this.actions.error
+          .withErrorResponses(new ParseFailedCommunicator(message))
+          .invokeAsync(() => Promise.reject(new CommandParseFailedError())),
+      { allowBot: false }
+    );
+
     this.trigger.onTrigger(
       runAction(HelpCommunicator, (c) => this.actions.help.show(c)),
       {

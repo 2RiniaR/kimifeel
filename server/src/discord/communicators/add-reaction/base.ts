@@ -7,10 +7,11 @@ export abstract class ReactionCommunicator<T = void> implements Communicator<T> 
   public abstract getProps(): T;
 
   public getSender(): DiscordUserIdentity {
-    return this.reaction.message.author;
+    return this.reaction.reactedUser;
   }
 
-  public reply(message: SystemMessage, options: ReplyOptions = {}) {
-    return this.reaction.message.reply(message, options);
+  public async reply(message: SystemMessage, options: ReplyOptions = {}) {
+    if (options.showOnlyActive) return;
+    await this.reaction.message.reply(message, options);
   }
 }

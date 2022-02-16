@@ -12,7 +12,7 @@ export class MessageImpl implements Message {
 
   public async reply(message: SystemMessage, options: MessageReplyOptions): Promise<void> {
     const card = await this.raw.reply({
-      content: options.mentions ? new UsersMention(options.mentions).getContent() : undefined,
+      content: options.mentions !== undefined ? new UsersMention(options.mentions).getContent() : undefined,
       embeds: [new SystemMessageCreator(message).create()]
     });
 

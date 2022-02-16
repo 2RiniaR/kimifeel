@@ -1,6 +1,10 @@
 import { ProfileSpecifier, RequestSpecifier, UserSpecifier } from "./structures";
 
-export class ClientUserNotExistError extends Error {}
+export class ClientUserNotExistError extends Error {
+  public constructor() {
+    super();
+  }
+}
 
 export class ProfileNotFoundError extends Error {
   public constructor(public readonly specifier: ProfileSpecifier) {
@@ -26,9 +30,17 @@ export class ContentLengthLimitError extends Error {
   }
 }
 
-export class SentRequestOwnError extends Error {}
+export class SentRequestOwnError extends Error {
+  public constructor() {
+    super();
+  }
+}
 
-export class ParameterStructureInvalidError extends Error {}
+export class ParameterStructureInvalidError extends Error {
+  public constructor() {
+    super();
+  }
+}
 
 export class ParameterFormatInvalidError<T> extends Error {
   public constructor(public readonly key: keyof T, public readonly format: string) {
@@ -36,4 +48,8 @@ export class ParameterFormatInvalidError<T> extends Error {
   }
 }
 
-export class UnavailableError extends Error {}
+export class UnavailableError extends Error {
+  public constructor() {
+    super();
+  }
+}

@@ -56,7 +56,7 @@ function toUniqueCondition(field: ProfileUniqueField): ProfileUniqueCondition {
 
 export class ProfileRepository {
   async find(unique: ProfileUniqueField): Promise<RawProfile | undefined> {
-    const result = await withConvertPrismaErrors.invoke(async () =>
+    const result = await withConvertPrismaErrors.invokeAsync(async () =>
       prisma.profile.findUnique({
         where: toUniqueCondition(unique),
         include: { authorUser: true, ownerUser: true }
@@ -66,7 +66,7 @@ export class ProfileRepository {
   }
 
   async search({ order, start, count, ownerUserId, authorUserId, content }: SearchProps): Promise<RawProfile[]> {
-    return withConvertPrismaErrors.invoke(async () =>
+    return withConvertPrismaErrors.invokeAsync(async () =>
       prisma.profile.findMany({
         where: { ownerUserId, authorUserId, content: { contains: content } },
         orderBy: { createdAt: order === "latest" ? "desc" : "asc" },
@@ -78,7 +78,7 @@ export class ProfileRepository {
   }
 
   async getRandom({ count, ownerUserId, authorUserId, content }: RandomProps): Promise<RawProfile[]> {
-    const resultsId = await withConvertPrismaErrors.invoke(async () =>
+    const resultsId = await withConvertPrismaErrors.invokeAsync(async () =>
       prisma.profile.findMany({
         select: { id: true },
         where: { ownerUserId, authorUserId, content: { contains: content } }
@@ -86,7 +86,7 @@ export class ProfileRepository {
     );
 
     const selectsId = getRandomIntegerArray(0, resultsId.length, count).map((v) => resultsId[v].id);
-    return withConvertPrismaErrors.invoke(async () =>
+    return withConvertPrismaErrors.invokeAsync(async () =>
       prisma.profile.findMany({
         where: { id: { in: selectsId } },
         include: { authorUser: true, ownerUser: true }
@@ -95,11 +95,13 @@ export class ProfileRepository {
   }
 
   async count({ authorUserId, ownerUserId }: CountCondition): Promise<number> {
-    return withConvertPrismaErrors.invoke(async () => prisma.profile.count({ where: { authorUserId, ownerUserId } }));
+    return withConvertPrismaErrors.invokeAsync(async () =>
+      prisma.profile.count({ where: { authorUserId, ownerUserId } })
+    );
   }
 
   async create({ ownerUserId, authorUserId, content }: CreateProps): Promise<RawProfile> {
-    return withConvertPrismaErrors.invoke(async () =>
+    return withConvertPrismaErrors.invokeAsync(async () =>
       prisma.profile.create({
         data: { ownerUserId, authorUserId, content },
         include: { authorUser: true, ownerUser: true }
@@ -108,7 +110,7 @@ export class ProfileRepository {
   }
 
   async delete(unique: ProfileUniqueField): Promise<RawProfile | undefined> {
-    return withConvertPrismaErrors.invoke(async () => {
+    return withConvertPrismaErrors.invokeAsync(async () => {
       try {
         return prisma.profile.delete({
           where: toUniqueCondition(unique),

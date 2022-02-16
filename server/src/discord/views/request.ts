@@ -3,7 +3,7 @@ import { Profile, Request, RequestIdentity, SystemMessage, SystemMessageRead } f
 import { RequestMessageGenerator } from "../actions";
 
 export class RequestMessageGeneratorImpl implements RequestMessageGenerator {
-  accepted(profile: Profile): SystemMessage {
+  public accepted(profile: Profile): SystemMessage {
     return {
       type: "succeed",
       title: "リクエストが承認されました！",
@@ -11,7 +11,7 @@ export class RequestMessageGeneratorImpl implements RequestMessageGenerator {
     };
   }
 
-  canceled(request: Request): SystemMessage {
+  public canceled(request: Request): SystemMessage {
     return {
       type: "failed",
       title: "リクエストがキャンセルされました",
@@ -19,7 +19,7 @@ export class RequestMessageGeneratorImpl implements RequestMessageGenerator {
     };
   }
 
-  denied(request: Request): SystemMessage {
+  public denied(request: Request): SystemMessage {
     return {
       type: "failed",
       title: "リクエストが拒否されました",
@@ -27,7 +27,7 @@ export class RequestMessageGeneratorImpl implements RequestMessageGenerator {
     };
   }
 
-  list(requests: Request[]): SystemMessage {
+  public list(requests: Request[]): SystemMessage {
     let message;
     if (requests.length > 0) {
       message = requests.map((request) => new RequestView(request).detail()).join("\n\n");
@@ -42,7 +42,7 @@ export class RequestMessageGeneratorImpl implements RequestMessageGenerator {
     };
   }
 
-  sent(request: Request): SystemMessage {
+  public sent(request: Request): SystemMessage {
     return new RequestSentMessage(request);
   }
 }
@@ -68,9 +68,9 @@ export class RequestSentMessage implements SystemMessage {
   }
 
   public static fromMessage(message: SystemMessageRead): RequestIdentity | undefined {
-    if (!message.fields) return;
+    if (message.fields === undefined) return;
     const indexField = message.fields.find((field) => field.name === RequestSentMessage.IndexFieldName);
-    if (!indexField) return;
+    if (indexField === undefined) return;
     return { index: parseInt(indexField.value) };
   }
 }

@@ -1,17 +1,28 @@
 import { Message as RawMessage } from "discord.js";
-import { fragmentCommand } from "command-parser";
-import { ClientImpl } from "../structures";
-import { FragmentLimitError } from "command-parser/fragment";
-import { MessageCommandTrigger, MessageCommandTriggerHandler, MessageCommandTriggerOptions } from "../../routers";
-import { MessageCommandImpl } from "../structures";
+import { ClientImpl, MessageImpl } from "../structures";
+import {
+  MessageCommandParseFailedHandler,
+  MessageCommandParseFailedOptions,
+  MessageCommandTrigger,
+  MessageCommandTriggerHandler,
+  MessageCommandTriggerOptions
+} from "../../routers";
+import { MessageCommand } from "../../structures";
+import { CommandFragments, CommandParser, FragmentLimitError, SyntaxError } from "command-parser";
 
-type Registration = {
+type TriggerRegistration = {
   handler: MessageCommandTriggerHandler;
   options: MessageCommandTriggerOptions;
 };
 
+type ParseFailedRegistration = {
+  handler: MessageCommandParseFailedHandler;
+  options: MessageCommandParseFailedOptions;
+};
+
 export class MessageCommandEventProvider implements MessageCommandTrigger {
-  private readonly registrations: Registration[] = [];
+  private readonly triggerRegistrations: TriggerRegistration[] = [];
+  private readonly parseFailedRegistrations: ParseFailedRegistration[] = [];
 
   constructor(client: ClientImpl) {
     client.onMessageCreated(async (message) => {
@@ -24,30 +35,45 @@ export class MessageCommandEventProvider implements MessageCommandTrigger {
   }
 
   public onTrigger(handler: MessageCommandTriggerHandler, options: MessageCommandTriggerOptions) {
-    this.registrations.push({ handler, options });
+    this.triggerRegistrations.push({ handler, options });
+  }
+
+  public onParseFailed(handler: MessageCommandParseFailedHandler, options: MessageCommandParseFailedOptions) {
+    this.parseFailedRegistrations.push({ handler, options });
   }
 
   private async onMessageCreated(rawMessage: RawMessage) {
-    const registrations = this.registrations.filter((registration) => this.checkBot(rawMessage, registration.options));
+    const registrations = this.triggerRegistrations.filter((registration) =>
+      this.checkBot(rawMessage, registration.options.allowBot)
+    );
 
     await Promise.all(
       registrations.map(async (registration) => {
-        let fragments;
+        let fragments: CommandFragments | undefined;
         try {
-          fragments = fragmentCommand(rawMessage.content, registration.options.prefixes);
+          fragments = new CommandParser(rawMessage.content, registration.options.prefixes).parse();
         } catch (error) {
-          if (error instanceof FragmentLimitError) return;
-          throw error;
+          if (error instanceof FragmentLimitError || error instanceof SyntaxError) {
+            await this.runParseFailedEvents(rawMessage);
+          }
+          return;
         }
-        if (!fragments) return;
 
-        const message = new MessageCommandImpl(rawMessage, fragments);
-        await registration.handler(message);
+        if (fragments === undefined) return;
+        const messageCommand: MessageCommand = { message: new MessageImpl(rawMessage), fragments };
+        await registration.handler(messageCommand);
       })
     );
   }
 
-  private checkBot(message: RawMessage, options: MessageCommandTriggerOptions): boolean {
-    return !message.author.bot || options.allowBot;
+  private async runParseFailedEvents(rawMessage: RawMessage) {
+    const registrations = this.parseFailedRegistrations.filter((registration) =>
+      this.checkBot(rawMessage, registration.options.allowBot)
+    );
+    await Promise.all(registrations.map(async (registration) => registration.handler(new MessageImpl(rawMessage))));
+  }
+
+  private checkBot(message: RawMessage, allowBot: boolean): boolean {
+    return !message.author.bot || allowBot;
   }
 }

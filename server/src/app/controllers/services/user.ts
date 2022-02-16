@@ -12,16 +12,16 @@ export class UserService {
   }
 
   public async find(client: ClientUser, specifier: Endpoint.UserSpecifier): Promise<User> {
-    const user = await withConvertModelErrors.invoke(() => {
-      if (specifier.id) {
+    const user = await withConvertModelErrors.invokeAsync(() => {
+      if (specifier.id !== undefined) {
         return client.users.find({ id: specifier.id });
-      } else if (specifier.discordId) {
+      } else if (specifier.discordId !== undefined) {
         return client.users.find({ discordId: specifier.discordId });
       } else {
         throw new Endpoint.ParameterStructureInvalidError();
       }
     });
-    if (!user) throw new Endpoint.UserNotFoundError(specifier);
+    if (user === undefined) throw new Endpoint.UserNotFoundError(specifier);
     return user;
   }
 }

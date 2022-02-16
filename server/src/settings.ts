@@ -11,7 +11,7 @@ export class SettingsManager implements DiscordTokenProvider {
 
   private static getEnvironmentVariable(name: string): string {
     const value = process.env[name];
-    if (!value) return "";
+    if (value === undefined) return "";
     return value;
   }
 }

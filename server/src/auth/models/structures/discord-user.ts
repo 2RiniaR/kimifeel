@@ -21,10 +21,10 @@ class DiscordUserService {
   constructor(private readonly user: DiscordUser) {}
 
   public async authorize(): Promise<AuthorizedUser | undefined> {
-    const result = await withConvertRepositoryErrors.invoke(() =>
+    const result = await withConvertRepositoryErrors.invokeAsync(() =>
       new UserRepository().find({ discordId: this.user.discordId })
     );
-    if (!result) return;
+    if (result === undefined) return;
     return AuthorizedUser.fromRaw(result);
   }
 

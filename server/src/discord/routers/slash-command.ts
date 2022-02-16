@@ -33,7 +33,7 @@ export interface SlashCommandTrigger {
 }
 
 export class SlashCommandActionRouter {
-  constructor(
+  public constructor(
     private readonly trigger: SlashCommandTrigger,
     private readonly actions: {
       profile: ProfileAction;

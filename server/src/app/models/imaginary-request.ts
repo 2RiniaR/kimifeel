@@ -13,13 +13,10 @@ export type CreateRequestProps = {
 
 export class ImaginaryRequest implements ContextModel {
   private readonly service = new ImaginaryRequestService(this);
-  public readonly context: Context;
-
   public readonly profile: ImaginaryProfile;
 
-  constructor(ctx: Context, props: CreateRequestProps) {
-    this.context = ctx;
-    this.profile = new ImaginaryProfile(ctx, {
+  public constructor(public readonly context: Context, props: CreateRequestProps) {
+    this.profile = new ImaginaryProfile(context, {
       author: props.applicant,
       owner: props.target,
       content: props.content
@@ -33,15 +30,13 @@ export class ImaginaryRequest implements ContextModel {
 
 class ImaginaryRequestService implements ContextModel {
   public readonly context: Context;
-  private readonly request: ImaginaryRequest;
 
-  public constructor(request: ImaginaryRequest) {
+  public constructor(private readonly request: ImaginaryRequest) {
     this.context = request.context;
-    this.request = request;
   }
 
   public async create() {
-    const result = await withConvertRepositoryErrors.invoke(() =>
+    const result = await withConvertRepositoryErrors.invokeAsync(() =>
       new RequestRepository().create({
         targetUserId: this.request.profile.owner.id,
         applicantUserId: this.request.profile.author.id,

@@ -7,7 +7,7 @@ export class AcceptRequestCommunicator extends ReactionCommunicator<AcceptReques
   getProps(): AcceptRequestProps {
     const systemMessage = this.reaction.message.readSystemMessage();
     const request = RequestSentMessage.fromMessage(systemMessage);
-    if (!request) throw new ReadMessageFailedError();
+    if (request === undefined) throw new ReadMessageFailedError();
     return { index: request.index };
   }
 }
@@ -16,7 +16,7 @@ export class CancelRequestCommunicator extends ReactionCommunicator<CancelReques
   getProps(): CancelRequestProps {
     const systemMessage = this.reaction.message.readSystemMessage();
     const request = RequestSentMessage.fromMessage(systemMessage);
-    if (!request) throw new ReadMessageFailedError();
+    if (request === undefined) throw new ReadMessageFailedError();
     return { index: request.index };
   }
 }
@@ -25,7 +25,7 @@ export class DenyRequestCommunicator extends ReactionCommunicator<DenyRequestPro
   getProps(): DenyRequestProps {
     const systemMessage = this.reaction.message.readSystemMessage();
     const request = RequestSentMessage.fromMessage(systemMessage);
-    if (!request) throw new ReadMessageFailedError();
+    if (request === undefined) throw new ReadMessageFailedError();
     return { index: request.index };
   }
 }

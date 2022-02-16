@@ -43,14 +43,12 @@ export interface IdentityUser extends ContextModel, UserIdentifier {}
 
 export class User implements IdentityUser {
   private readonly service = new UserService(this);
-  public readonly context: Context;
 
   public readonly id: string;
   public readonly discordId: string;
   public readonly enableMention: boolean;
 
-  public constructor(ctx: Context, props: UserIdentifier & UserProps) {
-    this.context = ctx;
+  public constructor(public readonly context: Context, props: UserIdentifier & UserProps) {
     this.id = props.id;
     this.discordId = props.discordId;
     this.enableMention = props.enableMention;
@@ -113,11 +111,9 @@ export class User implements IdentityUser {
 
 class UserService implements ContextModel {
   public readonly context: Context;
-  private readonly user: User;
 
-  public constructor(user: User) {
+  public constructor(private readonly user: User) {
     this.context = user.context;
-    this.user = user;
   }
 
   public async searchRequests(props: SearchRequestsProps): Promise<Request[]> {
@@ -136,7 +132,7 @@ class UserService implements ContextModel {
       applicantUserId = props.applicant?.id;
     }
 
-    const results = await withConvertRepositoryErrors.invoke(() =>
+    const results = await withConvertRepositoryErrors.invokeAsync(() =>
       new RequestRepository().search({
         order: props.order,
         start: props.start,
@@ -150,15 +146,15 @@ class UserService implements ContextModel {
   }
 
   public async updateConfig(props: Partial<ConfigProps>): Promise<User> {
-    const user = await withConvertRepositoryErrors.invoke(() => new UserRepository().update(this.user.id, props));
-    if (!user) throw new NotFoundError();
+    const user = await withConvertRepositoryErrors.invokeAsync(() => new UserRepository().update(this.user.id, props));
+    if (user === undefined) throw new NotFoundError();
     return User.fromRaw(this.context, user);
   }
 
   public async getStats(): Promise<UserStats> {
     const selfId = this.user.id;
     const profileRepository = new ProfileRepository();
-    return await withConvertRepositoryErrors.invoke(async () => ({
+    return await withConvertRepositoryErrors.invokeAsync(async () => ({
       ownedProfileCount: await profileRepository.count({ ownerUserId: selfId }),
       writtenProfileCount: await profileRepository.count({ authorUserId: selfId }),
       selfProfileCount: await profileRepository.count({ ownerUserId: selfId, authorUserId: selfId })

@@ -29,9 +29,10 @@ export class UserAction {
   ) {}
 
   public async register(communicator: Communicator) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
+      communicator.getProps();
       const senderId = communicator.getSender().id;
-      const result = await withConvertAuthErrors.invoke(() => this.authEndpoint.register({ discordId: senderId }));
+      const result = await withConvertAuthErrors.invokeAsync(() => this.authEndpoint.register({ discordId: senderId }));
 
       const user = toUserIdentity(result);
       const replyMessage = this.messageGenerator.registered(user);
@@ -40,29 +41,29 @@ export class UserAction {
   }
 
   public async config(communicator: Communicator<ConfigUserProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.userEndpoint.config(clientId, {
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.userEndpoint.config(id, {
           enableMention: props.enableMention
         })
       );
 
       const user = toUser(result);
       const replyMessage = this.messageGenerator.configured(user);
-      await communicator.reply(replyMessage, { showOnlySender: true });
+      await communicator.reply(replyMessage, { mentions: [user], showOnlySender: true });
     });
   }
 
   public async showStats(communicator: Communicator<ShowUserStatsProps>) {
-    await this.errorAction.withErrorResponses(communicator).invoke(async () => {
+    await this.errorAction.withErrorResponses(communicator).invokeAsync(async () => {
       const props = communicator.getProps();
 
-      const { clientId } = await authorize(this.authEndpoint, communicator);
-      const result = await withConvertAppErrors.invoke(() =>
-        this.userEndpoint.getStats(clientId, { discordId: props.userId })
+      const { id } = await authorize(this.authEndpoint, communicator);
+      const result = await withConvertAppErrors.invokeAsync(() =>
+        this.userEndpoint.getStats(id, { discordId: props.userId })
       );
 
       const stats = toUserStats(result);

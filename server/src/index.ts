@@ -1,5 +1,3 @@
-import "./helpers";
-import "./prisma";
-import "./build";
+import { startAppServer } from "./build";
 
-console.log("Kimifeel started!");
+startAppServer();

@@ -1,8 +1,19 @@
-import { CustomMessageEmbed } from "./base";
+import { SystemMessage } from "../structures";
+import { HelpMessageGenerator } from "../actions";
 
-export class HelpEmbed extends CustomMessageEmbed {
-  constructor() {
-    const message = [
+export class HelpMessageGeneratorImpl implements HelpMessageGenerator {
+  public show(): SystemMessage {
+    return new HelpMessage();
+  }
+}
+
+export class HelpMessage implements SystemMessage {
+  public readonly type = "info";
+  public readonly title = "「キミフィール」ヘルプ";
+  public readonly message;
+
+  public constructor() {
+    this.message = [
       "他の人に自分のプロフィールを書いてもらえるサービスです。",
       "",
       "▼ チュートリアル",
@@ -17,6 +28,5 @@ export class HelpEmbed extends CustomMessageEmbed {
       "▼ 制作者",
       "https://twitter.com/2RiniaR"
     ].join("\n");
-    super("info", "「キミフィール」ヘルプ", message);
   }
 }

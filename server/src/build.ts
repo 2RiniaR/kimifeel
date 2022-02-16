@@ -1,40 +1,19 @@
-import { ProfileController, RequestController, UserController } from "controllers";
-import { ProfileEndpoint, RequestEndpoint, UserEndpoint } from "endpoints";
-import { InteractionEventRunner, MessageEventRunner, ReactionEventRunner } from "discord/events";
-import { InteractionRouter, MessageRouter, ReactionRouter } from "discord/actions";
-import { ClientManager } from "./discord/client";
-import { SettingsManager } from "./settings";
+import { ProfileController, RequestController, UserController } from "app";
+import { AuthController } from "auth";
+import { SettingsManager } from "settings";
+import { DiscordBuilder } from "discord";
 
-const settings = new SettingsManager();
+export function startAppServer() {
+  const settings = new SettingsManager();
+  const endpoints = {
+    profile: new ProfileController(),
+    request: new RequestController(),
+    user: new UserController(),
+    auth: new AuthController()
+  };
+  const discord = new DiscordBuilder(settings, endpoints);
 
-const controllers = {
-  profile: new ProfileController(),
-  request: new RequestController(),
-  user: new UserController()
-} as const;
-
-const endpoints = {
-  profile: new ProfileEndpoint(controllers.profile),
-  request: new RequestEndpoint(controllers.request),
-  user: new UserEndpoint(controllers.user)
-} as const;
-
-const client = new ClientManager(settings);
-
-const events = {
-  reaction: new ReactionEventRunner(client),
-  interaction: new InteractionEventRunner(client),
-  message: new MessageEventRunner(client)
-} as const;
-
-const actions = {
-  reaction: new ReactionRouter(events.reaction, endpoints),
-  interaction: new InteractionRouter(events.interaction, endpoints),
-  message: new MessageRouter(events.message, endpoints)
-};
-actions.reaction.registerActions();
-actions.interaction.registerActions();
-actions.message.registerActions();
-
-settings.load();
-void client.initialize();
+  settings.load();
+  discord.initialize();
+  console.log("Kimifeel started!");
+}

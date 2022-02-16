@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { commands } from "src/commands";
+import { commands } from "./commands";
 
 dotenv.config();
 const token = getEnvironmentVariable("DISCORD_TOKEN");
@@ -12,7 +12,7 @@ const rest = new REST({ version: "9" }).setToken(token);
 
 function getEnvironmentVariable(name: string): string {
   const value = process.env[name];
-  if (!value) return "";
+  if (value === undefined) return "";
   return value;
 }
 

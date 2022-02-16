@@ -1,8 +1,7 @@
 import * as dotenv from "dotenv";
-import { DiscordTokenProvider } from "./discord/client";
+import { DiscordTokenProvider } from "./discord/adapters/structures";
 
 export class SettingsManager implements DiscordTokenProvider {
-  private _isLoaded = false;
   discordToken = "";
 
   public load() {
@@ -12,7 +11,7 @@ export class SettingsManager implements DiscordTokenProvider {
 
   private static getEnvironmentVariable(name: string): string {
     const value = process.env[name];
-    if (!value) return "";
+    if (value === undefined) return "";
     return value;
   }
 }
